@@ -2,4 +2,4 @@
 ~$*.docx
 
 # File temporanei draw.io
-.$*.drawio.bkp
+.$*.drawio*
