@@ -28,23 +28,23 @@ CREATE TABLE Asta (
 	Id_asta INT,
 	prezzo_inizio INT,
 	data_ora_inizio DATETIME,
-	data_ora_fine DATETIME,
+	durata TIME,
+	asta_automatica BOOLEAN,
+    	ip_multicast VARCHAR(255),
+ 	numero_riproposte INT,
+	descrizione_annullamento VARCHAR(255)
 	Rif_lotto INT,
 	PRIMARY KEY (Id_asta)
 	FOREIGN KEY (Rif_lotto) REFERENCES Lotto(Id_lotto),
-	CHECK (data_ora_fine > data_ora_inizio)
+	CHECK (durata > 0)
+   	CHECK (numero_riproposte > 0)
 );
 
 CREATE TABLE Lotto (
 	Id_lotto INT,
 	nome VARCHAR(255),
-	asta_automatica BOOLEAN,
-	durata_asta INT,
-	data_ora_inizio DATETIME,
- 	numero_riproposte INT,
-   	prezzo_base INT,
 	PRIMARY KEY (Id_lotto)
-   	CHECK (numero_riproposte > 0)
+
 );
 
 CREATE TABLE Articoli (
