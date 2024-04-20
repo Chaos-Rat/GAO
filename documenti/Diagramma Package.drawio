@@ -1,0 +1,34 @@
+<mxfile host="Electron" modified="2024-04-20T07:09:28.927Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.2.5 Chrome/120.0.6099.109 Electron/28.1.0 Safari/537.36" etag="0mRU2BT760bEgjyvbJio" version="24.2.5" type="device">
+  <diagram name="Page-1" id="b_zJH3Sg9wVDs8cVNdYo">
+    <mxGraphModel dx="1036" dy="606" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Dt2sfRQi0EiWRXjGA9YJ-3" value="aste" style="shape=folder;fontStyle=1;tabWidth=110;tabHeight=30;tabPosition=left;html=1;boundedLbl=1;labelInHeader=1;container=1;collapsible=0;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="280" y="220" width="420" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="Dt2sfRQi0EiWRXjGA9YJ-4" value="" style="html=1;strokeColor=none;resizeWidth=1;resizeHeight=1;fillColor=none;part=1;connectable=0;allowArrows=0;deletable=0;whiteSpace=wrap;" vertex="1" parent="Dt2sfRQi0EiWRXjGA9YJ-3">
+          <mxGeometry width="672" height="320" relative="1" as="geometry">
+            <mxPoint y="30" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Dt2sfRQi0EiWRXjGA9YJ-5" value="client" style="shape=folder;fontStyle=1;tabWidth=110;tabHeight=30;tabPosition=left;html=1;boundedLbl=1;labelInHeader=1;container=1;collapsible=0;whiteSpace=wrap;" vertex="1" parent="Dt2sfRQi0EiWRXjGA9YJ-3">
+          <mxGeometry x="30" y="53.33242424242424" width="140" height="53.33333333333334" as="geometry" />
+        </mxCell>
+        <mxCell id="Dt2sfRQi0EiWRXjGA9YJ-6" value="" style="html=1;strokeColor=none;resizeWidth=1;resizeHeight=1;fillColor=none;part=1;connectable=0;allowArrows=0;deletable=0;whiteSpace=wrap;" vertex="1" parent="Dt2sfRQi0EiWRXjGA9YJ-5">
+          <mxGeometry width="140" height="44.91228070175439" relative="1" as="geometry">
+            <mxPoint y="30" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Dt2sfRQi0EiWRXjGA9YJ-7" value="server" style="shape=folder;fontStyle=1;tabWidth=110;tabHeight=30;tabPosition=left;html=1;boundedLbl=1;labelInHeader=1;container=1;collapsible=0;whiteSpace=wrap;" vertex="1" parent="Dt2sfRQi0EiWRXjGA9YJ-3">
+          <mxGeometry x="250" y="53.33242424242424" width="140" height="53.33333333333334" as="geometry" />
+        </mxCell>
+        <mxCell id="Dt2sfRQi0EiWRXjGA9YJ-8" value="" style="html=1;strokeColor=none;resizeWidth=1;resizeHeight=1;fillColor=none;part=1;connectable=0;allowArrows=0;deletable=0;whiteSpace=wrap;" vertex="1" parent="Dt2sfRQi0EiWRXjGA9YJ-7">
+          <mxGeometry width="140" height="44.91228070175439" relative="1" as="geometry">
+            <mxPoint y="30" as="offset" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
