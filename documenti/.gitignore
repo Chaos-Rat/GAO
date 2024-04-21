@@ -3,3 +3,6 @@
 
 # File temporanei draw.io
 .$*.drawio*
+
+# png esportati da draw.io
+*.png
