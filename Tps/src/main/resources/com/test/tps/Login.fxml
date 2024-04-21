@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.test.tps.LoginController">
+   <children>
+      <Button fx:id="EnterB" contentDisplay="CENTER" layoutX="279.0" layoutY="185.0" mnemonicParsing="false" onMouseClicked="#Access" prefHeight="30.0" prefWidth="63.0" text="Enter" />
+      <TextField fx:id="UserField" layoutX="17.0" layoutY="159.0" prefHeight="26.0" prefWidth="189.0" promptText="Insert your username" />
+      <PasswordField fx:id="PassField" layoutX="17.0" layoutY="256.0" prefHeight="26.0" prefWidth="189.0" promptText="Please insert your password" />
+      <Text fx:id="Title" layoutX="14.0" layoutY="65.0" strokeType="OUTSIDE" strokeWidth="0.0" text="*INSERT AUCTION HOUSE NAME*" wrappingWidth="593.9830722808838">
+         <font>
+            <Font size="32.0" />
+         </font>
+      </Text>
+      <Text fx:id="UserText" layoutX="17.0" layoutY="143.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Username" />
+      <Text fx:id="PassText" layoutX="17.0" layoutY="247.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Password" wrappingWidth="60.45573043823242" />
+      <Button fx:id="RegisterB" contentDisplay="CENTER" layoutX="279.0" layoutY="227.0" mnemonicParsing="false" onMouseClicked="#Register" prefHeight="30.0" prefWidth="63.0" text="Register" />
+   </children>
+</AnchorPane>
