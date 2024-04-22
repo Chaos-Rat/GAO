@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="749.0" prefWidth="1075.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.test.tps.HomeController">
+   <children>
+      <BorderPane prefHeight="749.0" prefWidth="1075.0">
+         <left>
+            <VBox fx:id="vbox" prefHeight="689.0" prefWidth="112.0" style="-fx-background-color: #6F5CC2;" BorderPane.alignment="CENTER">
+               <children>
+                  <HBox fx:id="avatarBox" alignment="TOP_CENTER" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Circle fx:id="avatar" fill="WHITE" radius="60.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="TOP_CENTER" prefHeight="60.0" prefWidth="112.0">
+                     <children>
+                        <Text fill="#f2efef" strokeType="OUTSIDE" strokeWidth="0.0" text="Username">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Text>
+                     </children>
+                     <padding>
+                        <Insets bottom="25.0" />
+                     </padding>
+                  </HBox>
+                  <Button fx:id="HomeB" mnemonicParsing="false" prefHeight="30.0" prefWidth="120.0" stylesheets="@CSS/button.css" text="Home" textFill="WHITE" />
+                  <HBox alignment="TOP_CENTER" prefHeight="30.0" prefWidth="120.0">
+                     <children>
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Area Personale">
+                           <HBox.margin>
+                              <Insets top="10.0" />
+                           </HBox.margin>
+                        </Text>
+                     </children>
+                  </HBox>
+                  <Button fx:id="ProfileB" defaultButton="true" mnemonicParsing="false" onAction="#ProfileClicked" prefHeight="30.0" prefWidth="119.0" stylesheets="@CSS/button.css" text="Profile" textFill="WHITE" />
+                  <Button fx:id="AsteB" alignment="CENTER" defaultButton="true" minWidth="44.0" mnemonicParsing="false" onAction="#AsteClicked" prefHeight="30.0" prefWidth="169.0" stylesheets="@CSS/button.css" text="Aste" textFill="WHITE" />
+                  <Button fx:id="LottiB" alignment="CENTER" defaultButton="true" minWidth="44.0" mnemonicParsing="false" onAction="#AsteClicked" prefHeight="30.0" prefWidth="169.0" stylesheets="@CSS/button.css" text="Lotti" textFill="WHITE" />
+                  <Button fx:id="ArticoliB" alignment="CENTER" defaultButton="true" minWidth="44.0" mnemonicParsing="false" onAction="#AsteClicked" prefHeight="30.0" prefWidth="169.0" stylesheets="@CSS/button.css" text="Articoli" textFill="WHITE" />
+                  <Button fx:id="LogoutB" alignment="CENTER" defaultButton="true" minWidth="44.0" mnemonicParsing="false" onAction="#LogoutClicked" prefHeight="30.0" prefWidth="169.0" stylesheets="@CSS/logout.css" text="Logout" textFill="WHITE" />
+               </children>
+            </VBox>
+         </left>
+         <top>
+            <HBox alignment="CENTER" prefHeight="60.0" prefWidth="1075.0" style="-fx-background-color: #52348F;" BorderPane.alignment="CENTER">
+               <children>
+                  <ImageView fitHeight="50.0" fitWidth="89.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@BlackMarket.png" />
+                     </image>
+                  </ImageView>
+                  <Text fx:id="Title" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="TheBlackMarket" textAlignment="RIGHT">
+                     <font>
+                        <Font size="26.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
+         </top>
+         <center>
+            <VBox prefHeight="200.0" prefWidth="924.0" BorderPane.alignment="CENTER">
+               <children>
+                  <HBox prefHeight="60.0" prefWidth="701.0" />
+               </children>
+            </VBox>
+         </center>
+         <right>
+            <ScrollBar orientation="VERTICAL" prefHeight="437.0" prefWidth="24.0" BorderPane.alignment="CENTER" />
+         </right>
+      </BorderPane>
+   </children>
+</AnchorPane>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="749.0" prefWidth="1075.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <BorderPane layoutY="-1.0" prefHeight="749.0" prefWidth="1075.0">
+         <top>
+            <HBox alignment="CENTER" prefHeight="60.0" prefWidth="1075.0" style="-fx-background-color: #52348F;" BorderPane.alignment="CENTER">
+               <children>
+                  <ImageView fitHeight="50.0" fitWidth="89.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@BlackMarket.png" />
+                     </image>
+                  </ImageView>
+                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="TheBlackMarket">
+                     <font>
+                        <Font size="26.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
+         </top>
+         <left>
+            <VBox prefHeight="684.0" prefWidth="116.0" style="-fx-background-color: #6F5CC2;" BorderPane.alignment="CENTER">
+               <children>
+                  <HBox prefHeight="85.0" prefWidth="116.0">
+                     <children>
+                        <Circle fill="WHITE" radius="60.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
+                     </children></HBox>
+                  <HBox alignment="TOP_CENTER" prefHeight="60.0" prefWidth="116.0">
+                     <children>
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Username">
+                           <font>
+                              <Font size="13.0" />
+                           </font>
+                        </Text>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets bottom="25.0" />
+                     </padding>
+                  </HBox>
+                  <Button mnemonicParsing="false" prefHeight="29.0" prefWidth="132.0" stylesheets="@CSS/button.css" text="Home" textFill="WHITE" />
+                  <HBox alignment="CENTER" prefHeight="30.0" prefWidth="120.0">
+                     <children>
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Area Personale" />
+                     </children>
+                  </HBox>
+                  <Button mnemonicParsing="false" prefHeight="29.0" prefWidth="132.0" stylesheets="@CSS/button.css" text="Profile" textFill="WHITE" />
+                  <Button mnemonicParsing="false" prefHeight="29.0" prefWidth="132.0" stylesheets="@CSS/button.css" text="Aste" textFill="WHITE" />
+                  <Button mnemonicParsing="false" prefHeight="29.0" prefWidth="132.0" stylesheets="@CSS/button.css" text="Lotti" textFill="WHITE" />
+                  <Button mnemonicParsing="false" prefHeight="29.0" prefWidth="132.0" stylesheets="@CSS/button.css" text="Articoli" textFill="WHITE" />
+                  <Button mnemonicParsing="false" prefHeight="29.0" prefWidth="132.0" text="Logout" textFill="WHITE">
+                     <stylesheets>
+                        <URL value="@CSS/button.css" />
+                        <URL value="@CSS/logout.css" />
+                     </stylesheets></Button>
+               </children>
+            </VBox>
+         </left>
+      </BorderPane>
+   </children>
+</AnchorPane>

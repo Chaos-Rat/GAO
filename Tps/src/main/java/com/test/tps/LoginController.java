@@ -53,7 +53,7 @@ public class LoginController {
     @FXML
     void Access(MouseEvent event) throws IOException
     {
-        Parent root = FXMLLoader.load(getClass().getResource("Asta.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("Home.fxml"));
         Scene scene = new Scene(root);
         Stage stage = new Stage();
         stage.setTitle("The AuctionHouse");
@@ -75,6 +75,8 @@ public class LoginController {
         stage.setScene(scene);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.show();
+        Stage stage1 = (Stage) RegisterB.getScene().getWindow();
+        stage1.close();
     }
 
 

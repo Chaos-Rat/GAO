@@ -2,6 +2,9 @@ package com.test.tps;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -11,8 +14,11 @@ import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 
 public class ProfileController
@@ -22,7 +28,13 @@ public class ProfileController
     private Button ChangeB;
 
     @FXML
+    private Button LogoutB;
+
+    @FXML
     private Button ConfirmB;
+
+    @FXML
+    private Button HomeB;
 
     @FXML
     private Button ModifyB;
@@ -60,7 +72,7 @@ public class ProfileController
     }
 
     @FXML
-    void ChangeAvatar(ActionEvent event)
+    void ChangeAvatar (ActionEvent event)throws InvocationTargetException
     {
         FileChooser.ExtensionFilter ex1 = new FileChooser.ExtensionFilter("ImageFiles","*.png");
         FileChooser.ExtensionFilter ex2 = new FileChooser.ExtensionFilter("ImageFiles","*.jpg");
@@ -72,6 +84,27 @@ public class ProfileController
         File selectedFile = fileChooser.showOpenDialog(stage);
         Image image = new Image(selectedFile.toURI().toString());
         avatar.setFill(new ImagePattern(image));
+    }
+
+    @FXML
+    void LogoutClicked(ActionEvent event) throws IOException
+    {
+        Stage stage = (Stage) LogoutB.getScene().getWindow();
+        stage.close();
+
+    }
+    @FXML
+    void HomeClicked(ActionEvent event) throws IOException
+    {
+        Parent root = FXMLLoader.load(getClass().getResource("Home.fxml"));
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setTitle("The AuctionHouse");
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+        Stage stage1 = (Stage) HomeB.getScene().getWindow();
+        stage1.close();
     }
 
     @FXML

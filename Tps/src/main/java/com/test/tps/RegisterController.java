@@ -2,12 +2,18 @@ package com.test.tps;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+
+import java.io.IOException;
 
 public class RegisterController {
     @FXML
@@ -82,10 +88,16 @@ public class RegisterController {
 
     }
     @FXML
-    void BackStageClick(ActionEvent event)
-    {
-        Stage stage = (Stage) backB.getScene().getWindow();
-        stage.close();
+    void BackStageClick(ActionEvent event) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("Login.fxml"));
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setTitle("The AuctionHouse");
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+        Stage stage1 = (Stage) backB.getScene().getWindow();
+        stage1.close();
 
     }
     @FXML
