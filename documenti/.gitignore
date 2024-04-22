@@ -4,5 +4,6 @@
 # File temporanei draw.io
 .$*.drawio*
 
-# png esportati da draw.io
+# File esportati da draw.io
 *.png
+*.svg
