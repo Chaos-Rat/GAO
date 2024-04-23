@@ -104,7 +104,16 @@
                               </HBox>
                            </children>
                         </VBox>
-                        <Button fx:id="ConfirmB" mnemonicParsing="false" onAction="#ConfirmClicked" text="Confirm" />
+                        <VBox alignment="CENTER" prefHeight="177.0" prefWidth="74.0">
+                           <children>
+                              <Button fx:id="ConfirmB" mnemonicParsing="false" onAction="#ConfirmClicked" text="Confirm">
+                                 <VBox.margin>
+                                    <Insets bottom="20.0" />
+                                 </VBox.margin>
+                              </Button>
+                              <Button fx:id="backB" mnemonicParsing="false" onAction="#BackClicked" text="Back" />
+                           </children>
+                        </VBox>
                      </children>
                   </HBox>
                </children>

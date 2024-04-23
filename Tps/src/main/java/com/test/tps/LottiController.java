@@ -11,7 +11,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class AsteController
+public class LottiController
 {
     @FXML
     private Button ArticoliB;
@@ -43,13 +43,13 @@ public class AsteController
         Stage stage1 = (Stage) HomeB.getScene().getWindow();
         stage1.close();
     }
+
     @FXML
     void LogoutClicked(ActionEvent event)
     {
         Stage stage = (Stage) LogoutB.getScene().getWindow();
         stage.close();
     }
-
     @FXML
     void ProfileClicked(ActionEvent event) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource("Profile.fxml"));
@@ -61,7 +61,17 @@ public class AsteController
         stage.show();
         Stage stage1 = (Stage) ProfileB.getScene().getWindow();
         stage1.close();
-
     }
-
+    @FXML
+    void AsteClicked(ActionEvent event) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("Aste.fxml"));
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setTitle("The AuctionHouse");
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+        Stage stage1 = (Stage) AsteB.getScene().getWindow();
+        stage1.close();
+    }
 }

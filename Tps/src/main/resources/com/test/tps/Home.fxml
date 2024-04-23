@@ -31,7 +31,7 @@
                               <Insets />
                            </HBox.margin>
                            <font>
-                              <Font size="13.0" />
+                              <Font name="Dubai Regular" size="13.0" />
                            </font>
                         </Text>
                      </children>
@@ -39,21 +39,42 @@
                         <Insets bottom="25.0" />
                      </padding>
                   </HBox>
-                  <Button fx:id="HomeB" mnemonicParsing="false" prefHeight="30.0" prefWidth="120.0" stylesheets="@CSS/button.css" text="Home" textFill="WHITE" />
+                  <Button fx:id="HomeB" mnemonicParsing="false" prefHeight="30.0" prefWidth="120.0" stylesheets="@CSS/button.css" text="Home" textFill="WHITE">
+                     <font>
+                        <Font name="Courgette Regular" size="12.0" />
+                     </font></Button>
                   <HBox alignment="TOP_CENTER" prefHeight="30.0" prefWidth="120.0">
                      <children>
                         <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Area Personale">
                            <HBox.margin>
                               <Insets top="10.0" />
                            </HBox.margin>
+                           <font>
+                              <Font name="Courgette Regular" size="14.0" />
+                           </font>
                         </Text>
                      </children>
                   </HBox>
-                  <Button fx:id="ProfileB" defaultButton="true" mnemonicParsing="false" onAction="#ProfileClicked" prefHeight="30.0" prefWidth="119.0" stylesheets="@CSS/button.css" text="Profile" textFill="WHITE" />
-                  <Button fx:id="AsteB" alignment="CENTER" defaultButton="true" minWidth="44.0" mnemonicParsing="false" onAction="#AsteClicked" prefHeight="30.0" prefWidth="169.0" stylesheets="@CSS/button.css" text="Aste" textFill="WHITE" />
-                  <Button fx:id="LottiB" alignment="CENTER" defaultButton="true" minWidth="44.0" mnemonicParsing="false" onAction="#AsteClicked" prefHeight="30.0" prefWidth="169.0" stylesheets="@CSS/button.css" text="Lotti" textFill="WHITE" />
-                  <Button fx:id="ArticoliB" alignment="CENTER" defaultButton="true" minWidth="44.0" mnemonicParsing="false" onAction="#AsteClicked" prefHeight="30.0" prefWidth="169.0" stylesheets="@CSS/button.css" text="Articoli" textFill="WHITE" />
-                  <Button fx:id="LogoutB" alignment="CENTER" defaultButton="true" minWidth="44.0" mnemonicParsing="false" onAction="#LogoutClicked" prefHeight="30.0" prefWidth="169.0" stylesheets="@CSS/logout.css" text="Logout" textFill="WHITE" />
+                  <Button fx:id="ProfileB" defaultButton="true" mnemonicParsing="false" onAction="#ProfileClicked" prefHeight="30.0" prefWidth="119.0" stylesheets="@CSS/button.css" text="Profile" textFill="WHITE">
+                     <font>
+                        <Font name="Courgette Regular" size="12.0" />
+                     </font></Button>
+                  <Button fx:id="AsteB" alignment="CENTER" defaultButton="true" minWidth="44.0" mnemonicParsing="false" onAction="#AsteClicked" prefHeight="30.0" prefWidth="169.0" stylesheets="@CSS/button.css" text="Aste" textFill="WHITE">
+                     <font>
+                        <Font name="Courgette Regular" size="12.0" />
+                     </font></Button>
+                  <Button fx:id="LottiB" alignment="CENTER" defaultButton="true" minWidth="44.0" mnemonicParsing="false" onAction="#LottiClicked" prefHeight="30.0" prefWidth="169.0" stylesheets="@CSS/button.css" text="Lotti" textFill="WHITE">
+                     <font>
+                        <Font name="Courgette Regular" size="12.0" />
+                     </font></Button>
+                  <Button fx:id="ArticoliB" alignment="CENTER" defaultButton="true" minWidth="44.0" mnemonicParsing="false" onAction="#ArticoliClicked" prefHeight="30.0" prefWidth="169.0" stylesheets="@CSS/button.css" text="Articoli" textFill="WHITE">
+                     <font>
+                        <Font name="Courgette Regular" size="12.0" />
+                     </font></Button>
+                  <Button fx:id="LogoutB" alignment="CENTER" defaultButton="true" minWidth="44.0" mnemonicParsing="false" onAction="#LogoutClicked" prefHeight="30.0" prefWidth="169.0" stylesheets="@CSS/logout.css" text="Logout" textFill="WHITE">
+                     <font>
+                        <Font name="Courgette Regular" size="12.0" />
+                     </font></Button>
                </children>
             </VBox>
          </left>
@@ -67,14 +88,14 @@
                   </ImageView>
                   <Text fx:id="Title" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="TheBlackMarket" textAlignment="RIGHT">
                      <font>
-                        <Font size="26.0" />
+                        <Font name="Courgette Regular" size="26.0" />
                      </font>
                   </Text>
                </children>
             </HBox>
          </top>
          <center>
-            <VBox prefHeight="200.0" prefWidth="924.0" BorderPane.alignment="CENTER">
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="924.0" BorderPane.alignment="CENTER">
                <children>
                   <HBox prefHeight="60.0" prefWidth="701.0" />
                </children>

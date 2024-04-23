@@ -23,9 +23,11 @@ import java.lang.reflect.InvocationTargetException;
 
 public class ProfileController
 {
-
     @FXML
     private Button ChangeB;
+
+    @FXML
+    private Button backB;
 
     @FXML
     private Button LogoutB;
@@ -93,6 +95,24 @@ public class ProfileController
         stage.close();
 
     }
+
+    @FXML
+    void BackClicked(ActionEvent event) throws IOException
+    {
+        ModifyB.setVisible(true);
+        backB.setVisible(false);
+        ConfirmB.setVisible(false);
+        nameEdit.setVisible(false);
+        surnameEdit.setVisible(false);
+        emailEdit.setVisible(false);
+        ChangeB.setVisible(false);
+        Image image2 = new Image(getClass().getResourceAsStream("Avatar.png"));
+        ImageView imageView = new ImageView();
+        imageView.setImage(image2);
+        imageView.setPreserveRatio(true);
+        avatar.setFill(new ImagePattern(imageView.getImage()));
+
+    }
     @FXML
     void HomeClicked(ActionEvent event) throws IOException
     {
@@ -125,6 +145,7 @@ public class ProfileController
     {
         Image image = new Image(getClass().getResourceAsStream("Avatar.png"));
         avatar.setFill(new ImagePattern(image));
+        backB.setVisible(false);
         ChangeB.setVisible(false);
         ConfirmB.setVisible(false);
         nameEdit.setVisible(false);
