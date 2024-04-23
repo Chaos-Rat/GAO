@@ -61,7 +61,37 @@ public class AsteController
         stage.show();
         Stage stage1 = (Stage) ProfileB.getScene().getWindow();
         stage1.close();
+<<<<<<< Updated upstream
 
     }
 
+=======
+    }
+    @FXML
+    void LottiClicked(ActionEvent event) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("Lotti.fxml"));
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setTitle("The AuctionHouse");
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+        Stage stage1 = (Stage) LottiB.getScene().getWindow();
+        stage1.close();
+    }
+    @FXML
+    void ArticoliClicked(ActionEvent event) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("Articoli.fxml"));
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setTitle("The AuctionHouse");
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+        Stage stage1 = (Stage) AsteB.getScene().getWindow();
+        stage1.close();
+    }
+
+
+>>>>>>> Stashed changes
 }

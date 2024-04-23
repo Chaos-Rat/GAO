@@ -70,7 +70,10 @@ public class HomeController {
     {
         Stage stage = (Stage) LogoutB.getScene().getWindow();
         stage.close();
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
     }
 
     @FXML
@@ -94,8 +97,11 @@ public class HomeController {
         stage.show();
         Stage stage1 = (Stage) LottiB.getScene().getWindow();
         stage1.close();
+<<<<<<< Updated upstream
 
 
+=======
+>>>>>>> Stashed changes
     }
     @FXML
     void AsteClicked(ActionEvent event) throws IOException {

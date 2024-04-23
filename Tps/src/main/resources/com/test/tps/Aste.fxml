@@ -74,11 +74,19 @@
                      <font>
                         <Font name="Courgette Regular" size="12.0" />
                      </font></Button>
+<<<<<<< Updated upstream
                   <Button fx:id="LottiB" mnemonicParsing="false" prefHeight="29.0" prefWidth="132.0" stylesheets="@CSS/button.css" text="Lotti" textFill="WHITE">
                      <font>
                         <Font name="Courgette Regular" size="12.0" />
                      </font></Button>
                   <Button fx:id="ArticoliB" mnemonicParsing="false" prefHeight="29.0" prefWidth="132.0" stylesheets="@CSS/button.css" text="Articoli" textFill="WHITE">
+=======
+                  <Button fx:id="LottiB" mnemonicParsing="false" onAction="#LottiClicked" prefHeight="29.0" prefWidth="132.0" stylesheets="@CSS/button.css" text="Lotti" textFill="WHITE">
+                     <font>
+                        <Font name="Courgette Regular" size="12.0" />
+                     </font></Button>
+                  <Button fx:id="ArticoliB" mnemonicParsing="false" onAction="#ArticoliClicked" prefHeight="29.0" prefWidth="132.0" stylesheets="@CSS/button.css" text="Articoli" textFill="WHITE">
+>>>>>>> Stashed changes
                      <font>
                         <Font name="Courgette Regular" size="12.0" />
                      </font></Button>
