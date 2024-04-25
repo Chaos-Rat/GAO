@@ -73,7 +73,12 @@ CREATE TABLE Articolo_Categoria (
    	FOREIGN KEY (Rif_categoria) REFERENCES Categoria(Id_categoria),
 );
 
-
+CREATE TABLE Salvataggio (
+   	Rif_asta INT,
+   	Rif_utente INT,
+   	FOREIGN KEY (Rif_asta) REFERENCES Asta(Id_asta),
+   	FOREIGN KEY (Rif_utente) REFERENCES Utente(Id_utente),
+);
 
 
 
