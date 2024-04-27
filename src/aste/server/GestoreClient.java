@@ -5,13 +5,22 @@ import java.net.Socket;
 import aste.Richiesta;
 import aste.Risposta;
 
-public class GestoreClient {
+public class GestoreClient implements Runnable {
 	private Socket socket;
 	private	GestoreAste gestoreAste;
 	private int idUtente;
 	private Richiesta richiestaEntrante;
 	private Risposta rispostaUscente;
 
+	public GestoreClient(Socket socket, GestoreAste gestoreAste) {
+		this.socket = socket;
+		this.gestoreAste = gestoreAste;
+	}
+
+	@Override
+	public void run() {
+		
+	}
 
 	private void login(String username, String password) {
         // Implementazione del login
@@ -84,5 +93,4 @@ public class GestoreClient {
     private void visualizzaArticoli() {
         // Implementazione della visualizzazione degli articoli
     }
-
 }
