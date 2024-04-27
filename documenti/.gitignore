@@ -1,9 +1,5 @@
 # File temporanei Word
 ~$*.docx
 
-# File temporanei draw.io
-.$*.drawio*
-
-# File esportati da draw.io
-*.png
-*.svg
+# File temporanei ed esportati da draw.io
+*.drawio.*
