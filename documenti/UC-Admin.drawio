@@ -1,0 +1,34 @@
+<mxfile host="app.diagrams.net" modified="2024-04-06T16:45:57.468Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:124.0) Gecko/20100101 Firefox/124.0" etag="kfGHJvlOwdC6uaeaiKEh" version="24.2.2" type="google">
+  <diagram name="Page-1" id="odVaqZox5pCijNiCWqSz">
+    <mxGraphModel grid="1" page="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="aShWXN58p7Xwu_0gQA0a-3" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;sourcePerimeterSpacing=8;targetPerimeterSpacing=8;" edge="1" parent="1" source="8liMdQNfYL2SunO3tfDq-1" target="aShWXN58p7Xwu_0gQA0a-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aShWXN58p7Xwu_0gQA0a-5" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;sourcePerimeterSpacing=8;targetPerimeterSpacing=8;" edge="1" parent="1" source="8liMdQNfYL2SunO3tfDq-1" target="aShWXN58p7Xwu_0gQA0a-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="8liMdQNfYL2SunO3tfDq-1" value="Admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="100" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="aShWXN58p7Xwu_0gQA0a-1" value="Interdici utente" style="ellipse;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;" vertex="1" parent="1">
+          <mxGeometry x="180" y="145" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="aShWXN58p7Xwu_0gQA0a-2" value="Interdici asta" style="ellipse;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;" vertex="1" parent="1">
+          <mxGeometry x="180" y="75" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="8liMdQNfYL2SunO3tfDq-7" value="Admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="300" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="8liMdQNfYL2SunO3tfDq-8" style="edgeStyle=none;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=default;align=center;verticalAlign=middle;fontFamily=Helvetica;fontSize=11;fontColor=default;labelBackgroundColor=default;endArrow=classic;sourcePerimeterSpacing=8;targetPerimeterSpacing=26;" edge="1" parent="1" source="8liMdQNfYL2SunO3tfDq-9" target="8liMdQNfYL2SunO3tfDq-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="8liMdQNfYL2SunO3tfDq-9" value="Utente" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="60" y="440" width="30" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

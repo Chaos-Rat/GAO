@@ -1,0 +1,5 @@
+# File temporanei Word
+~$*.docx
+
+# File temporanei ed esportati da draw.io
+*.drawio.*
