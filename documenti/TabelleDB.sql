@@ -55,7 +55,8 @@ CREATE TABLE Articoli (
    	Rif_lotto INT,
    	Rif_utente INT,
 	quantita INT,
-	numero_immagini int,
+	numero_immagini INT,
+	immagine_principale INT,
 	PRIMARY KEY (Id_articolo)
    	FOREIGN KEY (Rif_lotto) REFERENCES Lotto(Id_lotto),
    	FOREIGN KEY (Rif_utente) REFERENCES Utente(Id_utente)
