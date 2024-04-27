@@ -4,6 +4,7 @@ import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Hashtable;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class GestoreAste {
@@ -11,9 +12,14 @@ public class GestoreAste {
     private Hashtable<Integer, InetAddress> mappaIndirizzi;
     private ScheduledExecutorService executorScheduler;
     
-    // GestoreAste(threadPoolAste : int)
-    public GestoreAste(int threadPoolAste) {
+    public GestoreAste(int threadPoolAste) throws IllegalArgumentException {
+		if (threadPoolAste <= 0) {
+			throw new IllegalArgumentException("Il numero di core per la pool deve essere >= 1.");
+		}
 
+		numeroAsteCorrenti = 0;
+		mappaIndirizzi = new Hashtable<>();
+		executorScheduler = Executors.newScheduledThreadPool(threadPoolAste);
     }
 
     // creaAsta(prezzoInizio : int, dataOraInizio : LocalDateTime, durata : LocalTime, astaAutomatica : boolean, rifLotto : int)
