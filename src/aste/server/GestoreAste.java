@@ -7,11 +7,9 @@ import java.util.Hashtable;
 import java.util.concurrent.ScheduledExecutorService;
 
 public class GestoreAste {
-
     private int numeroAsteCorrenti; 
     private Hashtable<Integer, InetAddress> mappaIndirizzi;
     private ScheduledExecutorService executorScheduler;
-    
     
     // GestoreAste(threadPoolAste : int)
     public GestoreAste(int threadPoolAste) {
