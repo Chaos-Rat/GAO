@@ -27,3 +27,6 @@ replay_pid*
 out/
 .idea/
 *.iml
+
+# External Libraries
+lib/
