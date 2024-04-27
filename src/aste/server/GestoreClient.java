@@ -13,37 +13,33 @@ public class GestoreClient {
 	private Risposta rispostaUscente;
 
 
-	public void login(String username, String password) {
+	private void login(String username, String password) {
         // Implementazione del login
     }
 
-    public void registrazione(String username, String password) {
+    private void registrazione(String username, String password) {
         // Implementazione della registrazione
     }
 
-    public void logout() {
+    private void logout() {
         // Implementazione del logout
     }
 
-    public void visualizzaProfilo() {
+    private void visualizzaProfilo() {
         // Implementazione della visualizzazione del profilo
     }
 
-    public void visualizzaImmagineProfilo() {
+    private void visualizzaImmagineProfilo() {
         // Implementazione della visualizzazione dell'immagine del profilo
     }
 
-    public void modificaProfilo() {
+    private void modificaProfilo() {
         // Implementazione della modifica del profilo
     }
 
-    public void visualizzaAste() {
+    private void visualizzaAste() {
         // Implementazione della visualizzazione delle aste
     }
-
-    // Altri metodi pubblici
-
-    // Metodi privati
 
     private void visualizzaAsteConcluse() {
         // Implementazione della visualizzazione delle aste concluse
