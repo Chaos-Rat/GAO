@@ -2,10 +2,10 @@ package aste.server;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -13,18 +13,26 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class GestoreAste {
-    private int numeroAsteCorrenti; 
-    private Hashtable<Integer, ScheduledFuture> mappaFuturi;
+	private ArrayList<Byte> indirizziLiberi;
+	private Hashtable<Integer, ScheduledFuture> mappaFuturi;
     private ScheduledExecutorService executorScheduler;
+
+	private final byte[] indirizzoBase;
+
     
     public GestoreAste(int threadPoolAste) throws IllegalArgumentException {
 		if (threadPoolAste <= 0) {
 			throw new IllegalArgumentException("Il numero di core per la pool deve essere >= 1.");
 		}
 
-		numeroAsteCorrenti = 0;
+		indirizziLiberi = new ArrayList<>();
 		mappaFuturi = new Hashtable<>();
 		executorScheduler = Executors.newScheduledThreadPool(threadPoolAste);
+		indirizzoBase = new byte[]{(byte)224, (byte)0, (byte)0, (byte)0};
+
+		for (int i = 0; i < 256; ++i) {
+			indirizziLiberi.add((byte)i);
+		}
     }
 
     public synchronized void creaAsta(int prezzoInizio,
@@ -33,17 +41,15 @@ public class GestoreAste {
 		boolean astaAutomatica,
 		int rifLotto
 	) {
-		if (numeroAsteCorrenti >= 256) {
+		if (indirizziLiberi.size() == 0) {
 			throw new IllegalStateException("Impossibile creare una nuova asta, limite raggiunto.");
 		}
 
 		Runnable schedulerTask = () -> {
 			// Preparando indirizzo multicast
-			byte[] buffer = new byte[4];
-
-			buffer[0] = (byte)224;
-			buffer[1] = buffer[2] = (byte)0;
-			buffer[3] = (byte)numeroAsteCorrenti;
+			byte[] buffer = indirizzoBase;
+			buffer[3] = indirizziLiberi.getLast();
+			indirizziLiberi.removeLast();
 
 			InetAddress indirizzo = null;
 
@@ -59,16 +65,16 @@ public class GestoreAste {
 		if (astaAutomatica) {
 			mappaFuturi.put(0, // TODO: Rimpiazzare con valore dal DB
 				executorScheduler.scheduleWithFixedDelay(schedulerTask,
-					ChronoUnit.MINUTES.between(LocalDateTime.now(), dataOraInizio),
+					ChronoUnit.SECONDS.between(LocalDateTime.now(), dataOraInizio),
 					0,
-					TimeUnit.MINUTES
+					TimeUnit.SECONDS
 				)
 			);
 		} else {
 			mappaFuturi.put(0, // TODO: Rimpiazzare con valore dal DB
 				executorScheduler.schedule(schedulerTask,
-					ChronoUnit.MINUTES.between(LocalDateTime.now(), dataOraInizio),
-					TimeUnit.MINUTES
+					ChronoUnit.SECONDS.between(LocalDateTime.now(), dataOraInizio),
+					TimeUnit.SECONDS
 				)
 			);
 		}
@@ -80,12 +86,12 @@ public class GestoreAste {
     }
 
     // annullaAsta(id : int, descrizioneAnnullamento : String)
-    public void annullaAsta(int annullaAsta, String descrizioneAnnullamento) {
+    public synchronized void annullaAsta(int annullaAsta, String descrizioneAnnullamento) {
 
     }
 
     // effettuaOfferta(idAsta : int, idUtente : int, valore : int)
-    public void effettuaOfferta(int idAsta, int idUtente, int valore) {
+    public synchronized void effettuaOfferta(int idAsta, int idUtente, int valore) {
 
     }
 }
