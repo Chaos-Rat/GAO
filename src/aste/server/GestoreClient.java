@@ -29,25 +29,39 @@ public class GestoreClient implements Runnable {
 		
 	}
 
-	private void login(String username, String password) {
+	private void login(String email, String password)
+    {
         // Implementazione del login
+
     }
 
-    private void registrazione(String username, String password) {
+    private void registrazione()
+    {
         // Implementazione della registrazione
+
     }
 
-    private void logout() {
+    private void logout()
+    {
         // Implementazione del logout
+        if (idUtente==0)
+        {
+            rispostaUscente.tipoRisposta = Risposta.TipoRisposta.ERRORE;
+            rispostaUscente.payload = new Object[] {Risposta.TipoErrore.OPERAZIONE_INVALIDA};
+            return;
+        }
+        idUtente = 0;
+        rispostaUscente.tipoRisposta = Risposta.TipoRisposta.OK;
     }
 
-    private void visualizzaProfilo(Connection conn) throws SQLException {
+    private void visualizzaProfilo() throws SQLException {
         // Implementazione della visualizzazione del profilo
         // Definiamo la query SQL per selezionare un utente alla volta
+        Integer id = (Integer)richiestaEntrante.payload[0];
         String query = "SELECT * FROM Utenti WHERE Id_utente";
 
         // Utilizziamo un oggetto Statement per eseguire la query
-        try (Statement stmt = conn.createStatement()) {
+        try (Statement stmt = gestoreDatabase.getConnection().createStatement()) {
             // Eseguiamo la query e otteniamo il risultato
             ResultSet rs = stmt.executeQuery(query);
 
@@ -61,16 +75,6 @@ public class GestoreClient implements Runnable {
                 String email = rs.getString("email");
                 String iban = rs.getString("iban");
                 float saldo = rs.getFloat("saldo");
-
-                // Stampiamo le informazioni della riga corrente
-                System.out.println("Nome: " + nome);
-                System.out.println("Cognome: " + cognome);
-                System.out.println("Data Nascita: " + dataNascita);
-                System.out.println("Citta Residenza: " + cittaResidenza);
-                System.out.println("Email: " + email);
-                System.out.println("Iban: " + iban);
-                System.out.println("Saldo: " + saldo);
-                System.out.println("-----------------------------------------");
             }
         }
     }

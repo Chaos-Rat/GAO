@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -30,16 +31,7 @@ public class ProfileController
     private Button AsteB;
 
     @FXML
-    private Button LottiB;
-
-    @FXML
     private Button ChangeB;
-
-    @FXML
-    private Button backB;
-
-    @FXML
-    private Button LogoutB;
 
     @FXML
     private Button ConfirmB;
@@ -48,16 +40,55 @@ public class ProfileController
     private Button HomeB;
 
     @FXML
+    private Button LogoutB;
+
+    @FXML
+    private Button LottiB;
+
+    @FXML
     private Button ModifyB;
 
     @FXML
+    private TextField addressEdit;
+
+    @FXML
+    private Text addressText;
+
+    @FXML
     private Circle avatar;
+
+    @FXML
+    private Button backB;
+
+    @FXML
+    private TextField capEdit;
+
+    @FXML
+    private Text capText;
+
+    @FXML
+    private TextField cityEdit;
+
+    @FXML
+    private Text cityText;
+
+    @FXML
+    private DatePicker dateEdit;
+
+    @FXML
+    private Text dateText;
 
     @FXML
     private TextField emailEdit;
 
     @FXML
     private Text emailText;
+
+    @FXML
+    private TextField ibanEdit;
+
+    @FXML
+    private Text ibanText;
 
     @FXML
     private TextField nameEdit;
@@ -75,11 +106,17 @@ public class ProfileController
     void ModifyInfo(ActionEvent event)
     {
         ModifyB.setVisible(false);
+        backB.setVisible(true);
         ConfirmB.setVisible(true);
         nameEdit.setVisible(true);
         surnameEdit.setVisible(true);
         emailEdit.setVisible(true);
         ChangeB.setVisible(true);
+        dateEdit.setVisible(true);
+        cityEdit.setVisible(true);
+        capEdit.setVisible(true);
+        addressEdit.setVisible(true);
+        ibanEdit.setVisible(true);
     }
 
     @FXML
@@ -102,7 +139,6 @@ public class ProfileController
     {
         Stage stage = (Stage) LogoutB.getScene().getWindow();
         stage.close();
-
     }
 
     @FXML
@@ -115,7 +151,12 @@ public class ProfileController
         surnameEdit.setVisible(false);
         emailEdit.setVisible(false);
         ChangeB.setVisible(false);
-        Image image2 = new Image(getClass().getResourceAsStream("Avatar.png"));
+        dateEdit.setVisible(false);
+        cityEdit.setVisible(false);
+        capEdit.setVisible(false);
+        addressEdit.setVisible(false);
+        ibanEdit.setVisible(false);
+        Image image2 = new Image(getClass().getResourceAsStream("../view/Avatar.png"));
         ImageView imageView = new ImageView();
         imageView.setImage(image2);
         imageView.setPreserveRatio(true);
@@ -144,11 +185,17 @@ public class ProfileController
         surnameText.setText("Surname: " + surnameEdit.getText());
         emailText.setText("Email: " + emailEdit.getText());
         ModifyB.setVisible(true);
+        backB.setVisible(false);
         ConfirmB.setVisible(false);
         nameEdit.setVisible(false);
         surnameEdit.setVisible(false);
         emailEdit.setVisible(false);
         ChangeB.setVisible(false);
+        dateEdit.setVisible(false);
+        cityEdit.setVisible(false);
+        capEdit.setVisible(false);
+        addressEdit.setVisible(false);
+        ibanEdit.setVisible(false);
     }
 
     public void initialize()
@@ -161,6 +208,11 @@ public class ProfileController
         nameEdit.setVisible(false);
         surnameEdit.setVisible(false);
         emailEdit.setVisible(false);
+        dateEdit.setVisible(false);
+        cityEdit.setVisible(false);
+        capEdit.setVisible(false);
+        addressEdit.setVisible(false);
+        ibanEdit.setVisible(false);
     }
 
     @FXML

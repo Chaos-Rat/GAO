@@ -32,6 +32,12 @@ public class RegisterController {
     private Text capText;
 
     @FXML
+    private TextField addressField;
+
+    @FXML
+    private Text addressText;
+
+    @FXML
     private TextField cityField;
 
     @FXML
@@ -114,6 +120,8 @@ public class RegisterController {
         passF.setVisible(false);
         backB2.setVisible(false);
         regB.setVisible(false);
+        addressText.setVisible(true);
+        addressField.setVisible(true);
         nameText.setVisible(true);
         nameField.setVisible(true);
         cognText.setVisible(true);
@@ -140,6 +148,8 @@ public class RegisterController {
         passF.setVisible(true);
         regB.setVisible(true);
         backB2.setVisible(true);
+        addressText.setVisible(false);
+        addressField.setVisible(false);
         nameText.setVisible(false);
         nameField.setVisible(false);
         cognText.setVisible(false);
