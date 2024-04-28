@@ -1,5 +1,8 @@
 package aste.client.controller;
 
+import aste.Richiesta;
+import aste.Risposta;
+import aste.client.HelloApplication;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -107,9 +110,37 @@ public class RegisterController {
 
     }
     @FXML
-    void RegisterClick(ActionEvent event)
-    {
-
+    void RegisterClick(ActionEvent event) throws IOException, ClassNotFoundException {
+        Richiesta richiesta = new Richiesta();
+        richiesta.tipoRichiesta = Richiesta.TipoRichiesta.REGISTRAZIONE;
+        richiesta.payload = new Object[9];
+        richiesta.payload[0] = nameField.getText();
+        richiesta.payload[1] = cognField.getText();
+        richiesta.payload[2] = passF.getText();
+        richiesta.payload[3] = dateP.getChronology();
+        richiesta.payload[4] = cityField.getText();
+        richiesta.payload[5] = capField.getText();
+        richiesta.payload[6] = addressField.getText();
+        richiesta.payload[7] = addressField.getText();
+        richiesta.payload[8] = ibanField.getText();
+        HelloApplication.output.writeObject(richiesta);
+        Risposta risposta = (Risposta) HelloApplication.input.readObject();
+        if ((Risposta.TipoRisposta) risposta.payload[0] == Risposta.TipoRisposta.OK)
+        {
+            Parent root = FXMLLoader.load(getClass().getResource("../view/Login.fxml"));
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setTitle("The AuctionHouse");
+            stage.setScene(scene);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.show();
+            Stage stage1 = (Stage) backB.getScene().getWindow();
+            stage1.close();
+        }
+        if ((Risposta.TipoErrore) risposta.payload[0] == Risposta.TipoErrore.CAMPI_INVALIDI)
+        {
+            System.out.println("Please fill out all the required fields");
+        }
     }
     @FXML
     void BackClick(ActionEvent event)
