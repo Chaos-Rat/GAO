@@ -17,8 +17,7 @@ public class GestoreAste {
 	private Hashtable<Integer, ScheduledFuture> mappaFuturi;
     private ScheduledExecutorService executorScheduler;
 
-	private final byte[] indirizzoBase;
-
+	private final byte[] INDIRIZZO_BASE;
     
     public GestoreAste(int threadPoolAste) throws IllegalArgumentException {
 		if (threadPoolAste <= 0) {
@@ -28,7 +27,7 @@ public class GestoreAste {
 		indirizziLiberi = new ArrayList<>();
 		mappaFuturi = new Hashtable<>();
 		executorScheduler = Executors.newScheduledThreadPool(threadPoolAste);
-		indirizzoBase = new byte[]{(byte)224, (byte)0, (byte)0, (byte)0};
+		INDIRIZZO_BASE = new byte[]{(byte)224, (byte)0, (byte)0, (byte)0};
 
 		for (int i = 0; i < 256; ++i) {
 			indirizziLiberi.add((byte)i);
@@ -47,7 +46,7 @@ public class GestoreAste {
 
 		Runnable schedulerTask = () -> {
 			// Preparando indirizzo multicast
-			byte[] buffer = indirizzoBase;
+			byte[] buffer = INDIRIZZO_BASE;
 			buffer[3] = indirizziLiberi.getLast();
 			indirizziLiberi.removeLast();
 
@@ -59,7 +58,7 @@ public class GestoreAste {
 				throw new Error(e.getMessage());
 			}
 
-			// TODO: Aggiornare ip_multicast sul DB
+			
 		};
 
 		if (astaAutomatica) {

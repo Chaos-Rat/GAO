@@ -8,3 +8,6 @@ JavaFX:
 
 Connector/J (JDBC):
 * link download: https://dev.mysql.com/get/Downloads/Connector-J/mysql-connector-j-8.3.0.zip
+
+Apache Commons DBCP:
+* link download: https://dlcdn.apache.org//commons/dbcp/binaries/commons-dbcp2-2.12.0-bin.zip
