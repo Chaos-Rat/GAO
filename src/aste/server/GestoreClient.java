@@ -22,6 +22,10 @@ public class GestoreClient implements Runnable {
 		this.socket = socket;
 		this.gestoreDatabase = gestoreDatabase;
 		this.gestoreAste = gestoreAste;
+
+		idUtente = 0;
+		richiestaEntrante = new Richiesta();
+		rispostaUscente = new Risposta();
 	}
 
 	@Override
@@ -54,7 +58,7 @@ public class GestoreClient implements Runnable {
         rispostaUscente.tipoRisposta = Risposta.TipoRisposta.OK;
     }
 
-    private void visualizzaProfilo() throws SQLException {
+    private void visualizzaProfilo() {
         // Implementazione della visualizzazione del profilo
         // Definiamo la query SQL per selezionare un utente alla volta
         Integer id = (Integer)richiestaEntrante.payload[0];
@@ -76,7 +80,9 @@ public class GestoreClient implements Runnable {
                 String iban = rs.getString("iban");
                 float saldo = rs.getFloat("saldo");
             }
-        }
+        } catch (SQLException e) {
+			throw new Error(e.getMessage());
+		}
     }
 
     private void visualizzaImmagineProfilo() {

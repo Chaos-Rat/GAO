@@ -1,7 +1,14 @@
 package aste.server;
 
+import java.sql.Statement;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -12,10 +19,18 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import com.mysql.cj.jdbc.exceptions.SQLError;
+import com.mysql.cj.protocol.x.SyncFlushDeflaterOutputStream;
+
+import aste.Risposta;
+import aste.Risposta.TipoErrore;
+
 public class GestoreAste {
 	private GestoreDatabase gestoreDatabase;
 	private ArrayList<Byte> indirizziLiberi;
+	@SuppressWarnings("rawtypes")
 	private Hashtable<Integer, ScheduledFuture> mappaFuturi;
+
     private ScheduledExecutorService executorScheduler;
 
 	private final byte[] INDIRIZZO_BASE;
@@ -60,8 +75,37 @@ public class GestoreAste {
 				throw new Error(e.getMessage());
 			}
 
-			
+			// Aggiornando DB
+			StringBuilder builder = new StringBuilder();
+
+			for (int i = 0; i < buffer.length; ++i) {
+				builder.append(Integer.toBinaryString((int)buffer[i]));
+			}
+
+			String query = "UPDATE Aste\n" +
+				"SET ip_multicast = " + builder.toString() + "\n" +
+				"WHERE Id_asta = " + ";";
 		};
+
+		Connection connection = null;
+
+		try {
+			String query = "INSERT INTO Aste (prezzo_inizio, data_ora_inizio, asta_automatica, Rif_lotto)\n" + 
+				"VALUES (" + prezzoInizio + ", " + dataOraInizio + ", " +
+				durata + ", " + (astaAutomatica ? 1 : 0) + ", " +
+				rifLotto + ");";
+
+			connection = gestoreDatabase.getConnection();
+			Statement statement = connection.createStatement();
+			statement.executeUpdate(query, new String[]{"Id_asta"});
+			ResultSet result = statement.getGeneratedKeys();
+
+			result.getInt("Id_asta");
+
+			connection.commit();
+		} catch (SQLException e) {
+			
+		}
 
 		if (astaAutomatica) {
 			mappaFuturi.put(0, // TODO: Rimpiazzare con valore dal DB
@@ -87,7 +131,7 @@ public class GestoreAste {
     }
 
     // annullaAsta(id : int, descrizioneAnnullamento : String)
-    public synchronized void annullaAsta(int annullaAsta, String descrizioneAnnullamento) {
+    public synchronized void annullaAsta(int idAsta, String descrizioneAnnullamento) {
 
     }
 
