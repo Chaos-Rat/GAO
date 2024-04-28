@@ -61,6 +61,20 @@
             </HBox>
             <HBox alignment="CENTER" prefHeight="82.0" prefWidth="232.0">
                <children>
+                  <VBox alignment="CENTER_LEFT" prefHeight="82.0" prefWidth="219.0">
+                     <children>
+                        <Text fx:id="addressText" strokeType="OUTSIDE" strokeWidth="0.0" text="Address" wrappingWidth="111.13671875">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Text>
+                        <TextField fx:id="addressField" prefHeight="25.0" prefWidth="196.0" promptText="Please insert your Address" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="82.0" prefWidth="232.0">
+               <children>
                   <VBox alignment="CENTER_LEFT" prefHeight="77.0" prefWidth="212.0">
                      <children>
                         <Text fx:id="capText" strokeType="OUTSIDE" strokeWidth="0.0" text="CAP" wrappingWidth="111.13671875">
@@ -87,16 +101,16 @@
                   </VBox>
                </children>
             </HBox>
-            <HBox alignment="CENTER" prefHeight="82.0" prefWidth="232.0">
+            <HBox alignment="CENTER" prefHeight="79.0" prefWidth="281.0">
                <children>
-                  <VBox alignment="CENTER_LEFT" prefHeight="82.0" prefWidth="219.0">
+                  <VBox alignment="CENTER_LEFT" prefHeight="59.0" prefWidth="219.0">
                      <children>
                         <Text fx:id="dateText" strokeType="OUTSIDE" strokeWidth="0.0" text="Date" wrappingWidth="111.13671875">
                            <font>
                               <Font size="15.0" />
                            </font>
                         </Text>
-                        <DatePicker fx:id="dateP" promptText="Date of Birth" />
+                        <DatePicker fx:id="dateP" prefHeight="25.0" prefWidth="220.0" promptText="Date of Birth" />
                      </children>
                   </VBox>
                </children>

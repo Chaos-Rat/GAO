@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -57,7 +58,7 @@
          <center>
             <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
                <children>
-                  <HBox alignment="CENTER" prefHeight="179.0" prefWidth="682.0">
+                  <HBox alignment="CENTER_LEFT" prefHeight="179.0" prefWidth="682.0">
                      <children>
                         <Button fx:id="ChangeB" mnemonicParsing="false" onAction="#ChangeAvatar" text="Change">
                            <HBox.margin>
@@ -72,6 +73,11 @@
                                  </VBox.margin></Text>
                               <Text fx:id="surnameText" strokeType="OUTSIDE" strokeWidth="0.0" text="Surname: " wrappingWidth="125.13671875" />
                               <Text fx:id="emailText" strokeType="OUTSIDE" strokeWidth="0.0" text="Email:" />
+                              <Text fx:id="dateText" strokeType="OUTSIDE" strokeWidth="0.0" text="Date:" />
+                              <Text fx:id="cityText" strokeType="OUTSIDE" strokeWidth="0.0" text="City:" />
+                              <Text fx:id="capText" strokeType="OUTSIDE" strokeWidth="0.0" text="CAP:" />
+                              <Text fx:id="addressText" strokeType="OUTSIDE" strokeWidth="0.0" text="Address:" />
+                              <Text fx:id="ibanText" strokeType="OUTSIDE" strokeWidth="0.0" text="Iban:" />
                            </children>
                            <HBox.margin>
                               <Insets left="10.0" />
@@ -83,9 +89,9 @@
                         <Insets />
                      </opaqueInsets>
                   </HBox>
-                  <HBox alignment="CENTER" prefHeight="177.0" prefWidth="682.0">
+                  <HBox alignment="CENTER_LEFT" prefHeight="362.0" prefWidth="704.0">
                      <children>
-                        <VBox prefHeight="170.0" prefWidth="357.0">
+                        <VBox prefHeight="357.0" prefWidth="272.0">
                            <children>
                               <HBox alignment="CENTER" prefHeight="56.0" prefWidth="357.0">
                                  <children>
@@ -102,16 +108,45 @@
                                     <TextField fx:id="emailEdit" prefWidth="196.0" promptText="Please Enter your new email" />
                                  </children>
                               </HBox>
+                              <HBox alignment="CENTER_RIGHT" prefHeight="56.0" prefWidth="357.0">
+                                 <children>
+                                    <DatePicker fx:id="dateEdit" prefHeight="23.0" prefWidth="234.0" promptText="Please enter your new date of birth" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER" prefHeight="56.0" prefWidth="357.0">
+                                 <children>
+                                    <TextField fx:id="cityEdit" prefWidth="196.0" promptText="Please Enter your new city name" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER" prefHeight="56.0" prefWidth="357.0">
+                                 <children>
+                                    <TextField fx:id="capEdit" prefWidth="196.0" promptText="Please Enter your new CAP" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER" prefHeight="56.0" prefWidth="357.0">
+                                 <children>
+                                    <TextField fx:id="addressEdit" prefWidth="196.0" promptText="Please Enter your new Address" />
+                                 </children>
+                              </HBox>
                            </children>
                         </VBox>
-                        <VBox alignment="CENTER" prefHeight="177.0" prefWidth="74.0">
+                        <VBox alignment="CENTER" prefHeight="357.0" prefWidth="214.0">
+                           <children>
+                              <HBox alignment="CENTER_RIGHT" prefHeight="56.0" prefWidth="357.0">
+                                 <children>
+                                    <TextField fx:id="ibanEdit" prefWidth="196.0" promptText="Please Enter your new Iban" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox alignment="CENTER_RIGHT" prefHeight="177.0" prefWidth="74.0">
                            <children>
                               <Button fx:id="ConfirmB" mnemonicParsing="false" onAction="#ConfirmClicked" text="Confirm">
                                  <VBox.margin>
                                     <Insets bottom="20.0" />
                                  </VBox.margin>
                               </Button>
-                              <Button fx:id="backB" mnemonicParsing="false" onAction="#BackClicked" text="Back" />
+                              <Button fx:id="backB" mnemonicParsing="false" onAction="#BackClicked" prefHeight="25.0" prefWidth="57.0" text="Back" />
                            </children>
                         </VBox>
                      </children>
