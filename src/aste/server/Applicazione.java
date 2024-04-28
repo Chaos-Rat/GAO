@@ -1,14 +1,16 @@
 package aste.server;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
+import aste.server.GestoreDatabase.Opzioni;
 
 public class Applicazione {
-	private GestoreConnessioni gestoreConnessioni;
 	private GestoreAste gestoreAste;
+	private GestoreConnessioni gestoreConnessioni;
+	private GestoreDatabase gestoreDatabase;
 
-	public Applicazione(int threadPoolConnessioni, int ThreadPoolAste) {
-		
+	public Applicazione(int threadPoolAste, int porta, int threadPoolConnessioni, GestoreDatabase.Opzioni opzioniDatabase) {
+		gestoreDatabase = new GestoreDatabase(opzioniDatabase);
+		gestoreAste = new GestoreAste(threadPoolAste, gestoreDatabase);
+		gestoreConnessioni = new GestoreConnessioni(threadPoolConnessioni, porta, gestoreDatabase, gestoreAste);
 	}
 
 	public void avvia() {
@@ -20,10 +22,16 @@ public class Applicazione {
 	}
 
 	public static void main(String[] args) {
-		Applicazione applicazione = new Applicazione(2, 2);
+		GestoreDatabase.Opzioni opzioniDB = new GestoreDatabase.Opzioni("com.mysql.cj.jdbc.Driver",
+		"jdbc:mysql://localhost:3306/gestione_aste_online",
+		"server",
+		"JUiv[xDc*OCqCg26",
+		5,
+		10,
+		100);
+
+		Applicazione applicazione = new Applicazione(2, 3000, 2, opzioniDB);
 		applicazione.avvia();
 		applicazione.finalizza();
-
-		System.out.println(ChronoUnit.SECONDS.between(LocalDateTime.now(), LocalDateTime.parse("2024-04-28T11:15")));
 	}
 }

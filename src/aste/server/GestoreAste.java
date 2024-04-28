@@ -13,17 +13,19 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class GestoreAste {
+	private GestoreDatabase gestoreDatabase;
 	private ArrayList<Byte> indirizziLiberi;
 	private Hashtable<Integer, ScheduledFuture> mappaFuturi;
     private ScheduledExecutorService executorScheduler;
 
 	private final byte[] INDIRIZZO_BASE;
     
-    public GestoreAste(int threadPoolAste) throws IllegalArgumentException {
+    public GestoreAste(int threadPoolAste, GestoreDatabase gestoreDatabase) throws IllegalArgumentException {
 		if (threadPoolAste <= 0) {
 			throw new IllegalArgumentException("Il numero di core per la pool deve essere >= 1.");
 		}
 
+		this.gestoreDatabase = gestoreDatabase;
 		indirizziLiberi = new ArrayList<>();
 		mappaFuturi = new Hashtable<>();
 		executorScheduler = Executors.newScheduledThreadPool(threadPoolAste);

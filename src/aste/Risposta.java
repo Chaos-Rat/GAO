@@ -8,12 +8,12 @@ public class Risposta implements Serializable {
 	
 	private static final long serialVersionUID = -1993048461030574444L;
 
-	public enum TipoRisposta {
+	public static enum TipoRisposta {
 		OK,
 		ERRORE
 	}
 
-	public enum TipoErrore {
+	public static enum TipoErrore {
 		CAMPI_INVALIDI,
 		OPERAZIONE_INVALIDA,
 		GENERICO

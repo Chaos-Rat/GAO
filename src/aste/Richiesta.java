@@ -8,7 +8,7 @@ public class Richiesta implements Serializable {
 	
 	private static final long serialVersionUID = 1159972224332743381L;
 
-	public enum TipoRichiesta {
+	public static enum TipoRichiesta {
 		LOGIN,
 		REGISTRAZIONE,
 		VISUALIZZA_PROFILO,

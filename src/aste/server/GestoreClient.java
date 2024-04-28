@@ -7,13 +7,15 @@ import aste.Risposta;
 
 public class GestoreClient implements Runnable {
 	private Socket socket;
+	private GestoreDatabase gestoreDatabase;
 	private	GestoreAste gestoreAste;
 	private int idUtente;
 	private Richiesta richiestaEntrante;
 	private Risposta rispostaUscente;
 
-	public GestoreClient(Socket socket, GestoreAste gestoreAste) {
+	public GestoreClient(Socket socket, GestoreDatabase gestoreDatabase, GestoreAste gestoreAste) {
 		this.socket = socket;
+		this.gestoreDatabase = gestoreDatabase;
 		this.gestoreAste = gestoreAste;
 	}
 
