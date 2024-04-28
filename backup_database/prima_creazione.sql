@@ -1,3 +1,7 @@
+CREATE DATABASE gestione_aste_online;
+
+USE gestione_aste_online;
+
 CREATE TABLE Utenti (
 	Id_utente INT NOT NULL AUTO_INCREMENT,
 	nome VARCHAR(255) NOT NULL,
@@ -99,3 +103,6 @@ CREATE TABLE Salvataggi (
    	FOREIGN KEY (Rif_asta) REFERENCES Aste(Id_asta),
    	FOREIGN KEY (Rif_utente) REFERENCES Utenti(Id_utente)
 );
+
+CREATE USER 'server'@'localhost' IDENTIFIED BY 'JUiv[xDc*OCqCg26';
+GRANT SELECT, INSERT, UPDATE, DELETE ON `gestione\_aste\_online`.* TO 'server'@'localhost';
