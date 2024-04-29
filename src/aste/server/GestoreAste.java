@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -53,12 +54,28 @@ public class GestoreAste {
 
     public synchronized void creaAsta(int prezzoInizio,
 		LocalDateTime dataOraInizio,
-		LocalTime durata,
+		Duration durata,
 		boolean astaAutomatica,
 		int rifLotto
 	) throws IllegalArgumentException, IllegalStateException {
 		if (indirizziLiberi.size() == 0) {
 			throw new IllegalStateException("Impossibile creare una nuova asta, limite raggiunto.");
+		}
+
+		if (prezzoInizio < 0) {
+			throw new IllegalArgumentException("Impossibile avere un prezzo di inizio < 0.");
+		}
+
+		if (dataOraInizio.isBefore(LocalDateTime.now())) {
+			throw new IllegalArgumentException("La data deve essere dopo quella corrente < 0.");
+		}
+
+		if (durata.isNegative() || durata.isZero()) {
+			throw new IllegalArgumentException("La durata deve essere >= 0.");
+		}
+
+		if (rifLotto <= 0) {
+			// TODO: verifica che il lotto e' dell'utente
 		}
 
 		final int idAsta;
@@ -88,7 +105,7 @@ public class GestoreAste {
 			try {
 				indirizzo = InetAddress.getByAddress(buffer);
 			} catch (UnknownHostException e) {
-				throw new Error(e.getMessage());
+				throw new Error("[" + Thread.currentThread().getName() + "]: " + e.getMessage());
 			}
 
 			// Aggiornando DB
@@ -105,9 +122,9 @@ public class GestoreAste {
 			try {
 				Connection connection = gestoreDatabase.getConnection();
 				Statement statement = connection.createStatement();
-				statement.executeUpdate(queryInserimento, new String[]{"Id_asta"});
+				statement.executeUpdate(queryUpdate);
 			} catch (SQLException e) {
-				
+				throw new Error("[" + Thread.currentThread().getName() + "]: " + e.getMessage());
 			}
 		};
 
