@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -288,22 +289,15 @@ public class GestoreClient implements Runnable {
 
     }
 
-    private void visualizzaAste() {
-        // Implementazione della visualizzazione delle aste
+    // Metodo per caricare tutte le aste in un array list 
+    private ArrayList<Object> precaricamentoAste() {
         // Definiamo la query SQL per selezionare tutte le aste
-        String query = "SELECT Asta.Id_asta, Asta.durata, Lotto.nome Immagine.Id_immagine FROM Aste, Lotto, Immagine";
-
-        rispostaUscente = new Risposta();
-
-        // Utilizziamo un oggetto Statement per eseguire la query
+        String query = "SELECT Asta.Id_asta, Asta.durata, Lotto.nome, Immagine.Id_immagine FROM Aste, Lotto, Immagine";
+        
         try {
             Statement stmt = gestoreDatabase.getConnection().createStatement();
             // Cariciamo il payload richiestaEntrante per sapere quante pagine e aste faciamo vedere nella pagina
             ResultSet rs = stmt.executeQuery(query);
-            Integer numeroAste = (Integer) richiestaEntrante.payload[0];
-            Integer numeroPagine = (Integer) richiestaEntrante.payload[1];
-            String stringaRicerca = (String) richiestaEntrante.payload[2];
-            int[] idCategorie = (int[]) richiestaEntrante.payload[3];
             
             // Iteriamo attraverso ogni riga del risultato
             while (rs.next()) {
@@ -325,11 +319,31 @@ public class GestoreClient implements Runnable {
                 aste[4]= ImmaginePrincipale;
 
                 // cariciamo l'array nel payload 
-                aste = (Object[]) rispostaUscente.payload[0];
+                precaricamentoAste().add(aste);
             }
         } catch (SQLException e) {
-
+            
         }
+
+        return precaricamentoAste();
+    }
+
+    // Implementazione della visualizzazione delle aste
+    private void visualizzaAste() {
+        Integer numeroAste = (Integer) richiestaEntrante.payload[0];
+        Integer numeroPagina = (Integer) richiestaEntrante.payload[1];
+        String stringaRicerca = (String) richiestaEntrante.payload[2];
+        int[] idCategorie = (int[]) richiestaEntrante.payload[3];
+
+        
+        // Definiamo la query SQL per selezionare tutte le aste
+        String query = "SELECT Asta.Id_asta, Asta.durata, Lotto.nome, Immagine.Id_immagine FROM Aste, Lotto, Immagine LIMIT 5 OFFSET "+ 
+        ((numeroPagina-1)*numeroAste) +";";
+
+        rispostaUscente = new Risposta();
+
+        // Utilizziamo un oggetto Statement per eseguire la query
+        rispostaUscente.payload[0] = precaricamentoAste();
     }
 
     private void visualizzaAsteConcluse() {
