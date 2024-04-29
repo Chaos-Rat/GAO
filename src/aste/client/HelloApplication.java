@@ -21,6 +21,7 @@ public class HelloApplication extends Application
     static {
         try {
             socket = new Socket("localhost",3000);
+            System.out.println("sono connesso negro");
             input = new ObjectInputStream(socket.getInputStream());
             output = new ObjectOutputStream(socket.getOutputStream());
         } catch (IOException e) {
@@ -40,7 +41,8 @@ public class HelloApplication extends Application
         stage.show();
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         launch();
     }
 }
