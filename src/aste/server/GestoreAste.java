@@ -75,7 +75,13 @@ public class GestoreAste {
 		}
 
 		if (rifLotto <= 0) {
-			// TODO: verifica che il lotto e' dell'utente
+			try {
+				Connection connection = gestoreDatabase.getConnection();
+				Statement statement = connection.createStatement();
+				// TODO: Vedere se il lotto e' dell'utente.
+			} catch (SQLException e) {
+
+			}
 		}
 
 		final int idAsta;
@@ -100,21 +106,13 @@ public class GestoreAste {
 			byte[] buffer = INDIRIZZO_BASE;
 			buffer[3] = indirizziLiberi.remove(indirizziLiberi.size() - 1);
 
-			InetAddress indirizzo = null;
-
-			try {
-				indirizzo = InetAddress.getByAddress(buffer);
-			} catch (UnknownHostException e) {
-				throw new Error("[" + Thread.currentThread().getName() + "]: " + e.getMessage());
-			}
-
-			// Aggiornando DB
 			StringBuilder builder = new StringBuilder();
 
 			for (int i = 0; i < buffer.length; ++i) {
 				builder.append(Integer.toBinaryString((int)buffer[i]));
 			}
 
+			// Aggiornando DB
 			String queryUpdate = "UPDATE Aste\n" +
 				"SET ip_multicast = " + builder.toString() + "\n" +
 				"WHERE Id_asta = " + idAsta + ";";
@@ -129,7 +127,7 @@ public class GestoreAste {
 		};
 
 		if (astaAutomatica) {
-			mappaFuturi.put(0, // TODO: Rimpiazzare con valore dal DB
+			mappaFuturi.put(idAsta,
 				executorScheduler.scheduleWithFixedDelay(schedulerTask,
 					ChronoUnit.SECONDS.between(LocalDateTime.now(), dataOraInizio),
 					0,
@@ -137,7 +135,7 @@ public class GestoreAste {
 				)
 			);
 		} else {
-			mappaFuturi.put(0, // TODO: Rimpiazzare con valore dal DB
+			mappaFuturi.put(idAsta,
 				executorScheduler.schedule(schedulerTask,
 					ChronoUnit.SECONDS.between(LocalDateTime.now(), dataOraInizio),
 					TimeUnit.SECONDS
