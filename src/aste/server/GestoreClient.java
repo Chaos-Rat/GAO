@@ -10,6 +10,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import aste.Richiesta;
 import aste.Risposta;
@@ -218,20 +220,24 @@ public class GestoreClient implements Runnable {
 		throw new UnsupportedOperationException("Unimplemented method 'creaArticolo'");
 	}
 
-	private void login()
-    {
-        // Implementazione del login
+	private void login() {
+		String email = (String)richiestaEntrante.payload[0];
+		String password = (String)richiestaEntrante.payload[1];
 
+		Pattern patternEmail = Pattern.compile("^((?!\\.)[\\w\\-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])$");
+		Matcher matcher = patternEmail.matcher(email);
+		
+		if (!matcher.find()) {
+			// TODO: Send error message
+		}
     }
 
-    private void registrazione()
-    {
+    private void registrazione() {
         // Implementazione della registrazione
 
     }
 
-    private void logout()
-    {
+    private void logout() {
         // Implementazione del logout
         if (idUtente==0)
         {
