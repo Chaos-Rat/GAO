@@ -56,16 +56,32 @@ public class GestoreAste {
 		LocalTime durata,
 		boolean astaAutomatica,
 		int rifLotto
-	) {
+	) throws IllegalArgumentException, IllegalStateException {
 		if (indirizziLiberi.size() == 0) {
 			throw new IllegalStateException("Impossibile creare una nuova asta, limite raggiunto.");
+		}
+
+		final int idAsta;
+
+		String queryInserimento = "INSERT INTO Aste (prezzo_inizio, data_ora_inizio, asta_automatica, Rif_lotto)\n" + 
+			"VALUES (" + prezzoInizio + ", " + dataOraInizio + ", " +
+			durata + ", " + (astaAutomatica ? 1 : 0) + ", " +
+			rifLotto + ");";
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			Statement statement = connection.createStatement();
+			statement.executeUpdate(queryInserimento, new String[]{"Id_asta"});
+			ResultSet result = statement.getGeneratedKeys();
+			idAsta = result.getInt("Id_asta");
+		} catch (SQLException e) {
+			throw new Error("[" + Thread.currentThread().getName() + "]: " + e.getMessage());
 		}
 
 		Runnable schedulerTask = () -> {
 			// Preparando indirizzo multicast
 			byte[] buffer = INDIRIZZO_BASE;
-			buffer[3] = indirizziLiberi.getLast();
-			indirizziLiberi.removeLast();
+			buffer[3] = indirizziLiberi.remove(indirizziLiberi.size() - 1);
 
 			InetAddress indirizzo = null;
 
@@ -82,30 +98,18 @@ public class GestoreAste {
 				builder.append(Integer.toBinaryString((int)buffer[i]));
 			}
 
-			String query = "UPDATE Aste\n" +
+			String queryUpdate = "UPDATE Aste\n" +
 				"SET ip_multicast = " + builder.toString() + "\n" +
-				"WHERE Id_asta = " + ";";
+				"WHERE Id_asta = " + idAsta + ";";
+
+			try {
+				Connection connection = gestoreDatabase.getConnection();
+				Statement statement = connection.createStatement();
+				statement.executeUpdate(queryInserimento, new String[]{"Id_asta"});
+			} catch (SQLException e) {
+				
+			}
 		};
-
-		Connection connection = null;
-
-		try {
-			String query = "INSERT INTO Aste (prezzo_inizio, data_ora_inizio, asta_automatica, Rif_lotto)\n" + 
-				"VALUES (" + prezzoInizio + ", " + dataOraInizio + ", " +
-				durata + ", " + (astaAutomatica ? 1 : 0) + ", " +
-				rifLotto + ");";
-
-			connection = gestoreDatabase.getConnection();
-			Statement statement = connection.createStatement();
-			statement.executeUpdate(query, new String[]{"Id_asta"});
-			ResultSet result = statement.getGeneratedKeys();
-
-			result.getInt("Id_asta");
-
-			connection.commit();
-		} catch (SQLException e) {
-			
-		}
 
 		if (astaAutomatica) {
 			mappaFuturi.put(0, // TODO: Rimpiazzare con valore dal DB

@@ -11,3 +11,9 @@ Connector/J (JDBC):
 
 Apache Commons DBCP:
 * link download: https://dlcdn.apache.org//commons/dbcp/binaries/commons-dbcp2-2.12.0-bin.zip
+
+Apache Commons Pooling:
+* link download: https://dlcdn.apache.org//commons/pool/binaries/commons-pool2-2.12.0-bin.zip
+
+Apache Commons Logging:
+* link download: https://dlcdn.apache.org//commons/logging/binaries/commons-logging-1.3.1-bin.zip
