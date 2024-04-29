@@ -338,7 +338,8 @@ public class GestoreClient implements Runnable {
         String query = "SELECT COUNT(*) AS numero_aste, CURDATE() FROM Aste WHERE data_ora_inizio + durata < CURDATE()";
 
         // Utilizziamo un oggetto Statement per eseguire la query
-        try (Statement stmt = conn.createStatement()) {
+        try {
+			Statement stmt = gestoreDatabase.getConnection().createStatement();
             // Eseguiamo la query e otteniamo il risultato
             ResultSet rs = stmt.executeQuery(query);
 
@@ -357,7 +358,9 @@ public class GestoreClient implements Runnable {
                 System.out.println("Id Categorie: " + idCategorie);
                 System.out.println("-----------------------------------------");
             }
-        }
+        } catch (SQLException e) {
+
+		}
     }
 
     private void visualizzaAsteCorrenti()  {
@@ -366,7 +369,8 @@ public class GestoreClient implements Runnable {
         String query = "SELECT COUNT(*) AS numero_aste, CURDATE() FROM Aste WHERE data_ora_inizio + durata = CURDATE()";
 
         // Utilizziamo un oggetto Statement per eseguire la query
-        try (Statement stmt = conn.createStatement()) {
+        try {
+			Statement stmt = gestoreDatabase.getConnection().createStatement();
             // Eseguiamo la query e otteniamo il risultato
             ResultSet rs = stmt.executeQuery(query);
 
@@ -385,7 +389,9 @@ public class GestoreClient implements Runnable {
                 System.out.println("Id Categorie: " + idCategorie);
                 System.out.println("-----------------------------------------");
             }
-        }
+        } catch (SQLException e) {
+			
+		}
     }
 
     private void visualizzaAsteProgrammate()  {
@@ -394,7 +400,8 @@ public class GestoreClient implements Runnable {
         String query = "SELECT COUNT(*) AS numero_aste, CURDATE() FROM Aste WHERE data_ora_inizio > CURDATE()";
 
         // Utilizziamo un oggetto Statement per eseguire la query
-        try (Statement stmt = conn.createStatement()) {
+        try {
+			Statement stmt = gestoreDatabase.getConnection().createStatement();
             // Eseguiamo la query e otteniamo il risultato
             ResultSet rs = stmt.executeQuery(query);
 
@@ -413,7 +420,9 @@ public class GestoreClient implements Runnable {
                 System.out.println("Id Categorie: " + idCategorie);
                 System.out.println("-----------------------------------------");
             }
-        }
+        } catch (SQLException e) {
+			
+		}
     }
 
     private void visualizzaAsteVinte()  {
@@ -422,7 +431,8 @@ public class GestoreClient implements Runnable {
         String query = "SELECT COUNT(*) AS numero_aste FROM Aste";
 
         // Utilizziamo un oggetto Statement per eseguire la query
-        try (Statement stmt = conn.createStatement()) {
+        try {
+			Statement stmt = gestoreDatabase.getConnection().createStatement();
             // Eseguiamo la query e otteniamo il risultato
             ResultSet rs = stmt.executeQuery(query);
 
@@ -441,7 +451,9 @@ public class GestoreClient implements Runnable {
                 System.out.println("Id Categorie: " + idCategorie);
                 System.out.println("-----------------------------------------");
             }
-        }
+        } catch (SQLException e) {
+
+		}
     }
 
     private void visualizzaAsteSalvate()  {
@@ -450,7 +462,8 @@ public class GestoreClient implements Runnable {
         String query = "SELECT COUNT(*) AS numero_aste FROM Aste";
 
         // Utilizziamo un oggetto Statement per eseguire la query
-        try (Statement stmt = conn.createStatement()) {
+        try {
+			Statement stmt = gestoreDatabase.getConnection().createStatement();
             // Eseguiamo la query e otteniamo il risultato
             ResultSet rs = stmt.executeQuery(query);
 
@@ -469,7 +482,9 @@ public class GestoreClient implements Runnable {
                 System.out.println("Id Categorie: " + idCategorie);
                 System.out.println("-----------------------------------------");
             }
-        }
+        } catch (SQLException e) {
+
+		}
     }
 
     private void creaAsta() {
@@ -508,39 +523,39 @@ public class GestoreClient implements Runnable {
     }
 
     private void visualizzaAsta() {
-        // Implementazione della visualizzazione di un'asta
-        // Definiamo la query SQL per selezionare tutte le aste
-        String query = "SELECT * FROM Aste WHERE Id_asta";
+        // // Implementazione della visualizzazione di un'asta
+        // // Definiamo la query SQL per selezionare tutte le aste
+        // String query = "SELECT * FROM Aste WHERE Id_asta";
 
-        // Utilizziamo un oggetto Statement per eseguire la query
-        try (Statement stmt = gestoreDatabase.getConnection().createStatement()) {
-            // Eseguiamo la query e otteniamo il risultato
-            ResultSet rs = stmt.executeQuery(query);
-            Integer numeroAste = (Integer) richiestaEntrante.payload[0];
-            Integer numeroPagine = (Integer) richiestaEntrante.payload[1];
-            String stringaRicerca = (String) richiestaEntrante.payload[2];
-            int idCategorie [] = (int[]) richiestaEntrante.payload[3];
+        // // Utilizziamo un oggetto Statement per eseguire la query
+        // try (Statement stmt = gestoreDatabase.getConnection().createStatement()) {
+        //     // Eseguiamo la query e otteniamo il risultato
+        //     ResultSet rs = stmt.executeQuery(query);
+        //     Integer numeroAste = (Integer) richiestaEntrante.payload[0];
+        //     Integer numeroPagine = (Integer) richiestaEntrante.payload[1];
+        //     String stringaRicerca = (String) richiestaEntrante.payload[2];
+        //     int idCategorie [] = (int[]) richiestaEntrante.payload[3];
             
-            if()
-            // Iteriamo attraverso ogni riga del risultato
-            while (rs.next()) {
-                // Leggiamo i valori di ogni colonna per la riga corrente
-                Risposta risposta = new Risposta();
-                risposta.payload = new Object[];
-                risposta.payload[0] = 
+        //     if()
+        //     // Iteriamo attraverso ogni riga del risultato
+        //     while (rs.next()) {
+        //         // Leggiamo i valori di ogni colonna per la riga corrente
+        //         Risposta risposta = new Risposta();
+        //         risposta.payload = new Object[];
+        //         risposta.payload[0] = 
                 
-                double prezzoInizio = rs.getDouble("prezzo_inizio");
-                Timestamp dataOraInizio = rs.getTimestamp("data_ora_inizio");
-                int durata = rs.getInt("durata");
-                boolean astaAutomatica = rs.getBoolean("asta_automatica");
-                String ipMulticast = rs.getString("ip_multicast");
-                String descrizioneAnnullamento = rs.getString("descrizione_annullamento");
-                int rifLotto = rs.getInt("Rif_lotto");
+        //         double prezzoInizio = rs.getDouble("prezzo_inizio");
+        //         Timestamp dataOraInizio = rs.getTimestamp("data_ora_inizio");
+        //         int durata = rs.getInt("durata");
+        //         boolean astaAutomatica = rs.getBoolean("asta_automatica");
+        //         String ipMulticast = rs.getString("ip_multicast");
+        //         String descrizioneAnnullamento = rs.getString("descrizione_annullamento");
+        //         int rifLotto = rs.getInt("Rif_lotto");
 
-                // Stampiamo le informazioni della riga corrente
+        //         // Stampiamo le informazioni della riga corrente
          
-            }
-        }
+        //     }
+        // }
     }
 
     private void salvaAsta() {
@@ -557,7 +572,8 @@ public class GestoreClient implements Runnable {
         String query = "SELECT * FROM Articoli WHERE Id_articolo";
 
         // Utilizziamo un oggetto Statement per eseguire la query
-        try (Statement stmt = conn.createStatement()) {
+        try {
+			Statement stmt = gestoreDatabase.getConnection().createStatement();
             // Eseguiamo la query e otteniamo il risultato
             ResultSet rs = stmt.executeQuery(query);
 
@@ -578,6 +594,8 @@ public class GestoreClient implements Runnable {
                 System.out.println("Riferimento Utente: " + rifUtente);
                 System.out.println("-----------------------------------------");
             }
-        }
+        } catch (SQLException e) {
+
+		}
     }
 }
