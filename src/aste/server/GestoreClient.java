@@ -1,11 +1,15 @@
 package aste.server;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import aste.Richiesta;
 import aste.Risposta;
@@ -31,10 +35,190 @@ public class GestoreClient implements Runnable {
 
 	@Override
 	public void run() {
-		
+		try {
+			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+
+			while (!socket.isClosed()) {
+				richiestaEntrante = (Richiesta)inputStream.readObject();
+
+				gestisciRichiesta();
+
+				outputStream.writeObject(rispostaUscente);
+			}
+
+		} catch (IOException e) {
+
+		} catch (ClassNotFoundException e) {
+			
+		} finally {
+			try {
+				socket.close();
+			} catch (IOException e) {
+				System.err.println("[" + Thread.currentThread().getName() +
+					"]: Impossibile chiudere ServerSocket: " + e.getMessage() +
+					"."
+				);
+			}
+		}
 	}
 
-	private void login(String email, String password)
+	private void gestisciRichiesta() {
+		switch (richiestaEntrante.tipoRichiesta) {
+			case ANNULLA_ASTA:
+				annullaAsta();
+				break;
+			case CREA_ARTICOLO:
+				creaArticolo();
+				break;
+			case CREA_ASTA:
+				creaAsta();
+				break;
+			case CREA_CATEGORIA:
+				creaCategoria();
+				break;
+			case CREA_LOTTO:
+				creaLotto();
+				break;
+			case EFFETTUA_PUNTATA:
+				effettuaPuntata();
+				break;
+			case ELIMINA_ARTICOLO:
+				creaArticolo();
+				break;
+			case ELIMINA_LOTTO:
+				creaLotto();
+				break;
+			case LOGIN:
+				login();
+				break;
+			case LOGOUT:
+				logout();
+				break;
+			case MODIFICA_ARTICOLO:
+				modificaArticolo();
+				break;
+			case MODIFICA_ASTA:
+				modificaAsta();
+				break;
+			case MODIFICA_LOTTO:
+				modificaLotto();
+				break;
+			case MODIFICA_PROFILO:
+				modificaProfilo();
+				break;
+			case REGISTRAZIONE:
+				registrazione();
+				break;
+			case SALVA_ASTA:
+				salvaAsta();
+				break;
+			case VISUALIZZA_ARTICOLI:
+				visualizzaArticoli();
+				break;
+			case VISUALIZZA_ARTICOLO:
+				visualizzaArticolo();
+				break;
+			case VISUALIZZA_ASTA:
+				visualizzaAsta();
+				break;
+			case VISUALIZZA_ASTE:
+				visualizzaAste();
+				break;
+			case VISUALIZZA_ASTE_CONCLUSE:
+				visualizzaAsteConcluse();
+				break;
+			case VISUALIZZA_ASTE_CORRENTI:
+				visualizzaAsteCorrenti();
+				break;
+			case VISUALIZZA_ASTE_PROGRAMMATE:
+				visualizzaAsteProgrammate();
+				break;
+			case VISUALIZZA_ASTE_SALVATE:
+				visualizzaAsteSalvate();
+				break;
+			case VISUALIZZA_ASTE_VINTE:
+				visualizzaAsteVinte();
+				break;
+			case VISUALIZZA_CATEGORIE:
+				visualizzaCategorie();
+				break;
+			case VISUALIZZA_IMMAGINE_PROFILO:
+				visualizzaImmagineProfilo();
+				break;
+			case VISUALIZZA_LOTTI:
+				visualizzaLotti();
+				break;
+			case VISUALIZZA_LOTTO:
+				visualizzaLotto();
+				break;
+			case VISUALIZZA_PROFILO:
+				visualizzaProfilo();
+				break;
+			case VISUALIZZA_PUNTATE:
+				visualizzaPuntate();
+				break;
+			default:
+				break;
+		}
+	}
+
+	private void visualizzaPuntate() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'visualizzaPuntate'");
+	}
+
+	private void visualizzaLotto() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'visualizzaLotto'");
+	}
+
+	private void visualizzaLotti() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'visualizzaLotti'");
+	}
+
+	private void visualizzaCategorie() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'visualizzaCategorie'");
+	}
+
+	private void visualizzaArticolo() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'visualizzaArticolo'");
+	}
+
+	private void modificaLotto() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'modificaLotto'");
+	}
+
+	private void modificaArticolo() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'modificaArticolo'");
+	}
+
+	private void effettuaPuntata() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'effettuaPuntata'");
+	}
+
+	private void creaLotto() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'creaLotto'");
+	}
+
+	private void creaCategoria() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'creaCategoria'");
+	}
+
+	private void creaArticolo() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'creaArticolo'");
+	}
+
+	private void login()
     {
         // Implementazione del login
 
@@ -99,7 +283,7 @@ public class GestoreClient implements Runnable {
 
     }
 
-    private void visualizzaAste(Connection conn) throws SQLException {
+    private void visualizzaAste() {
         // Implementazione della visualizzazione delle aste
         // Definiamo la query SQL per selezionare tutte le aste
         String query = "SELECT COUNT(*) AS numero_aste FROM Aste";
@@ -127,7 +311,7 @@ public class GestoreClient implements Runnable {
         }
     }
 
-    private void visualizzaAsteConcluse(Connection conn) throws SQLException {
+    private void visualizzaAsteConcluse() {
         // Implementazione della visualizzazione delle aste concluse
         // Definiamo la query SQL per selezionare tutte le aste conqulse 
         String query = "SELECT COUNT(*) AS numero_aste, CURDATE() FROM Aste WHERE data_ora_inizio + durata < CURDATE()";
@@ -155,7 +339,7 @@ public class GestoreClient implements Runnable {
         }
     }
 
-    private void visualizzaAsteCorrenti(Connection conn) throws SQLException {
+    private void visualizzaAsteCorrenti()  {
         // Implementazione della visualizzazione delle aste correnti
         // Definiamo la query SQL per selezionare tutte le aste corrnti
         String query = "SELECT COUNT(*) AS numero_aste, CURDATE() FROM Aste WHERE data_ora_inizio + durata = CURDATE()";
@@ -183,7 +367,7 @@ public class GestoreClient implements Runnable {
         }
     }
 
-    private void visualizzaAsteProgrammate(Connection conn) throws SQLException {
+    private void visualizzaAsteProgrammate()  {
         // Implementazione della visualizzazione delle aste programmate
         // Definiamo la query SQL per selezionare tutte le aste programmate
         String query = "SELECT COUNT(*) AS numero_aste, CURDATE() FROM Aste WHERE data_ora_inizio > CURDATE()";
@@ -211,7 +395,7 @@ public class GestoreClient implements Runnable {
         }
     }
 
-    private void visualizzaAsteVinte(Connection conn) throws SQLException {
+    private void visualizzaAsteVinte()  {
         // Implementazione della visualizzazione delle aste vinte
         // Definiamo la query SQL per selezionare tutte le aste
         String query = "SELECT COUNT(*) AS numero_aste FROM Aste";
@@ -239,7 +423,7 @@ public class GestoreClient implements Runnable {
         }
     }
 
-    private void visualizzaAsteSalvate(Connection conn) throws SQLException {
+    private void visualizzaAsteSalvate()  {
         // Implementazione della visualizzazione delle aste salvate
         // Definiamo la query SQL per selezionare tutte le aste
         String query = "SELECT COUNT(*) AS numero_aste FROM Aste";
@@ -268,14 +452,41 @@ public class GestoreClient implements Runnable {
     }
 
     private void creaAsta() {
-        // Implementazione della creazione di un'asta
+        // if (prezzoInizio < 0) {
+		// 	throw new IllegalArgumentException("Impossibile avere un prezzo di inizio < 0.");
+		// }
+
+		// if (dataOraInizio.isBefore(LocalDateTime.now())) {
+		// 	throw new IllegalArgumentException("La data deve essere dopo quella corrente < 0.");
+		// }
+
+		// if (durata.isNegative() || durata.isZero()) {
+		// 	throw new IllegalArgumentException("La durata deve essere >= 0.");
+		// }
+
+		// if (rifLotto <= 0) {
+		// 	try {
+		// 		String queryControlloLotto = "SELECT \n" +
+		// 			"FROM " +
+		// 			"" +
+		// 			"" +
+		// 		;
+
+		// 		Connection connection = gestoreDatabase.getConnection();
+		// 		Statement statement = connection.createStatement();
+		// 		ResultSet result = statement.executeQuery(null);
+		// 		// TODO: Vedere se il lotto e' dell'utente.
+		// 	} catch (SQLException e) {
+
+		// 	}
+		// }
     }
 
     private void modificaAsta() {
         // Implementazione della modifica di un'asta
     }
 
-    private void visualizzaAsta() throws SQLException {
+    private void visualizzaAsta() {
         // Implementazione della visualizzazione di un'asta
         // Definiamo la query SQL per selezionare tutte le aste
         String query = "SELECT * FROM Aste WHERE Id_asta";
@@ -319,7 +530,7 @@ public class GestoreClient implements Runnable {
         // Implementazione dell'annullamento di un'asta
     }
 
-    private void visualizzaArticoli(Connection conn) throws SQLException {
+    private void visualizzaArticoli() {
         // Implementazione della visualizzazione degli articoli
         // Definiamo la query SQL per selezionare tutti gli articoli
         String query = "SELECT * FROM Articoli WHERE Id_articolo";

@@ -16,7 +16,7 @@ public class Applicazione {
 	}
 
 	public void finalizza() {
-		
+		gestoreConnessioni.finalizza();
 	}
 
 	public static void main(String[] args) {
