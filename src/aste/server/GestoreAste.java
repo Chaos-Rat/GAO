@@ -57,31 +57,9 @@ public class GestoreAste {
 		Duration durata,
 		boolean astaAutomatica,
 		int rifLotto
-	) throws IllegalArgumentException, IllegalStateException {
+	) throws IllegalStateException {
 		if (indirizziLiberi.size() == 0) {
 			throw new IllegalStateException("Impossibile creare una nuova asta, limite raggiunto.");
-		}
-
-		if (prezzoInizio < 0) {
-			throw new IllegalArgumentException("Impossibile avere un prezzo di inizio < 0.");
-		}
-
-		if (dataOraInizio.isBefore(LocalDateTime.now())) {
-			throw new IllegalArgumentException("La data deve essere dopo quella corrente < 0.");
-		}
-
-		if (durata.isNegative() || durata.isZero()) {
-			throw new IllegalArgumentException("La durata deve essere >= 0.");
-		}
-
-		if (rifLotto <= 0) {
-			try {
-				Connection connection = gestoreDatabase.getConnection();
-				Statement statement = connection.createStatement();
-				// TODO: Vedere se il lotto e' dell'utente.
-			} catch (SQLException e) {
-
-			}
 		}
 
 		final int idAsta;
