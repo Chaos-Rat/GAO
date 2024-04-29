@@ -274,7 +274,6 @@ public class GestoreClient implements Runnable {
     {
         // Implementazione della visualizzazione dell'immagine del profilo
 
-        
     }
 
     private void modificaProfilo() 
@@ -286,28 +285,44 @@ public class GestoreClient implements Runnable {
     private void visualizzaAste() {
         // Implementazione della visualizzazione delle aste
         // Definiamo la query SQL per selezionare tutte le aste
-        String query = "SELECT COUNT(*) AS numero_aste FROM Aste";
+        String query = "SELECT Asta.Id_asta, Asta.durata, Lotto.nome Immagine.Id_immagine FROM Aste, Lotto, Immagine";
+
+        rispostaUscente = new Risposta();
 
         // Utilizziamo un oggetto Statement per eseguire la query
-        try (Statement stmt = conn.createStatement()) {
-            // Eseguiamo la query e otteniamo il risultato
+        try {
+            Statement stmt = gestoreDatabase.getConnection().createStatement();
+            // Cariciamo il payload richiestaEntrante per sapere quante pagine e aste faciamo vedere nella pagina
             ResultSet rs = stmt.executeQuery(query);
-
+            Integer numeroAste = (Integer) richiestaEntrante.payload[0];
+            Integer numeroPagine = (Integer) richiestaEntrante.payload[1];
+            String stringaRicerca = (String) richiestaEntrante.payload[2];
+            int[] idCategorie = (int[]) richiestaEntrante.payload[3];
+            
             // Iteriamo attraverso ogni riga del risultato
             while (rs.next()) {
-                // Leggiamo i valori di ogni colonna per la riga corrente
-                Integer numeroAste = rs.getInt("numero_aste");
-                Integer numeroPagina = rs.getInt("numero_pagina");
-                String ricerca = rs.getString("ricerca");
-                int idCategorie = rs.getInt("id_categorie");
+                // Creamo un array di object per contenere pià aste in una pagina 
+                Object[] aste = new Object[4];
 
-                // Stampiamo le informazioni della riga corrente
-                System.out.println("Numero Aste: " + numeroAste);
-                System.out.println("Numero Pagina: " + numeroPagina);
-                System.out.println("Ricerca: " + ricerca);
-                System.out.println("Id Categorie: " + idCategorie);
-                System.out.println("-----------------------------------------");
+                // I dati di una singola asta 
+                Integer idAsta = rs.getInt("id_asta");
+                Timestamp durata = rs.getTimestamp("data_ora_inizio");
+                Float prezzoAttuale = rs.getFloat("data_ora_inizio");
+                String nomeLotto = rs.getString("data_ora_inizio");
+                Byte ImmaginePrincipale = rs.getByte("data_ora_inizio"); 
+
+                // cariciamo i dati di una singola asta nel array 
+                aste[0]= idAsta;
+                aste[1]= durata;
+                aste[2]= prezzoAttuale;
+                aste[3]= nomeLotto;
+                aste[4]= ImmaginePrincipale;
+
+                // cariciamo l'array nel payload 
+                aste = (Object[]) rispostaUscente.payload[0];
             }
+        } catch (SQLException e) {
+
         }
     }
 
