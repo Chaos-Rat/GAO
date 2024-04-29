@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -53,12 +54,34 @@ public class GestoreAste {
 
     public synchronized void creaAsta(int prezzoInizio,
 		LocalDateTime dataOraInizio,
-		LocalTime durata,
+		Duration durata,
 		boolean astaAutomatica,
 		int rifLotto
 	) throws IllegalArgumentException, IllegalStateException {
 		if (indirizziLiberi.size() == 0) {
 			throw new IllegalStateException("Impossibile creare una nuova asta, limite raggiunto.");
+		}
+
+		if (prezzoInizio < 0) {
+			throw new IllegalArgumentException("Impossibile avere un prezzo di inizio < 0.");
+		}
+
+		if (dataOraInizio.isBefore(LocalDateTime.now())) {
+			throw new IllegalArgumentException("La data deve essere dopo quella corrente < 0.");
+		}
+
+		if (durata.isNegative() || durata.isZero()) {
+			throw new IllegalArgumentException("La durata deve essere >= 0.");
+		}
+
+		if (rifLotto <= 0) {
+			try {
+				Connection connection = gestoreDatabase.getConnection();
+				Statement statement = connection.createStatement();
+				// TODO: Vedere se il lotto e' dell'utente.
+			} catch (SQLException e) {
+
+			}
 		}
 
 		final int idAsta;
@@ -83,21 +106,13 @@ public class GestoreAste {
 			byte[] buffer = INDIRIZZO_BASE;
 			buffer[3] = indirizziLiberi.remove(indirizziLiberi.size() - 1);
 
-			InetAddress indirizzo = null;
-
-			try {
-				indirizzo = InetAddress.getByAddress(buffer);
-			} catch (UnknownHostException e) {
-				throw new Error(e.getMessage());
-			}
-
-			// Aggiornando DB
 			StringBuilder builder = new StringBuilder();
 
 			for (int i = 0; i < buffer.length; ++i) {
 				builder.append(Integer.toBinaryString((int)buffer[i]));
 			}
 
+			// Aggiornando DB
 			String queryUpdate = "UPDATE Aste\n" +
 				"SET ip_multicast = " + builder.toString() + "\n" +
 				"WHERE Id_asta = " + idAsta + ";";
@@ -105,14 +120,14 @@ public class GestoreAste {
 			try {
 				Connection connection = gestoreDatabase.getConnection();
 				Statement statement = connection.createStatement();
-				statement.executeUpdate(queryInserimento, new String[]{"Id_asta"});
+				statement.executeUpdate(queryUpdate);
 			} catch (SQLException e) {
-				
+				throw new Error("[" + Thread.currentThread().getName() + "]: " + e.getMessage());
 			}
 		};
 
 		if (astaAutomatica) {
-			mappaFuturi.put(0, // TODO: Rimpiazzare con valore dal DB
+			mappaFuturi.put(idAsta,
 				executorScheduler.scheduleWithFixedDelay(schedulerTask,
 					ChronoUnit.SECONDS.between(LocalDateTime.now(), dataOraInizio),
 					0,
@@ -120,7 +135,7 @@ public class GestoreAste {
 				)
 			);
 		} else {
-			mappaFuturi.put(0, // TODO: Rimpiazzare con valore dal DB
+			mappaFuturi.put(idAsta,
 				executorScheduler.schedule(schedulerTask,
 					ChronoUnit.SECONDS.between(LocalDateTime.now(), dataOraInizio),
 					TimeUnit.SECONDS
