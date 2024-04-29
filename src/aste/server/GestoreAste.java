@@ -1,11 +1,6 @@
 package aste.server;
 
 import java.sql.Statement;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,17 +15,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import com.mysql.cj.jdbc.exceptions.SQLError;
-import com.mysql.cj.protocol.x.SyncFlushDeflaterOutputStream;
-
-import aste.Risposta;
-import aste.Risposta.TipoErrore;
-
 public class GestoreAste {
 	private GestoreDatabase gestoreDatabase;
 	private ArrayList<Byte> indirizziLiberi;
-	@SuppressWarnings("rawtypes")
-	private Hashtable<Integer, ScheduledFuture> mappaFuturi;
+	private Hashtable<Integer, ScheduledFuture<?>> mappaFuturi;
 
     private ScheduledExecutorService executorScheduler;
 
@@ -122,17 +110,14 @@ public class GestoreAste {
 		}
     }
 
-    // modificaAsta(idAsta : int, prezzoInizio : int, dataOraInizio : LocalDateTime, durata : LocalTime, astaAutomatica : boolean, rifLotto : int)
     public void modificaAsta(int idAsta, int prezzoInizio, LocalDateTime dataOraInizio, LocalTime durata, boolean astaAutomatica, int rifLotto) {
 
     }
 
-    // annullaAsta(id : int, descrizioneAnnullamento : String)
     public synchronized void annullaAsta(int idAsta, String descrizioneAnnullamento) {
 
     }
 
-    // effettuaOfferta(idAsta : int, idUtente : int, valore : int)
     public synchronized void effettuaOfferta(int idAsta, int idUtente, int valore) {
 
     }
