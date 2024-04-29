@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 
 import aste.Richiesta;
 import aste.Risposta;
+import aste.Risposta.TipoRisposta;
 
 public class GestoreClient implements Runnable {
 	private Socket socket;
@@ -85,12 +86,17 @@ public class GestoreClient implements Runnable {
 		}
     }
 
-    private void visualizzaImmagineProfilo() {
+    private void visualizzaImmagineProfilo() 
+    {
         // Implementazione della visualizzazione dell'immagine del profilo
+
+        
     }
 
-    private void modificaProfilo() {
+    private void modificaProfilo() 
+    {
         // Implementazione della modifica del profilo
+
     }
 
     private void visualizzaAste(Connection conn) throws SQLException {
@@ -269,19 +275,28 @@ public class GestoreClient implements Runnable {
         // Implementazione della modifica di un'asta
     }
 
-    private void visualizzaAsta(Connection conn) throws SQLException {
+    private void visualizzaAsta() throws SQLException {
         // Implementazione della visualizzazione di un'asta
         // Definiamo la query SQL per selezionare tutte le aste
         String query = "SELECT * FROM Aste WHERE Id_asta";
 
         // Utilizziamo un oggetto Statement per eseguire la query
-        try (Statement stmt = conn.createStatement()) {
+        try (Statement stmt = gestoreDatabase.getConnection().createStatement()) {
             // Eseguiamo la query e otteniamo il risultato
             ResultSet rs = stmt.executeQuery(query);
-
+            Integer numeroAste = (Integer) richiestaEntrante.payload[0];
+            Integer numeroPagine = (Integer) richiestaEntrante.payload[1];
+            String stringaRicerca = (String) richiestaEntrante.payload[2];
+            int idCategorie [] = (int[]) richiestaEntrante.payload[3];
+            
+            if()
             // Iteriamo attraverso ogni riga del risultato
             while (rs.next()) {
                 // Leggiamo i valori di ogni colonna per la riga corrente
+                Risposta risposta = new Risposta();
+                risposta.payload = new Object[];
+                risposta.payload[0] = 
+                
                 double prezzoInizio = rs.getDouble("prezzo_inizio");
                 Timestamp dataOraInizio = rs.getTimestamp("data_ora_inizio");
                 int durata = rs.getInt("durata");
@@ -291,14 +306,7 @@ public class GestoreClient implements Runnable {
                 int rifLotto = rs.getInt("Rif_lotto");
 
                 // Stampiamo le informazioni della riga corrente
-                System.out.println("Prezzo Inizio: " + prezzoInizio);
-                System.out.println("Data e Ora Inizio: " + dataOraInizio);
-                System.out.println("Durata: " + durata);
-                System.out.println("Asta Automatica: " + astaAutomatica);
-                System.out.println("IP Multicast: " + ipMulticast);
-                System.out.println("Descrizione Annullamento: " + descrizioneAnnullamento);
-                System.out.println("Riferimento Lotto: " + rifLotto);
-                System.out.println("-----------------------------------------");
+         
             }
         }
     }
