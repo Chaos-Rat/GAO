@@ -298,7 +298,7 @@ public class GestoreClient implements Runnable {
 		password must contain 1 non-alpha numeric number
 		password is 8-16 characters with no space
 		*/
-		if (!Pattern.matches("/^(?=.*\\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^\\w\\d\\s:])([^\\s]){8,16}$", passwordInput)) {
+		if (!Pattern.matches("^(?=.*\\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^\\w\\d\\s:])([^\\s]){8,16}$", passwordInput)) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "password" };
 			return;
@@ -347,7 +347,7 @@ public class GestoreClient implements Runnable {
 		String queryRegistrazione = "INSERT INTO Utenti(nome, cognome, data_nascita, citta_residenza, " + 
 			"cap, indirizzo, email, sale_password, " +
 			"hash_password, iban)\n" +
-			"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+			"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
 		;
 
 		try {

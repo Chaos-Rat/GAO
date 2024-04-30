@@ -17,6 +17,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 public class RegisterController {
     @FXML
@@ -117,11 +118,11 @@ public class RegisterController {
         richiesta.payload[0] = nameField.getText();
         richiesta.payload[1] = cognField.getText();
         richiesta.payload[2] = passF.getText();
-        richiesta.payload[3] = dateP.getChronology();
+        richiesta.payload[3] = dateP.getValue();
         richiesta.payload[4] = cityField.getText();
-        richiesta.payload[5] = capField.getText();
+        richiesta.payload[5] = Integer.parseInt(capField.getText());
         richiesta.payload[6] = addressField.getText();
-        richiesta.payload[7] = addressField.getText();
+        richiesta.payload[7] = emailF.getText();
         richiesta.payload[8] = ibanField.getText();
         HelloApplication.output.writeObject(richiesta);
         Risposta risposta = (Risposta) HelloApplication.input.readObject();
@@ -140,6 +141,7 @@ public class RegisterController {
         else if (risposta.tipoRisposta == Risposta.TipoRisposta.ERRORE && risposta.payload[0]==Risposta.TipoErrore.CAMPI_INVALIDI)
         {
             System.out.println("Please fill out all the required fields");
+            System.out.println(risposta.payload[1]);
         }
 
     }
