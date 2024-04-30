@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import aste.Richiesta;
 import aste.Risposta;
+import aste.Risposta.TipoErrore;
 import aste.Risposta.TipoRisposta;
 
 public class GestoreClient implements Runnable {
@@ -43,8 +44,10 @@ public class GestoreClient implements Runnable {
 			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
 
 			while (!socket.isClosed()) {
-				richiestaEntrante = (Richiesta)inputStream.readObject();
+				// Risposta resettata
+				rispostaUscente = new Risposta();
 
+				richiestaEntrante = (Richiesta)inputStream.readObject();
 				gestisciRichiesta();
 
 				outputStream.writeObject(rispostaUscente);
@@ -226,12 +229,43 @@ public class GestoreClient implements Runnable {
 		String password = (String)richiestaEntrante.payload[1];
 
 		Pattern patternEmail = Pattern.compile("^((?!\\.)[\\w\\-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])$");
-		Matcher matcher = patternEmail.matcher(email);
+		Matcher matcherEmail = patternEmail.matcher(email);
 		
-		if (!matcher.find()) {
-			// TODO: Send error message
+		Pattern patternPassword = Pattern.compile("^(?=.*\\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^\\w\\d\\s:])([^\\s]){8,16}$");
+		Matcher matcherPassword = patternPassword.matcher(password);
+
+		if (!matcherEmail.find() || !matcherPassword.find()) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ Risposta.TipoErrore.CAMPI_INVALIDI };
+			return;
+		}
+
+		String queryUtenti = "SELECT Id_utente, sale_password, hash_password\n" +
+			"FROM Utenti;"
+		;
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(queryUtenti);
+
+			while (resultSet.next()) {
+				Integer idUtente = resultSet.getInt("Id_utente");
+				byte[] salePassword = resultSet.getBytes("sale_password");
+				byte[] hashPassword = resultSet.getBytes("hash_password");
+
+				
+			}
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nella query di login.");
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
     }
+
+	private void verificaPassword(String password, byte[] salt, byte[] expectedHash) {
+		
+	}
 
     private void registrazione() {
         // Implementazione della registrazione
