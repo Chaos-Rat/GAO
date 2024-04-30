@@ -358,7 +358,8 @@ public class GestoreClient implements Runnable {
     // Metodo per caricare tutte le aste in un array list 
     private ArrayList<Object> precaricamentoAste() {
         // Definiamo la query SQL per selezionare tutte le aste
-        String query = "SELECT Asta.Id_asta, Asta.durata, Lotto.nome, Immagine.Id_immagine FROM Aste, Lotto, Immagine";
+        String query = "SELECT aste.Id_asta, aste.durata, lotti.nome, immagini.Id_immagine"+ 
+        "FROM aste, lotti, immagini;";
         
         try {
             Statement stmt = gestoreDatabase.getConnection().createStatement();
@@ -404,13 +405,28 @@ public class GestoreClient implements Runnable {
 
         
         // Definiamo la query SQL per selezionare tutte le aste
-        String query = "SELECT Asta.Id_asta, Asta.durata, Lotto.nome, Immagine.Id_immagine FROM Aste, Lotto, Immagine LIMIT 5 OFFSET "+ 
-        ((numeroPagina-1)*numeroAste)+ " WHERE Lotto.nome like '"+ stringaRicerca+ "%';";
+        /*
+        SELECT aste.Id_asta, aste.durata, Lotto.nome, Immagine.Id_immagine, articoli.nome, categorie.Id_categoria, lotti.nome, articoli.nome, categorie.Id_categoria
+        FROM articoli 
+        JOIN lotti 
+        ON articoli.Rif_lotto=lotti.Id_lotto 
+        JOIN articoli_categorie 
+        ON articoli.Id_articolo=articoli_categorie.Rif_articolo 
+        JOIN categorie 
+    O   N articoli_categorie.Rif_categoria=categorie.Id_categoria
+        */
+        
+        String query = "SELECT Asta.Id_asta, Asta.durata, Lotto.nome, Immagine.Id_immagine, articoli.nome, categorie.Id_categoria" +
+        "FROM Aste, Lotto, Immagine LIMIT 5 OFFSET "+ 
+        ((numeroPagina-1)*numeroAste)+ " Articoli JOIN Lotto ON Articolo.nome=Lotto.nome WHERE Articolo.nome like '"
+        + stringaRicerca+ "%' OR Lotto.nome like '"+ stringaRicerca+ "%';";
 
         
 
         // Utilizziamo un oggetto Statement per eseguire la query
         rispostaUscente.payload[0] = precaricamentoAste();
+    }public void setGestoreDatabase(GestoreDatabase gestoreDatabase) {
+        this.gestoreDatabase = gestoreDatabase;
     }
 
     private void visualizzaAsteConcluse() {

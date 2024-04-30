@@ -15,15 +15,16 @@ import java.net.Socket;
 public class HelloApplication extends Application
 {
     private static Socket socket;
-    public static ObjectInputStream input;
     public static ObjectOutputStream output;
+    public static ObjectInputStream input;
 
     static {
         try {
             socket = new Socket("localhost",3000);
-            System.out.println("sono connesso negro");
-            input = new ObjectInputStream(socket.getInputStream());
+            System.out.println("sono connesso :)");
             output = new ObjectOutputStream(socket.getOutputStream());
+            input = new ObjectInputStream(socket.getInputStream());
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
