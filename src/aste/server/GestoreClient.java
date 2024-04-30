@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,8 +48,8 @@ public class GestoreClient implements Runnable {
 	@Override
 	public void run() {
 		try {
-			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
 			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
 
 			while (!socket.isClosed()) {
 				// Risposta resettata
@@ -232,8 +233,8 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void login() {
-		String inputEmail = (String)richiestaEntrante.payload[0];
-		String inputPassword = (String)richiestaEntrante.payload[1];
+		String emailInput = (String)richiestaEntrante.payload[0];
+		String passwordInput = (String)richiestaEntrante.payload[1];
 
 		String queryUtenti = "SELECT Id_utente, email, sale_password, hash_password\n" +
 			"FROM Utenti;"
@@ -250,7 +251,7 @@ public class GestoreClient implements Runnable {
 				byte[] salePassword = resultSet.getBytes("sale_password");
 				byte[] hashPassword = resultSet.getBytes("hash_password");
 
-				if (inputEmail.equals(email) || verificaPassword(inputPassword, salePassword, hashPassword)) {
+				if (emailInput.equals(email) || verificaPassword(passwordInput, salePassword, hashPassword)) {
 					this.idUtente = idUtente;
 					rispostaUscente.tipoRisposta = TipoRisposta.OK;
 					return;
@@ -292,7 +293,15 @@ public class GestoreClient implements Runnable {
 	}
 
     private void registrazione() {
-		
+		String nomeInput = (String)richiestaEntrante.payload[0];
+		String cognomeInput = (String)richiestaEntrante.payload[1];
+		String passwordInput = (String)richiestaEntrante.payload[2];
+		LocalDate dataNascitaInput = (LocalDate)richiestaEntrante.payload[2];
+		String cittaResidenzaInput = (String)richiestaEntrante.payload[4];
+		Integer capInput = (Integer)richiestaEntrante.payload[5];
+		String indirizzoInput = (String)richiestaEntrante.payload[6];
+		String emailInput = (String)richiestaEntrante.payload[7];
+		String ibanInput = (String)richiestaEntrante.payload[8];
     }
 
     private void logout() {
