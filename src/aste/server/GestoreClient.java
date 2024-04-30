@@ -4,6 +4,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,8 +14,12 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 
 import aste.Richiesta;
 import aste.Risposta;
@@ -225,22 +232,10 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void login() {
-		String email = (String)richiestaEntrante.payload[0];
-		String password = (String)richiestaEntrante.payload[1];
+		String inputEmail = (String)richiestaEntrante.payload[0];
+		String inputPassword = (String)richiestaEntrante.payload[1];
 
-		Pattern patternEmail = Pattern.compile("^((?!\\.)[\\w\\-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])$");
-		Matcher matcherEmail = patternEmail.matcher(email);
-		
-		Pattern patternPassword = Pattern.compile("^(?=.*\\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^\\w\\d\\s:])([^\\s]){8,16}$");
-		Matcher matcherPassword = patternPassword.matcher(password);
-
-		if (!matcherEmail.find() || !matcherPassword.find()) {
-			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ Risposta.TipoErrore.CAMPI_INVALIDI };
-			return;
-		}
-
-		String queryUtenti = "SELECT Id_utente, sale_password, hash_password\n" +
+		String queryUtenti = "SELECT Id_utente, email, sale_password, hash_password\n" +
 			"FROM Utenti;"
 		;
 
@@ -251,11 +246,19 @@ public class GestoreClient implements Runnable {
 
 			while (resultSet.next()) {
 				Integer idUtente = resultSet.getInt("Id_utente");
+				String email = resultSet.getString("email");
 				byte[] salePassword = resultSet.getBytes("sale_password");
 				byte[] hashPassword = resultSet.getBytes("hash_password");
 
-				
+				if (inputEmail.equals(email) || verificaPassword(inputPassword, salePassword, hashPassword)) {
+					this.idUtente = idUtente;
+					rispostaUscente.tipoRisposta = TipoRisposta.OK;
+					return;
+				}
 			}
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI };
 		} catch (SQLException e) {
 			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nella query di login.");
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
@@ -263,13 +266,33 @@ public class GestoreClient implements Runnable {
 		}
     }
 
-	private void verificaPassword(String password, byte[] salt, byte[] expectedHash) {
-		
+	private boolean verificaPassword(String password, byte[] salt, byte[] hashRisultante) {
+		KeySpec specification = new PBEKeySpec(password.toCharArray(), salt, 65536, 512);
+		SecretKeyFactory factory;
+
+		try {
+			factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+		} catch (NoSuchAlgorithmException e) {
+			throw new Error("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nella verifica della password.");
+		}
+
+		byte[] hash;
+
+		try {
+			hash = factory.generateSecret(specification).getEncoded();
+		} catch (InvalidKeySpecException e) {
+			throw new Error("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nella generazione dell'hash.");
+		}
+
+		if (Arrays.equals(hashRisultante, hash)) {
+			return true;
+		}
+
+		return false;
 	}
 
     private void registrazione() {
-        // Implementazione della registrazione
-
+		
     }
 
     private void logout() {
