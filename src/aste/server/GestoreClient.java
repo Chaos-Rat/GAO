@@ -302,6 +302,19 @@ public class GestoreClient implements Runnable {
 		String indirizzoInput = (String)richiestaEntrante.payload[6];
 		String emailInput = (String)richiestaEntrante.payload[7];
 		String ibanInput = (String)richiestaEntrante.payload[8];
+
+		if (!Pattern.matches("[a-zA-Z ]+", nomeInput)) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI };
+			return;
+		}
+
+		if (!Pattern.matches("[a-zA-Z]+", cognomeInput)) {
+			
+		}
+
+		Pattern patternEmail = Pattern.compile("/^((?!\\.)[\\w\\-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])$");
+		Matcher matcherEmail = patternEmail.matcher(emailInput);
     }
 
     private void logout() {
