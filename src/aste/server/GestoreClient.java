@@ -330,6 +330,7 @@ public class GestoreClient implements Runnable {
 
     // Implementazione della visualizzazione delle aste
     private void visualizzaAste() {
+        rispostaUscente = new Risposta();
         Integer numeroAste = (Integer) richiestaEntrante.payload[0];
         Integer numeroPagina = (Integer) richiestaEntrante.payload[1];
         String stringaRicerca = (String) richiestaEntrante.payload[2];
@@ -338,9 +339,9 @@ public class GestoreClient implements Runnable {
         
         // Definiamo la query SQL per selezionare tutte le aste
         String query = "SELECT Asta.Id_asta, Asta.durata, Lotto.nome, Immagine.Id_immagine FROM Aste, Lotto, Immagine LIMIT 5 OFFSET "+ 
-        ((numeroPagina-1)*numeroAste) +";";
+        ((numeroPagina-1)*numeroAste)+ " WHERE Lotto.nome like '"+ stringaRicerca+ "%';";
 
-        rispostaUscente = new Risposta();
+        
 
         // Utilizziamo un oggetto Statement per eseguire la query
         rispostaUscente.payload[0] = precaricamentoAste();
