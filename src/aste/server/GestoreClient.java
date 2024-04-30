@@ -284,7 +284,7 @@ public class GestoreClient implements Runnable {
 		String nomeInput = (String)richiestaEntrante.payload[0];
 		String cognomeInput = (String)richiestaEntrante.payload[1];
 		String passwordInput = (String)richiestaEntrante.payload[2];
-		LocalDate dataNascitaInput = (LocalDate)richiestaEntrante.payload[2];
+		LocalDate dataNascitaInput = (LocalDate)richiestaEntrante.payload[3];
 		String cittaResidenzaInput = (String)richiestaEntrante.payload[4];
 		Integer capInput = (Integer)richiestaEntrante.payload[5];
 		String indirizzoInput = (String)richiestaEntrante.payload[6];
@@ -343,6 +343,7 @@ public class GestoreClient implements Runnable {
 
 		DatiPassword password = generaPassword(passwordInput);
 
+
 		String queryRegistrazione = "INSERT INTO Utenti(nome, cognome, data_nascita, citta_residenza, " + 
 			"cap, indirizzo, email, sale_password, " +
 			"hash_password, iban)\n" +
@@ -363,7 +364,6 @@ public class GestoreClient implements Runnable {
 			statement.setBytes(9, password.hash);
 			statement.setString(10, ibanInput);
 			statement.executeUpdate();
-
 			rispostaUscente.tipoRisposta = TipoRisposta.OK;
 		} catch (SQLException e) {
 			System.err.println("[" + Thread.currentThread().getName() +

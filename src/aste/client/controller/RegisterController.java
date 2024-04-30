@@ -125,7 +125,7 @@ public class RegisterController {
         richiesta.payload[8] = ibanField.getText();
         HelloApplication.output.writeObject(richiesta);
         Risposta risposta = (Risposta) HelloApplication.input.readObject();
-        if ((Risposta.TipoRisposta) risposta.payload[0] == Risposta.TipoRisposta.OK)
+        if (risposta.tipoRisposta == Risposta.TipoRisposta.OK)
         {
             Parent root = FXMLLoader.load(getClass().getResource("../view/Login.fxml"));
             Scene scene = new Scene(root);
@@ -137,10 +137,11 @@ public class RegisterController {
             Stage stage1 = (Stage) backB.getScene().getWindow();
             stage1.close();
         }
-        if ((Risposta.TipoErrore) risposta.payload[0] == Risposta.TipoErrore.CAMPI_INVALIDI)
+        else if (risposta.tipoRisposta == Risposta.TipoRisposta.ERRORE && risposta.payload[0]==Risposta.TipoErrore.CAMPI_INVALIDI)
         {
             System.out.println("Please fill out all the required fields");
         }
+
     }
     @FXML
     void BackClick(ActionEvent event)
