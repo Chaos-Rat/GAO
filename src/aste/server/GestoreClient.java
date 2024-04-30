@@ -242,8 +242,25 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void login() {
-		String emailInput = (String)richiestaEntrante.payload[0];
-		String passwordInput = (String)richiestaEntrante.payload[1];
+		String emailInput;
+		
+		try {
+			emailInput = (String)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "email"};
+			return;
+		}
+
+		String passwordInput;
+		
+		try {
+			passwordInput = (String)richiestaEntrante.payload[1];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "password"};
+			return;
+		}
 
 		String queryUtenti = "SELECT Id_utente, email, sale_password, hash_password\n" +
 			"FROM Utenti;"
@@ -260,7 +277,7 @@ public class GestoreClient implements Runnable {
 				byte[] salePassword = resultSet.getBytes("sale_password");
 				byte[] hashPassword = resultSet.getBytes("hash_password");
 
-				if (emailInput.equals(email) || verificaPassword(passwordInput, salePassword, hashPassword)) {
+				if (emailInput.equals(email) && verificaPassword(passwordInput, salePassword, hashPassword)) {
 					this.idUtente = idUtente;
 					rispostaUscente.tipoRisposta = TipoRisposta.OK;
 					return;
@@ -268,7 +285,7 @@ public class GestoreClient implements Runnable {
 			}
 
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI };
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
 		} catch (SQLException e) {
 			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nella query di login. " + e.getSQLState());
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
@@ -281,15 +298,35 @@ public class GestoreClient implements Runnable {
 	}
 
     private void registrazione() {
-		String nomeInput = (String)richiestaEntrante.payload[0];
-		String cognomeInput = (String)richiestaEntrante.payload[1];
-		String passwordInput = (String)richiestaEntrante.payload[2];
-		LocalDate dataNascitaInput = (LocalDate)richiestaEntrante.payload[3];
-		String cittaResidenzaInput = (String)richiestaEntrante.payload[4];
-		Integer capInput = (Integer)richiestaEntrante.payload[5];
-		String indirizzoInput = (String)richiestaEntrante.payload[6];
-		String emailInput = (String)richiestaEntrante.payload[7];
-		String ibanInput = (String)richiestaEntrante.payload[8];
+		String nomeInput;
+		
+		try {
+			nomeInput = (String)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "nome" };
+			return;
+		}
+
+		String cognomeInput;
+		
+		try {
+			cognomeInput = (String)richiestaEntrante.payload[1];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "cognome" };
+			return;
+		}
+
+		String passwordInput;
+
+		try {
+			passwordInput = (String)richiestaEntrante.payload[2];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "password" };
+			return;
+		}
 
 		/*
 		password must contain 1 number (0-9)
@@ -304,9 +341,39 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
+		LocalDate dataNascitaInput;
+		
+		try {
+			dataNascitaInput = (LocalDate)richiestaEntrante.payload[3];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "dataNascita" };
+			return;
+		}
+
 		if (dataNascitaInput.isAfter(LocalDate.now())) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "dataNascita" };
+			return;
+		}
+
+		String cittaResidenzaInput;
+		
+		try {
+			cittaResidenzaInput = (String)richiestaEntrante.payload[4];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "cittaResidenza" };
+			return;
+		}
+
+		Integer capInput;
+		
+		try {
+			capInput = (Integer)richiestaEntrante.payload[5];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "cap" };
 			return;
 		}
 
@@ -316,6 +383,26 @@ public class GestoreClient implements Runnable {
 		if (capInput < 0 || capInput > 100000) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "cap" };
+			return;
+		}
+
+		String indirizzoInput;
+
+		try {
+			indirizzoInput = (String)richiestaEntrante.payload[6];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "indirizzo" };
+			return;
+		}
+
+		String emailInput;
+
+		try {
+			emailInput = (String)richiestaEntrante.payload[7];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "email" };
 			return;
 		}
 
@@ -332,6 +419,16 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
+		String ibanInput;
+		
+		try {
+			ibanInput = (String)richiestaEntrante.payload[8];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "iban" };
+			return;
+		}
+
 		/*
 		Alfanumerico tra 2 e 34 lettere (mauiscole).
 		*/
@@ -342,7 +439,6 @@ public class GestoreClient implements Runnable {
 		}
 
 		DatiPassword password = generaPassword(passwordInput);
-
 
 		String queryRegistrazione = "INSERT INTO Utenti(nome, cognome, data_nascita, citta_residenza, " + 
 			"cap, indirizzo, email, sale_password, " +

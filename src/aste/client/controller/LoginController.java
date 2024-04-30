@@ -2,6 +2,7 @@ package aste.client.controller;
 
 import aste.Richiesta;
 import aste.Risposta;
+import aste.Risposta.TipoErrore;
 import aste.client.HelloApplication;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -77,7 +78,7 @@ public class LoginController {
         }
         else
         {
-            if ((Risposta.TipoErrore) risposta.payload[0] == Risposta.TipoErrore.CAMPI_INVALIDI)
+            if ((Risposta.TipoErrore) risposta.payload[0] == TipoErrore.OPERAZIONE_INVALIDA)
             {
                 System.out.println("The Email or Password you entered is invalid");
             }
