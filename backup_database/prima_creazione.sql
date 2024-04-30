@@ -14,7 +14,7 @@ CREATE TABLE Utenti (
 	sale_password BINARY(16) NOT NULL,
 	hash_password BINARY(64) NOT NULL,
 	iban VARCHAR(255) NOT NULL,
-	immagine_profilo BOOLEAN NOT NULL,
+	immagine_profilo BOOLEAN NOT NULL DEFAULT 0,
 	PRIMARY KEY (Id_utente)
 );
 

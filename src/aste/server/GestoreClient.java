@@ -6,9 +6,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -268,14 +270,112 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI };
 		} catch (SQLException e) {
-			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nella query di login.");
+			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nella query di login. " + e.getSQLState());
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
     }
 
-	private boolean verificaPassword(String password, byte[] salt, byte[] hashRisultante) {
-		KeySpec specification = new PBEKeySpec(password.toCharArray(), salt, 65536, 512);
+	private boolean verificaPassword(String password, byte[] sale, byte[] hashRisultante) {
+		return Arrays.equals(hashRisultante, generaPassword(password, sale));
+	}
+
+    private void registrazione() {
+		String nomeInput = (String)richiestaEntrante.payload[0];
+		String cognomeInput = (String)richiestaEntrante.payload[1];
+		String passwordInput = (String)richiestaEntrante.payload[2];
+		LocalDate dataNascitaInput = (LocalDate)richiestaEntrante.payload[2];
+		String cittaResidenzaInput = (String)richiestaEntrante.payload[4];
+		Integer capInput = (Integer)richiestaEntrante.payload[5];
+		String indirizzoInput = (String)richiestaEntrante.payload[6];
+		String emailInput = (String)richiestaEntrante.payload[7];
+		String ibanInput = (String)richiestaEntrante.payload[8];
+
+		/*
+		password must contain 1 number (0-9)
+		password must contain 1 uppercase letters
+		password must contain 1 lowercase letters
+		password must contain 1 non-alpha numeric number
+		password is 8-16 characters with no space
+		*/
+		if (!Pattern.matches("/^(?=.*\\d)(?=.*[A-Z])(?=.*[a-z])(?=.*[^\\w\\d\\s:])([^\\s]){8,16}$", passwordInput)) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "password" };
+			return;
+		}
+
+		if (dataNascitaInput.isAfter(LocalDate.now())) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "dataNascita" };
+			return;
+		}
+
+		/*
+		Il CAP e un codice di 5 cifre. 
+		*/
+		if (capInput < 0 || capInput > 100000) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "cap" };
+			return;
+		}
+
+		/*
+		The email couldn't start or finish with a dot
+		The email shouldn't contain spaces into the string
+		The email shouldn't contain special chars (<:, *,ecc)
+		The email could contain dots in the middle of mail address before the @
+		The email could contain a double doman ( '.de.org' or similar rarity)
+		*/
+		if (!Pattern.matches("^((?!\\.)[\\w\\-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])$", emailInput)) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "email" };
+			return;
+		}
+
+		/*
+		Alfanumerico tra 2 e 34 lettere (mauiscole).
+		*/
+		if (!Pattern.matches("^[A-Z0-9]{2,34}$", ibanInput)) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "iban" };
+			return;
+		}
+
+		DatiPassword password = generaPassword(passwordInput);
+
+		String queryRegistrazione = "INSERT INTO Utenti(nome, cognome, data_nascita, citta_residenza, " + 
+			"cap, indirizzo, email, sale_password, " +
+			"hash_password, iban)\n" +
+			"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+		;
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement statement = connection.prepareStatement(queryRegistrazione);
+			statement.setString(1, nomeInput);
+			statement.setString(2, cognomeInput);
+			statement.setDate(3, java.sql.Date.valueOf(dataNascitaInput));
+			statement.setString(4, cittaResidenzaInput);
+			statement.setInt(5, capInput);
+			statement.setString(6, indirizzoInput);
+			statement.setString(7, emailInput);
+			statement.setBytes(8, password.sale);
+			statement.setBytes(9, password.hash);
+			statement.setString(10, ibanInput);
+			statement.executeUpdate();
+
+			rispostaUscente.tipoRisposta = TipoRisposta.OK;
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di registrazione." + e.getSQLState()
+			);
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
+    }
+
+	private byte[] generaPassword(String password, byte[] sale) {
+		KeySpec specification = new PBEKeySpec(password.toCharArray(), sale, 65536, 512);
 		SecretKeyFactory factory;
 
 		try {
@@ -292,39 +392,39 @@ public class GestoreClient implements Runnable {
 			throw new Error("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nella generazione dell'hash.");
 		}
 
-		if (Arrays.equals(hashRisultante, hash)) {
-			return true;
-		}
-
-		return false;
+		return hash;
 	}
 
-    private void registrazione() {
-		String nomeInput = (String)richiestaEntrante.payload[0];
-		String cognomeInput = (String)richiestaEntrante.payload[1];
-		String passwordInput = (String)richiestaEntrante.payload[2];
-		LocalDate dataNascitaInput = (LocalDate)richiestaEntrante.payload[2];
-		String cittaResidenzaInput = (String)richiestaEntrante.payload[4];
-		Integer capInput = (Integer)richiestaEntrante.payload[5];
-		String indirizzoInput = (String)richiestaEntrante.payload[6];
-		String emailInput = (String)richiestaEntrante.payload[7];
-		String ibanInput = (String)richiestaEntrante.payload[8];
+	private DatiPassword generaPassword(String password) {
+		SecureRandom random = new SecureRandom();
+		byte[] sale = new byte[16];
+		random.nextBytes(sale);
 
+		return new DatiPassword(sale, generaPassword(password, sale));
+	}
 
+	
 
-		Pattern patternEmail = Pattern.compile("/^((?!\\.)[\\w\\-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])$");
-		Matcher matcherEmail = patternEmail.matcher(emailInput);
-    }
+	private static class DatiPassword {
+		public byte[] sale;
+		public byte[] hash;
+
+		public DatiPassword(byte[] sale, byte[] hash) {
+			this.sale = sale;
+			this.hash = hash;
+		}
+	} 
 
     private void logout() {
         // Implementazione del logout
-        if (idUtente==0)
+        if (idUtente == 0)
         {
             rispostaUscente.tipoRisposta = Risposta.TipoRisposta.ERRORE;
             rispostaUscente.payload = new Object[] {Risposta.TipoErrore.OPERAZIONE_INVALIDA};
             return;
         }
-        idUtente = 0;
+        
+		idUtente = 0;
         rispostaUscente.tipoRisposta = Risposta.TipoRisposta.OK;
     }
 
