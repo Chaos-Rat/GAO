@@ -471,7 +471,7 @@ public class GestoreClient implements Runnable {
     }
 
 	private byte[] generaPassword(String password, byte[] sale) {
-		KeySpec specification = new PBEKeySpec(password.toCharArray(), sale, 65536, 512);
+		KeySpec specification = new PBEKeySpec(password.toCharArray(), sale, 4, 512);
 		SecretKeyFactory factory;
 
 		try {
