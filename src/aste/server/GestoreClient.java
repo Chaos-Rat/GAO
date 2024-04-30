@@ -619,112 +619,104 @@ public class GestoreClient implements Runnable {
 		}
 	}
 
-	private void modificaProfilo() {
-		// Implementazione della modifica del profilo
+	private void modificaProfilo() 
+    {
+        // Implementazione della modifica del profilo
 
-	}
+    }
 
-	// Metodo per caricare tutte le aste in un array list 
-	private ArrayList<Object> precaricamentoAste() {
-		// Definiamo la query SQL per selezionare tutte le aste
-		String query = "SELECT aste.Id_asta, aste.durata, lotti.nome, immagini.Id_immagine"+ 
-		"FROM aste, lotti, immagini;";
-		
-		try {
+    // Metodo per caricare tutte le aste in un array list 
+    private ArrayList<Object> precaricamentoAste() {
+        // Definiamo la query SQL per selezionare tutte le aste
+        String query = "SELECT aste.Id_asta, aste.durata, lotti.nome, immagini.Id_immagine"+ 
+        "FROM aste, lotti, immagini;";
+        
+        try {
+            Statement stmt = gestoreDatabase.getConnection().createStatement();
+            // Cariciamo il payload richiestaEntrante per sapere quante pagine e aste faciamo vedere nella pagina
+            ResultSet rs = stmt.executeQuery(query);
+            
+            // Iteriamo attraverso ogni riga del risultato
+            while (rs.next()) {
+                // Creamo un array di object per contenere pià aste in una pagina 
+                Object[] aste = new Object[4];
+
+                // I dati di una singola asta 
+                Integer idAsta = rs.getInt("id_asta");
+                Timestamp durata = rs.getTimestamp("data_ora_inizio");
+                Float prezzoAttuale = rs.getFloat("data_ora_inizio");
+                String nomeLotto = rs.getString("data_ora_inizio");
+                Byte ImmaginePrincipale = rs.getByte("data_ora_inizio"); 
+
+                // cariciamo i dati di una singola asta nel array 
+                aste[0]= idAsta;
+                aste[1]= durata;
+                aste[2]= prezzoAttuale;
+                aste[3]= nomeLotto;
+                aste[4]= ImmaginePrincipale;
+
+                // cariciamo l'array nel payload 
+                precaricamentoAste().add(aste);
+            }
+        } catch (SQLException e) {
+            
+        }
+
+        return precaricamentoAste();
+    }
+
+    // Implementazione della visualizzazione delle aste
+    private void visualizzaAste() {
+        rispostaUscente = new Risposta();
+        Integer numeroAste = (Integer) richiestaEntrante.payload[0];
+        Integer numeroPagina = (Integer) richiestaEntrante.payload[1];
+        String stringaRicerca = (String) richiestaEntrante.payload[2];
+        int[] idCategorie = (int[]) richiestaEntrante.payload[3];
+
+        
+        // Definiamo la query SQL per selezionare tutte le aste
+        String query = "SELECT aste.Id_asta, aste.durata, lotti.nome, immagini.Id_immagine,"+ 
+        "articoli.nome, categorie.Id_categoria, lotti.nome, articoli.nome, categorie.Id_categoria" +
+        "FROM articoli JOIN lotti ON articoli.Rif_lotto=lotti.Id_lotto"+
+        "JOIN articoli_categorie ON articoli.Id_articolo=articoli_categorie.Rif_articolo"+ 
+        "JOIN categorie "+ 
+        "ON articoli_categorie.Rif_categoria=categorie.Id_categoria "+ 
+        "WHERE Articolo.nome like '"+ stringaRicerca+ "%' OR Lotto.nome like '"+ stringaRicerca+ "%'"+ 
+        "LIMIT 5 OFFSET "+ ((numeroPagina-1)*numeroAste)+ ";";
+
+        
+
+        // Utilizziamo un oggetto Statement per eseguire la query
+        rispostaUscente.payload[0] = precaricamentoAste();
+    }
+
+    private void visualizzaAsteConcluse() {
+        // Implementazione della visualizzazione delle aste concluse
+        // Definiamo la query SQL per selezionare tutte le aste conqulse 
+        String query = "SELECT COUNT(*) AS numero_aste, CURDATE() FROM Aste WHERE data_ora_inizio + durata < CURDATE()";
+
+        // Utilizziamo un oggetto Statement per eseguire la query
+        try {
 			Statement stmt = gestoreDatabase.getConnection().createStatement();
-			// Cariciamo il payload richiestaEntrante per sapere quante pagine e aste faciamo vedere nella pagina
-			ResultSet rs = stmt.executeQuery(query);
-			
-			// Iteriamo attraverso ogni riga del risultato
-			while (rs.next()) {
-				// Creamo un array di object per contenere pià aste in una pagina 
-				Object[] aste = new Object[4];
+            // Eseguiamo la query e otteniamo il risultato
+            ResultSet rs = stmt.executeQuery(query);
 
-				// I dati di una singola asta 
-				Integer idAsta = rs.getInt("id_asta");
-				Timestamp durata = rs.getTimestamp("data_ora_inizio");
-				Float prezzoAttuale = rs.getFloat("data_ora_inizio");
-				String nomeLotto = rs.getString("data_ora_inizio");
-				Byte ImmaginePrincipale = rs.getByte("data_ora_inizio"); 
+            // Iteriamo attraverso ogni riga del risultato
+            while (rs.next()) {
+                // Leggiamo i valori di ogni colonna per la riga corrente
+                Integer numeroAste = rs.getInt("numero_aste");
+                Integer numeroPagina = rs.getInt("numero_pagina");
+                String ricerca = rs.getString("ricerca");
+                int idCategorie = rs.getInt("id_categorie");
 
-				// cariciamo i dati di una singola asta nel array 
-				aste[0]= idAsta;
-				aste[1]= durata;
-				aste[2]= prezzoAttuale;
-				aste[3]= nomeLotto;
-				aste[4]= ImmaginePrincipale;
-
-				// cariciamo l'array nel payload 
-				precaricamentoAste().add(aste);
-			}
-		} catch (SQLException e) {
-			
-		}
-
-		return precaricamentoAste();
-	}
-
-	// Implementazione della visualizzazione delle aste
-	private void visualizzaAste() {
-		rispostaUscente = new Risposta();
-		Integer numeroAste = (Integer) richiestaEntrante.payload[0];
-		Integer numeroPagina = (Integer) richiestaEntrante.payload[1];
-		String stringaRicerca = (String) richiestaEntrante.payload[2];
-		int[] idCategorie = (int[]) richiestaEntrante.payload[3];
-
-		
-		// Definiamo la query SQL per selezionare tutte le aste
-		/*
-		SELECT aste.Id_asta, aste.durata, Lotto.nome, Immagine.Id_immagine, articoli.nome, categorie.Id_categoria, lotti.nome, articoli.nome, categorie.Id_categoria
-		FROM articoli 
-		JOIN lotti 
-		ON articoli.Rif_lotto=lotti.Id_lotto 
-		JOIN articoli_categorie 
-		ON articoli.Id_articolo=articoli_categorie.Rif_articolo 
-		JOIN categorie 
-	O   N articoli_categorie.Rif_categoria=categorie.Id_categoria
-		*/
-		
-		String query = "SELECT Asta.Id_asta, Asta.durata, Lotto.nome, Immagine.Id_immagine, articoli.nome, categorie.Id_categoria" +
-		"FROM Aste, Lotto, Immagine LIMIT 5 OFFSET "+ 
-		((numeroPagina-1)*numeroAste)+ " Articoli JOIN Lotto ON Articolo.nome=Lotto.nome WHERE Articolo.nome like '"
-		+ stringaRicerca+ "%' OR Lotto.nome like '"+ stringaRicerca+ "%';";
-
-		
-
-		// Utilizziamo un oggetto Statement per eseguire la query
-		rispostaUscente.payload[0] = precaricamentoAste();
-	}public void setGestoreDatabase(GestoreDatabase gestoreDatabase) {
-		this.gestoreDatabase = gestoreDatabase;
-	}
-
-	private void visualizzaAsteConcluse() {
-		// Implementazione della visualizzazione delle aste concluse
-		// Definiamo la query SQL per selezionare tutte le aste conqulse 
-		String query = "SELECT COUNT(*) AS numero_aste, CURDATE() FROM Aste WHERE data_ora_inizio + durata < CURDATE()";
-
-		// Utilizziamo un oggetto Statement per eseguire la query
-		try {
-			Statement stmt = gestoreDatabase.getConnection().createStatement();
-			// Eseguiamo la query e otteniamo il risultato
-			ResultSet rs = stmt.executeQuery(query);
-
-			// Iteriamo attraverso ogni riga del risultato
-			while (rs.next()) {
-				// Leggiamo i valori di ogni colonna per la riga corrente
-				Integer numeroAste = rs.getInt("numero_aste");
-				Integer numeroPagina = rs.getInt("numero_pagina");
-				String ricerca = rs.getString("ricerca");
-				int idCategorie = rs.getInt("id_categorie");
-
-				// Stampiamo le informazioni della riga corrente
-				System.out.println("Numero Aste: " + numeroAste);
-				System.out.println("Numero Pagina: " + numeroPagina);
-				System.out.println("Ricerca: " + ricerca);
-				System.out.println("Id Categorie: " + idCategorie);
-				System.out.println("-----------------------------------------");
-			}
-		} catch (SQLException e) {
+                // Stampiamo le informazioni della riga corrente
+                System.out.println("Numero Aste: " + numeroAste);
+                System.out.println("Numero Pagina: " + numeroPagina);
+                System.out.println("Ricerca: " + ricerca);
+                System.out.println("Id Categorie: " + idCategorie);
+                System.out.println("-----------------------------------------");
+            }
+        } catch (SQLException e) {
 
 		}
 	}
