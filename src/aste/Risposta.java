@@ -14,6 +14,7 @@ public class Risposta implements Serializable {
 	}
 
 	public static enum TipoErrore {
+		RICHIESTA_INVALIDA,
 		CAMPI_INVALIDI,
 		OPERAZIONE_INVALIDA,
 		GENERICO

@@ -1,6 +1,7 @@
 package aste.server;
 
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -24,6 +25,7 @@ import javax.crypto.spec.PBEKeySpec;
 
 import aste.Richiesta;
 import aste.Risposta;
+import aste.Richiesta.TipoRichiesta;
 import aste.Risposta.TipoErrore;
 import aste.Risposta.TipoRisposta;
 
@@ -55,22 +57,27 @@ public class GestoreClient implements Runnable {
 				// Risposta resettata
 				rispostaUscente = new Risposta();
 
-				richiestaEntrante = (Richiesta)inputStream.readObject();
-				gestisciRichiesta();
+				try {
+					richiestaEntrante = (Richiesta)inputStream.readObject();
+					gestisciRichiesta();
+				} catch (ClassNotFoundException	| InvalidClassException e) {
+					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+					rispostaUscente.payload = new Object[]{ TipoErrore.RICHIESTA_INVALIDA };
+				}
 
 				outputStream.writeObject(rispostaUscente);
 			}
-
 		} catch (IOException e) {
-
-		} catch (ClassNotFoundException e) {
-			
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: Errore I/O: " + e.getMessage() +
+				"."
+			);
 		} finally {
 			try {
 				socket.close();
 			} catch (IOException e) {
 				System.err.println("[" + Thread.currentThread().getName() +
-					"]: Impossibile chiudere ServerSocket: " + e.getMessage() +
+					"]: Impossibile chiudere Socket: " + e.getMessage() +
 					"."
 				);
 			}
@@ -303,15 +310,7 @@ public class GestoreClient implements Runnable {
 		String emailInput = (String)richiestaEntrante.payload[7];
 		String ibanInput = (String)richiestaEntrante.payload[8];
 
-		if (!Pattern.matches("[a-zA-Z ]+", nomeInput)) {
-			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI };
-			return;
-		}
 
-		if (!Pattern.matches("[a-zA-Z]+", cognomeInput)) {
-			
-		}
 
 		Pattern patternEmail = Pattern.compile("/^((?!\\.)[\\w\\-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])$");
 		Matcher matcherEmail = patternEmail.matcher(emailInput);
