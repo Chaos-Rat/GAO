@@ -221,14 +221,184 @@ public class GestoreClient implements Runnable {
 		throw new UnsupportedOperationException("Unimplemented method 'visualizzaPuntate'");
 	}
 
+	// Metodo Visualizza lotto 
 	private void visualizzaLotto() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'visualizzaLotto'");
+		// conmtrollo se l'utente e conesso 
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
+
+
 	}
 
+	// Metodo visualizza lotti 
 	private void visualizzaLotti() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'visualizzaLotti'");
+		// conmtrollo se l'utente e conesso 
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
+
+		// Funzione per avere il numero degli articoli 
+		Integer numeroLotti;
+
+		try {
+			numeroLotti = (Integer)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroLotti"};
+			return;
+		}
+
+		if (numeroLotti == null || numeroLotti <= 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroLotti"};
+			return;
+		}
+
+		// Funzione per avere il numero della pagina 
+		Integer numeroPagina;
+
+		try {
+			numeroPagina = (Integer)richiestaEntrante.payload[1];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroPagina"};
+			return;
+		}
+
+		if (numeroPagina == null || numeroLotti <= 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroPagina"};
+			return;
+		}
+
+		// Funzione per ls ricerca degli articoli 
+		String stringaRicerca;
+
+		try {
+			stringaRicerca = (String)richiestaEntrante.payload[2];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "stringaRicerca"};
+			return;
+		}
+
+		if (stringaRicerca == null) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "stringaRicerca"};
+			return;
+		}
+
+		// Funzione per avere le categoria 
+		Integer idCategoriaInput;
+
+		try {
+			idCategoriaInput = (Integer)richiestaEntrante.payload[3];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria"};
+			return;
+		}
+
+		if (idCategoriaInput == null) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria"};
+			return;
+		}
+
+		// controllo se la categoria presa esiste 
+		String queryControlloCategoria = "SELECT Id_categoria\n" +
+			"FROM Categorie\n" + 
+			"WHERE Id_categoria = ?;"
+		;
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloCategoria);
+			preparedStatement.setInt(1, idCategoriaInput);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			if (!resultSet.next()) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria" };
+				return;
+			}
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di controllo dell'idCategoria nella creazione dell'articolo. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
+
+		// Impostazione della query finale 
+		String queryVisualizzazione = "SELECT Lotti.Id_lotto, Lotti.nome, Immagini.Id_immagine\n" + 
+			"FROM Lotti\n" +
+			"LEFT JOIN Articoli ON Articoli.Rif_lotto = Lotti.Id_lotto\n" +
+			"JOIN Immagini ON Immagini.Rif_Lotti = Lotti.Id_lotto\n" +
+			"WHERE Articoli.Rif_utente = ? AND Articoli.Rif_categoria = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1\n" +
+			"LIMIT ? OFFSET ?;";
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
+			preparedStatement.setInt(1, idUtente);
+			preparedStatement.setInt(2, idCategoriaInput);
+			preparedStatement.setString(3, "%"+ stringaRicerca+ "%");
+			preparedStatement.setInt(4, numeroLotti);
+			preparedStatement.setInt(5, ((numeroPagina-1)*numeroLotti));
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			// array list per gli oggetti dei lotti 
+			ArrayList<Object> lotti= new ArrayList<>();
+
+			// While per caricare l'array list 
+			while (resultSet.next()) {
+				lotti.add(resultSet.getInt("Id_lotto"));
+				lotti.add(resultSet.getString("nome"));
+				
+				int idImmagine= resultSet.getInt("Id_immagine");
+				FileInputStream stream;
+				if (resultSet.wasNull()) {
+					stream= new FileInputStream("static_resources\\default_articolo.png");
+				} else {
+					stream= new FileInputStream("res\\immagini_articoli\\"+ idImmagine+ ".png");
+				}
+
+				lotti.add(stream.readAllBytes());
+
+				stream.close();
+			}
+
+			// If se l'array list ritorna vuoto 
+			if(lotti.size() == 0) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroPagina" };
+				return;
+			}
+
+			// Transformazione del array list in array e risposta nel payload uscita 
+			rispostaUscente.payload = lotti.toArray();
+			rispostaUscente.tipoRisposta= TipoRisposta.OK;
+
+		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di vissualizazione lotti. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+
+		} catch (IOException e) { // questo catch e per gli errori che potrebbe dare il caricamento del immagine del utente
+			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nell'apertura/scrittura delle immagine profilo. " + e.getMessage());
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
 	}
 
 	private void visualizzaCategorie() {
@@ -1366,40 +1536,14 @@ public class GestoreClient implements Runnable {
 		// Implementazione della modifica di un'asta
 	}
 
+	// Metodo visualizza asta 
 	private void visualizzaAsta() {
-		// // Implementazione della visualizzazione di un'asta
-		// // Definiamo la query SQL per selezionare tutte le aste
-		// String query = "SELECT * FROM Aste WHERE Id_asta";
-
-		// // Utilizziamo un oggetto Statement per eseguire la query
-		// try (Statement stmt = gestoreDatabase.getConnection().createStatement()) {
-		//     // Eseguiamo la query e otteniamo il risultato
-		//     ResultSet rs = stmt.executeQuery(query);
-		//     Integer numeroAste = (Integer) richiestaEntrante.payload[0];
-		//     Integer numeroPagine = (Integer) richiestaEntrante.payload[1];
-		//     String stringaRicerca = (String) richiestaEntrante.payload[2];
-		//     int idCategorie [] = (int[]) richiestaEntrante.payload[3];
-			
-		//     if()
-		//     // Iteriamo attraverso ogni riga del risultato
-		//     while (rs.next()) {
-		//         // Leggiamo i valori di ogni colonna per la riga corrente
-		//         Risposta risposta = new Risposta();
-		//         risposta.payload = new Object[];
-		//         risposta.payload[0] = 
-				
-		//         double prezzoInizio = rs.getDouble("prezzo_inizio");
-		//         Timestamp dataOraInizio = rs.getTimestamp("data_ora_inizio");
-		//         int durata = rs.getInt("durata");
-		//         boolean astaAutomatica = rs.getBoolean("asta_automatica");
-		//         String ipMulticast = rs.getString("ip_multicast");
-		//         String descrizioneAnnullamento = rs.getString("descrizione_annullamento");
-		//         int rifLotto = rs.getInt("Rif_lotto");
-
-		//         // Stampiamo le informazioni della riga corrente
-		 
-		//     }
-		// }
+		// conmtrollo se l'utente e conesso 
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
 	}
 
 	private void salvaAsta() {
@@ -1516,7 +1660,7 @@ public class GestoreClient implements Runnable {
 		// Impostazione della query finale 
 		String queryVisualizzazione = "SELECT Articoli.Id_articolo, Articoli.nome, Articoli.condizione, Immagini.Id_immagine\n" + 
 			"FROM Articoli\n" +
-			"LEFT JOIN Immagini ON Articoli.Id_articolo = Immagini.Id_immagine\n" +
+			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
 			"WHERE Articoli.Rif_utente = ? AND Articoli.Rif_categoria = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1\n" +
 			"LIMIT ? OFFSET ?;";
 
@@ -1576,6 +1720,5 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
-
 	}
 }
