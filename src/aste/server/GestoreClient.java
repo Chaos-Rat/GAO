@@ -389,7 +389,7 @@ public class GestoreClient implements Runnable {
 		} catch (IOException e) { // questo catch e per gli errori che potrebbe dare il caricamento del immagine del utente
 			System.err.println("[" +
 				Thread.currentThread().getName() +
-				"]: C'e' stato un errore nell'apertura/lettura/chiusura delle immagini degli articoli. "
+				"]: C'e' stato un errore nell'apertura/lettura/chiusura delle immagini dei lotti. "
 				+ e.getMessage()
 			);
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
@@ -1363,27 +1363,168 @@ public class GestoreClient implements Runnable {
 
     // Implementazione della visualizzazione delle aste
     private void visualizzaAste() {
-        rispostaUscente = new Risposta();
-        Integer numeroAste = (Integer) richiestaEntrante.payload[0];
-        Integer numeroPagina = (Integer) richiestaEntrante.payload[1];
-        String stringaRicerca = (String) richiestaEntrante.payload[2];
-        int[] idCategorie = (int[]) richiestaEntrante.payload[3];
+        // conmtrollo se l'utente e conesso 
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
 
-        
-        // Definiamo la query SQL per selezionare tutte le aste
-        String query = "SELECT aste.Id_asta, aste.durata, lotti.nome, immagini.Id_immagine,"+ 
-        "articoli.nome, categorie.Id_categoria, lotti.nome, articoli.nome, categorie.Id_categoria" +
-        "FROM articoli JOIN lotti ON articoli.Rif_lotto=lotti.Id_lotto"+
-        "JOIN articoli_categorie ON articoli.Id_articolo=articoli_categorie.Rif_articolo"+ 
-        "JOIN categorie "+ 
-        "ON articoli_categorie.Rif_categoria=categorie.Id_categoria "+ 
-        "WHERE Articolo.nome like '"+ stringaRicerca+ "%' OR Lotto.nome like '"+ stringaRicerca+ "%'"+ 
-        "LIMIT 5 OFFSET "+ ((numeroPagina-1)*numeroAste)+ ";";
+		// Funzione per avere il numero delle aste 
+		Integer numeroAste;
 
-        
+		try {
+			numeroAste = (Integer)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroAste"};
+			return;
+		}
 
-        // Utilizziamo un oggetto Statement per eseguire la query
-        rispostaUscente.payload[0] = precaricamentoAste();
+		if (numeroAste == null || numeroAste <= 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroAste"};
+			return;
+		}
+
+		// Funzione per avere il numero della pagina 
+		Integer numeroPagina;
+
+		try {
+			numeroPagina = (Integer)richiestaEntrante.payload[1];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroPagina"};
+			return;
+		}
+
+		if (numeroPagina == null || numeroAste <= 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroPagina"};
+			return;
+		}
+
+		// Funzione per la ricerca delle aste 
+		String stringaRicerca;
+
+		try {
+			stringaRicerca = (String)richiestaEntrante.payload[2];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "stringaRicerca"};
+			return;
+		}
+
+		if (stringaRicerca == null) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "stringaRicerca"};
+			return;
+		}
+
+		// Funzione per avere le categoria 
+		Integer idCategoriaInput;
+
+		try {
+			idCategoriaInput = (Integer)richiestaEntrante.payload[3];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria"};
+			return;
+		}
+
+		if (idCategoriaInput == null) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria"};
+			return;
+		}
+
+		// controllo se la categoria presa esiste 
+		String queryControlloCategoria = "SELECT Id_categoria\n" +
+			"FROM Categorie\n" + 
+			"WHERE Id_categoria = ?;"
+		;
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloCategoria);
+			preparedStatement.setInt(1, idCategoriaInput);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			if (!resultSet.next()) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria" };
+				return;
+			}
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di controllo dell'idCategoria nella visualizzazione delle aste. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
+
+		// Impostazione della query finale 
+		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_aste, Aste.durata, Aste.prezzo_attuale, Lotti.nome, Immagini.Id_immagine\n" + 
+			"FROM Aste\n" +
+			"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n"+
+			"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n"+
+			"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n"+
+			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n"+
+			"WHERE Articoli.Rif_utente = ? AND Articoli.Rif_categoria = ? AND Lotti.nome LIKE ? AND Immagini.principale = 1\n" +
+			"LIMIT ? OFFSET ?;";
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
+			preparedStatement.setInt(1, idUtente);
+			preparedStatement.setInt(2, idCategoriaInput);
+			preparedStatement.setString(3, "%"+ stringaRicerca+ "%");
+			preparedStatement.setInt(4, numeroAste);
+			preparedStatement.setInt(5, ((numeroPagina-1)*numeroAste));
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			// array list per gli oggetti delle aste 
+			ArrayList<Object> Aste= new ArrayList<>();
+
+			// While per caricare l'array list 
+			while (resultSet.next()) {
+				Aste.add(resultSet.getInt("Id_aste"));
+				Aste.add(resultSet.getString("nome"));
+				
+				int idImmagine= resultSet.getInt("Id_immagine");
+				FileInputStream stream;
+				if (resultSet.wasNull()) {
+					stream= new FileInputStream("static_resources\\default_articolo.png");
+				} else {
+					stream= new FileInputStream("res\\immagini_articoli\\"+ idImmagine+ ".png");
+				}
+
+				Aste.add(stream.readAllBytes());
+
+				stream.close();
+			}
+
+			// Transformazione del array list in array e risposta nel payload uscita 
+			rispostaUscente.tipoRisposta= TipoRisposta.OK;
+			rispostaUscente.payload = Aste.toArray();
+
+		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di vissualizzazione aste. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		} catch (IOException e) { // questo catch e per gli errori che potrebbe dare il caricamento del immagine del utente
+			System.err.println("[" +
+				Thread.currentThread().getName() +
+				"]: C'e' stato un errore nell'apertura/lettura/chiusura delle immagini delle aste. "
+				+ e.getMessage()
+			);
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
     }
 
     private void visualizzaAsteConcluse() {
