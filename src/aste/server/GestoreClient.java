@@ -450,8 +450,72 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void effettuaPuntata() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'effettuaPuntata'");
+		// conmtrollo se l'utente e conesso 
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
+
+		// Funzione per prendere un'asta 
+		Integer idAsta;
+
+		try {
+			idAsta = (Integer)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroAste"};
+			return;
+		}
+
+		if (idAsta == null || idAsta <= 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroAste"};
+			return;
+		}
+
+		// Funzione per prendere un valore 
+		Float valore;
+
+		try {
+			valore = (Float)richiestaEntrante.payload[1];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroAste"};
+			return;
+		}
+
+		if (valore == null || valore <= 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroAste"};
+			return;
+		}
+
+		// controllo se la categoria presa esiste 
+		String queryControlloCategoria = "SELECT Aste.prezzo_attuale, Puntate.valore\n" +
+			"FROM Puntate\n" + 
+			"JOIN Aste ON Puntate.Rif_asta = Aste.Id_asta\n" + 
+			"WHERE Aste.prezzo_attuale < Puntate.valore;"
+		;
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloCategoria);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			if (!resultSet.next()) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "valore" };
+				return;
+			}
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di controllo di valore nell'effetua puntata. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
 	}
 
 	private void creaLotto() {
@@ -1840,12 +1904,12 @@ public class GestoreClient implements Runnable {
 				rispostaUscente.payload[0]= resultSet.getTime("data_ora_inizio");
 				rispostaUscente.payload[1]= resultSet.getTime("durata");
 				rispostaUscente.payload[2]= resultSet.getFloat("prezzo_inizio");
-				rispostaUscente.payload[2]= resultSet.getFloat("prezzo_attuale");
-				rispostaUscente.payload[3]= resultSet.getInt("ip_multicast");
-				rispostaUscente.payload[4]= resultSet.getString("descrizione_annullamento");
-				rispostaUscente.payload[5]= resultSet.getInt("Id_lotto");
-				rispostaUscente.payload[6]= resultSet.getString("nome_lotto");
-				rispostaUscente.payload[7]= resultSet.getByte("immagini_articolo");
+				rispostaUscente.payload[3]= resultSet.getFloat("prezzo_attuale");
+				rispostaUscente.payload[4]= resultSet.getInt("ip_multicast");
+				rispostaUscente.payload[5]= resultSet.getString("descrizione_annullamento");
+				rispostaUscente.payload[6]= resultSet.getInt("Id_lotto");
+				rispostaUscente.payload[7]= resultSet.getString("nome_lotto");
+				rispostaUscente.payload[8]= resultSet.getByte("immagini_articolo");
 
 				//
 				FileInputStream stream;
