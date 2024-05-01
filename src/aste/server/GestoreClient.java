@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -848,34 +849,61 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void creaAsta() {
-		// if (prezzoInizio < 0) {
-		// 	throw new IllegalArgumentException("Impossibile avere un prezzo di inizio < 0.");
-		// }
+		LocalDateTime dataOraInizio;
 
-		// if (dataOraInizio.isBefore(LocalDateTime.now())) {
-		// 	throw new IllegalArgumentException("La data deve essere dopo quella corrente < 0.");
-		// }
+		try {
+			dataOraInizio = (LocalDateTime)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "dataOraInizio" };
+			return;
+		}
 
-		// if (durata.isNegative() || durata.isZero()) {
-		// 	throw new IllegalArgumentException("La durata deve essere >= 0.");
-		// }
+		if (dataOraInizio.isBefore(LocalDateTime.now())) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "dataOraInizio" };
+			return;
+		}
 
-		// if (rifLotto <= 0) {
-		// 	try {
-		// 		String queryControlloLotto = "SELECT \n" +
-		// 			"FROM " +
-		// 			"" +
-		// 			"" +
-		// 		;
+		Duration durata;
 
-		// 		Connection connection = gestoreDatabase.getConnection();
-		// 		Statement statement = connection.createStatement();
-		// 		ResultSet result = statement.executeQuery(null);
-		// 		// TODO: Vedere se il lotto e' dell'utente.
-		// 	} catch (SQLException e) {
+		try {
+			durata = (Duration)richiestaEntrante.payload[1];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "durata" };
+			return;
+		}
 
-		// 	}
-		// }
+		Float prezzoInizio;
+
+		try {
+			prezzoInizio = (Float)richiestaEntrante.payload[2];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "prezzoInizio" };
+			return;
+		}
+
+		Boolean astaAutomatica;
+
+		try {
+			astaAutomatica = (Boolean)richiestaEntrante.payload[3];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "astaAutomatica" };
+			return;
+		}
+
+		Integer idLotto;
+
+		try {
+			idLotto = (Integer)richiestaEntrante.payload[4];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idLotto" };
+			return;
+		}
 	}
 
 	private void modificaAsta() {

@@ -33,3 +33,6 @@ lib/
 
 # Visual Studio Code
 /.vscode
+
+# dynamic resources
+/res/
