@@ -918,29 +918,91 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void visualizzaProfilo() {
-		// Implementazione della visualizzazione del profilo
-		// Definiamo la query SQL per selezionare un utente alla volta
-		Integer id = (Integer)richiestaEntrante.payload[0];
-		String query = "SELECT * FROM Utenti WHERE Id_utente";
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
 
-		// Utilizziamo un oggetto Statement per eseguire la query
-		try (Statement stmt = gestoreDatabase.getConnection().createStatement()) {
-			// Eseguiamo la query e otteniamo il risultato
-			ResultSet rs = stmt.executeQuery(query);
+		Integer idUtenteInput;
 
-			// Iteriamo attraverso ogni riga del risultato
-			while (rs.next()) {
-				// Leggiamo i valori di ogni colonna per la riga corrente
-				String nome = rs.getString("nome");
-				String cognome = rs.getString("cognome");
-				Timestamp dataNascita = rs.getTimestamp("data_nascita");
-				String cittaResidenza = rs.getString("citta_Residenza");
-				String email = rs.getString("email");
-				String iban = rs.getString("iban");
-				float saldo = rs.getFloat("saldo");
+		try {
+			idUtenteInput = (Integer)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idUtente"};
+			return;
+		}
+
+		if (idUtenteInput == null || idUtenteInput < 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idUtente"};
+			return;
+		}
+
+		try {
+			if (idUtenteInput == 0) { // utente loggato
+				String queryVisualizzazione = "SELECT nome, cognome, data_nascita, citta_residenza, cap, indirizzo, email, iban\n" +
+					"FROM Utenti\n" +
+					"WHERE Id_utente = ?"
+				;
+	
+				Connection connection = gestoreDatabase.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
+				preparedStatement.setInt(1, idUtente);
+				ResultSet resultSet = preparedStatement.executeQuery();
+
+				if (!resultSet.next()) {
+					System.err.println("[" + Thread.currentThread().getName() +
+						"]: C'e' stato un errore nell'ottenere il profilo di un'utente. "
+					);
+
+					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+					rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+				}
+
+				rispostaUscente.tipoRisposta = TipoRisposta.OK;
+				rispostaUscente.payload = new Object[]{
+					resultSet.getString("nome"),
+					resultSet.getString("cognome"),
+					resultSet.getDate("data_nascita").toLocalDate(),
+					resultSet.getString("citta_residenza"),
+					resultSet.getInt("cap"),
+					resultSet.getString("indirizzo"),
+					resultSet.getString("email"),
+					resultSet.getString("iban")
+				};
+			} else {
+				String queryVisualizzazione = "SELECT nome, cognome, email\n" +
+					"FROM Utenti\n" +
+					"WHERE Id_utente = ?;"
+				;
+
+				Connection connection = gestoreDatabase.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
+				preparedStatement.setInt(1, idUtenteInput);
+				ResultSet resultSet = preparedStatement.executeQuery();
+
+				if (!resultSet.next()) {
+					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+					rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idUtente" };
+					return;
+				}
+
+				rispostaUscente.tipoRisposta = TipoRisposta.OK;
+				rispostaUscente.payload = new Object[]{
+					resultSet.getString("nome"),
+					resultSet.getString("cognome"),
+					resultSet.getString("email")
+				};
 			}
 		} catch (SQLException e) {
-			throw new Error(e.getMessage());
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di controllo dell'idUtente nella visualizzazione del profilo. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
 	}
 
