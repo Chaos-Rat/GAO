@@ -39,6 +39,7 @@ public class GestoreClient implements Runnable {
 	private GestoreDatabase gestoreDatabase;
 	private	GestoreAste gestoreAste;
 	private int idUtente;
+	private boolean admin;
 	private Richiesta richiestaEntrante;
 	private Risposta rispostaUscente;
 
@@ -48,6 +49,7 @@ public class GestoreClient implements Runnable {
 		this.gestoreAste = gestoreAste;
 
 		idUtente = 0;
+		admin = false;
 		richiestaEntrante = new Richiesta();
 		rispostaUscente = new Risposta();
 	}
@@ -199,32 +201,8 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		String queryAdmin = "SELECT utente_admin\n" +
-			"FROM Utenti\n" +
-			"WHERE Id_utente = ?;"
-		;
-
-		try {
-			Connection connection = gestoreDatabase.getConnection();
-			PreparedStatement statement = connection.prepareStatement(queryAdmin);
-			statement.setInt(1, idUtente);
-			ResultSet resultSet = statement.executeQuery();
-
-			while (resultSet.next()) {
-				rispostaUscente.tipoRisposta = TipoRisposta.OK;
-				rispostaUscente.payload = new Object[]{
-					Boolean.valueOf(resultSet.getInt("utente_admin") == 1)
-				};
-				return;
-			}
-
-			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
-		} catch (SQLException e) {
-			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nella query di verifica admin. " + e.getSQLState());
-			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
-		}
+		rispostaUscente.tipoRisposta = TipoRisposta.OK;
+		rispostaUscente.payload = new Object[]{ Boolean.valueOf(admin) };
 	}
 
 	private void visualizzaPuntate() {
@@ -303,7 +281,7 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		String queryUtenti = "SELECT Id_utente, email, sale_password, hash_password\n" +
+		String queryUtenti = "SELECT Id_utente, email, sale_password, hash_password, utente_admin\n" +
 			"FROM Utenti;"
 		;
 
@@ -320,6 +298,7 @@ public class GestoreClient implements Runnable {
 
 				if (emailInput.equals(email) && verificaPassword(passwordInput, salePassword, hashPassword)) {
 					this.idUtente = idUtente;
+					admin = resultSet.getInt("utente_admin") == 1;
 					rispostaUscente.tipoRisposta = TipoRisposta.OK;
 					return;
 				}
