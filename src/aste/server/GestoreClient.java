@@ -329,7 +329,7 @@ public class GestoreClient implements Runnable {
 			}
 		} catch (SQLException e) {
 			System.err.println("[" + Thread.currentThread().getName() +
-				"]: C'e' stato un errore nella query di controllo dell'idCategoria nella creazione dell'articolo. " + e.getMessage()
+				"]: C'e' stato un errore nella query di controllo dell'idCategoria nella visualizzazione dei lotti. " + e.getMessage()
 			);
 
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
@@ -337,11 +337,11 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT Lotti.Id_lotto, Lotti.nome, Immagini.Id_immagine\n" + 
+		String queryVisualizzazione = "SELECT DISTINCT Lotti.Id_lotto, Lotti.nome, Immagini.Id_immagine\n" + 
 			"FROM Lotti\n" +
-			"LEFT JOIN Articoli ON Articoli.Rif_lotto = Lotti.Id_lotto\n" +
-			"JOIN Immagini ON Immagini.Rif_Lotti = Lotti.Id_lotto\n" +
-			"WHERE Articoli.Rif_utente = ? AND Articoli.Rif_categoria = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1\n" +
+			"JOIN Articoli ON Articoli.Rif_lotto = Lotti.Id_lotto\n" +
+			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
+			"WHERE Articoli.Rif_utente = ? AND Articoli.Rif_categoria = ? AND Lotti.nome LIKE ? AND Immagini.principale = 1\n" +
 			"LIMIT ? OFFSET ?;";
 
 		try {
@@ -375,27 +375,23 @@ public class GestoreClient implements Runnable {
 				stream.close();
 			}
 
-			// If se l'array list ritorna vuoto 
-			if(lotti.size() == 0) {
-				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroPagina" };
-				return;
-			}
-
 			// Transformazione del array list in array e risposta nel payload uscita 
-			rispostaUscente.payload = lotti.toArray();
 			rispostaUscente.tipoRisposta= TipoRisposta.OK;
+			rispostaUscente.payload = lotti.toArray();
 
 		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
 			System.err.println("[" + Thread.currentThread().getName() +
-				"]: C'e' stato un errore nella query di vissualizazione lotti. " + e.getMessage()
+				"]: C'e' stato un errore nella query di vissualizzazione lotti. " + e.getMessage()
 			);
 
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
-
 		} catch (IOException e) { // questo catch e per gli errori che potrebbe dare il caricamento del immagine del utente
-			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nell'apertura/scrittura delle immagine profilo. " + e.getMessage());
+			System.err.println("[" +
+				Thread.currentThread().getName() +
+				"]: C'e' stato un errore nell'apertura/lettura/chiusura delle immagini degli articoli. "
+				+ e.getMessage()
+			);
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
@@ -458,7 +454,80 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void creaLotto() {
-		
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
+
+		String nomeInput;
+
+		try {
+			nomeInput = (String)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "nome"};
+			return;
+		}
+
+		if (nomeInput == null || nomeInput.equals("")) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "nome"};
+			return;
+		}
+
+		int[] idArticoliInput;
+
+		try {
+			idArticoliInput = (int[])richiestaEntrante.payload[1];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idArticoli"};
+			return;
+		}
+
+		if (idArticoliInput == null || idArticoliInput.length == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idArticoli"};
+			return;
+		}
+
+		String queryControlloArticoli = "SELECT Articoli.Id_articolo\n" +
+			"FROM Utenti\n" +
+			"JOIN Articoli ON Articoli.Rif_utente = Utenti.Id_utente\n" +
+			"WHERE Id_lotto = 1 AND Utenti.Id_utente = ?;"
+		;
+
+		ArrayList<Integer> articoliUtente = new ArrayList<>();
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement statement = connection.prepareStatement(queryControlloArticoli);
+			statement.setInt(1, idUtente);
+			ResultSet resultSet = statement.executeQuery();
+
+			while (resultSet.next()) {
+				articoliUtente.add(resultSet.getInt("Id_articolo"));
+			}
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di creazione del lotto. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+			return;
+		}
+
+		if (articoliUtente.isEmpty()) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
+
+		for (int i = 0; i < idArticoliInput.length; ++i) {
+			
+		}
 	}
 
 	private void creaCategoria() {
@@ -1061,8 +1130,6 @@ public class GestoreClient implements Runnable {
 
 		return new DatiPassword(sale, generaPassword(password, sale));
 	}
-
-	
 
 	private static class DatiPassword {
 		public byte[] sale;
@@ -1684,7 +1751,9 @@ public class GestoreClient implements Runnable {
 				articoli.add(resultSet.getString("condizione"));
 				
 				int idImmagine= resultSet.getInt("Id_immagine");
+				
 				FileInputStream stream;
+
 				if (resultSet.wasNull()) {
 					stream= new FileInputStream("static_resources\\default_articolo.png");
 				} else {
@@ -1696,16 +1765,9 @@ public class GestoreClient implements Runnable {
 				stream.close();
 			}
 
-			// If se l'array list ritorna vuoto 
-			if(articoli.size() == 0) {
-				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroPagina" };
-				return;
-			}
-
 			// Transformazione del array list in array e risposta nel payload uscita 
-			rispostaUscente.payload = articoli.toArray();
 			rispostaUscente.tipoRisposta= TipoRisposta.OK;
+			rispostaUscente.payload = articoli.toArray();
 
 		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
 			System.err.println("[" + Thread.currentThread().getName() +
@@ -1716,7 +1778,11 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 
 		} catch (IOException e) { // questo catch e per gli errori che potrebbe dare il caricamento del immagine del utente
-			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nell'apertura/scrittura delle immagine profilo. " + e.getMessage());
+			System.err.println("[" +
+				Thread.currentThread().getName() +
+				"]: C'e' stato un errore nell'apertura/scrittura/chiusura delle immagini dei lotti. "
+				+ e.getMessage()
+			);
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
