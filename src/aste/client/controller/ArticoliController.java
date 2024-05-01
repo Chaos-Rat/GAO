@@ -6,6 +6,7 @@ import aste.client.HelloApplication;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -14,8 +15,11 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jdk.jfr.Category;
@@ -28,6 +32,9 @@ import java.util.HashMap;
 
 public class ArticoliController
 {
+    @FXML
+    private VBox articoliList;
+
     @FXML
     private ComboBox <String> category;
 
@@ -85,9 +92,56 @@ public class ArticoliController
                 catmap.put((String) rispostacat.payload[i*2+1], (Integer) rispostacat.payload[i*2]);
             }
             catmap.put("Tutte le categorie",0);
-            category.getSelectionModel().select("Tutte le categorie");
+            category.getSelectionModel().select("Altre categorie");
             category.getItems().addAll(catmap.keySet());
         }
+        Richiesta richiestaArticoli = new Richiesta();
+        richiestaArticoli.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_ARTICOLI;
+        richiestaArticoli.payload = new Object[4];
+        richiestaArticoli.payload[0] = 10;
+        richiestaArticoli.payload[1] = 1;
+        richiestaArticoli.payload[2] = "";
+        richiestaArticoli.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
+        HelloApplication.output.writeObject(richiestaArticoli);
+        Risposta rispostaArticoli = new Risposta();
+        rispostaArticoli = (Risposta) HelloApplication.input.readObject();
+        for (int i = 0; i <rispostaArticoli.payload.length/4; i++)
+        {
+            HBox box = new HBox();
+            FileOutputStream out = new FileOutputStream("cache/Articolo.png");
+            out.write((byte[]) rispostaArticoli.payload[i*4+3]);
+            out.close();
+            FileInputStream in = new FileInputStream("cache/Articolo.png");
+            Image img = new Image(in);
+            in.close();
+            ImageView item = new ImageView();
+            item.setImage(img);
+            item.setFitWidth(100);
+            item.setFitHeight(100);
+            item.setPreserveRatio(true);
+            String nome = (String) rispostaArticoli.payload[i*4+1];
+            String cond = (String) rispostaArticoli.payload[i*4+2];
+            Text nomeT = new Text("Nome: " + nome);
+            Text condT = new Text("Condition: " +cond);
+            Integer id = (Integer) rispostaArticoli.payload[i*4+0];
+            Text idT = new Text("Id: +" + id.toString());
+            VBox vbox = new VBox();
+            VBox vbox2 = new VBox();
+            vbox2.setAlignment(Pos.CENTER);
+            vbox.setAlignment(Pos.CENTER);
+            vbox.getChildren().add(item);
+            vbox2.getChildren().addAll(nomeT,condT);
+            box.setPrefWidth(940);
+            box.setAlignment(Pos.CENTER);
+            box.getChildren().addAll(vbox,vbox2);
+            articoliList.getChildren().add(box);
+        }
+        if (rispostaArticoli.payload[0] == Risposta.TipoErrore.CAMPI_INVALIDI)
+        {
+            System.out.println(rispostaArticoli.payload[0]);
+            System.out.println(rispostaArticoli.payload[1]);
+        }
+
         confirmB.setVisible(false);
         categoryF.setVisible(false);
         Richiesta richiesta = new Richiesta();
@@ -103,7 +157,6 @@ public class ArticoliController
             Image image = new Image(defaultImg);
             ImageView imageView = new ImageView();
             imageView.setImage(image);
-            imageView.setPreserveRatio(true);
             avatar.setFill(new ImagePattern(imageView.getImage()));
             defaultImg.close();
         }
