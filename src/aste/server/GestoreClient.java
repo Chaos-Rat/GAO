@@ -242,7 +242,7 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		// Funzione per avere il numero degli articoli 
+		// Funzione per avere il numero dei lotti 
 		Integer numeroLotti;
 
 		try {
@@ -276,7 +276,7 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		// Funzione per ls ricerca degli articoli 
+		// Funzione per ls ricerca dei lotti 
 		String stringaRicerca;
 
 		try {
@@ -1780,7 +1780,7 @@ public class GestoreClient implements Runnable {
 		} catch (IOException e) { // questo catch e per gli errori che potrebbe dare il caricamento del immagine del utente
 			System.err.println("[" +
 				Thread.currentThread().getName() +
-				"]: C'e' stato un errore nell'apertura/scrittura/chiusura delle immagini dei lotti. "
+				"]: C'e' stato un errore nell'apertura/scrittura/chiusura delle immagini degli articoli. "
 				+ e.getMessage()
 			);
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
