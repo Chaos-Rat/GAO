@@ -221,8 +221,38 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void visualizzaCategorie() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'visualizzaCategorie'");
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
+
+		String queryVisualizzazione = "SELECT Id_categoria, nome\n" +
+			"FROM Categorie;"
+		;
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(queryVisualizzazione);
+
+			ArrayList<Object> buffer = new ArrayList<>();
+
+			while (resultSet.next()) {
+				buffer.add(Integer.valueOf(resultSet.getInt("Id_categoria")));
+				buffer.add(resultSet.getString("nome"));
+			}
+			
+			rispostaUscente.tipoRisposta = TipoRisposta.OK;
+			rispostaUscente.payload = buffer.toArray();
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di visualizzazione delle categorie. " + e.getSQLState()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
 	}
 
 	private void visualizzaArticolo() {
@@ -251,7 +281,7 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void creaCategoria() {
-		if (!admin) {
+		if (idUtente == 0 || !admin) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
 			return;
@@ -276,7 +306,7 @@ public class GestoreClient implements Runnable {
 
 		String queryValidazione = "SELECT Id_categoria\n" +
 			"FROM Categorie\n" +
-			"WHERE nome = ?"
+			"WHERE nome = ?;"
 		;
 
 		String queryCreazione = "INSERT INTO Categorie(nome)\n" +
@@ -311,7 +341,7 @@ public class GestoreClient implements Runnable {
 			System.err.println("[" + Thread.currentThread().getName() +
 				"]: C'e' stato un errore nella query di creazione categoria. " + e.getSQLState()
 			);
-			
+
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
