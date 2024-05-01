@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -85,6 +86,7 @@ public class ArticoloController
 
     @FXML
     public void initialize() throws IOException, ClassNotFoundException {
+		selectedFiles = new ArrayList<>();
         Richiesta richiestacat = new Richiesta();
         richiestacat.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_CATEGORIE;
         HelloApplication.output.writeObject(richiestacat);
@@ -112,12 +114,17 @@ public class ArticoloController
         fileChooser.getExtensionFilters().addAll(ex1);
         fileChooser.setTitle("Select your image");
         selectedFiles = fileChooser.showOpenMultipleDialog(stageFile);
-        File selectedFile = selectedFiles.get(0);
-        Image image = new Image(selectedFile.toURI().toString());
-        articolo.setFitWidth(295);
-        articolo.setFitHeight(360);
-        articolo.setPreserveRatio(true);
-        articolo.setImage(image);
+		if (selectedFiles != null) {
+			File selectedFile = selectedFiles.get(0);
+			Image image = new Image(selectedFile.toURI().toString());
+			articolo.setFitWidth(295);
+			articolo.setFitHeight(360);
+			articolo.setPreserveRatio(true);
+			articolo.setImage(image);
+		}
+        else {
+			selectedFiles = new ArrayList<>();
+		}
     }
 
     @FXML
@@ -155,11 +162,15 @@ public class ArticoloController
             Stage stage1 = (Stage) createB.getScene().getWindow();
             stage1.close();
         }
-        else
+        else if (risposta.payload[0] == Risposta.TipoErrore.CAMPI_INVALIDI)
         {
             System.out.println("Articolo non creato");
             System.out.println(risposta.payload[0]);
-        }
+			System.out.println(risposta.payload[1]);
+        } else {
+			System.out.println("Articolo non creato");
+            System.out.println(risposta.payload[0]);
+		}
     }
 
 

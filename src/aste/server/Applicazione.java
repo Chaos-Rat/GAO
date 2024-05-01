@@ -29,7 +29,7 @@ public class Applicazione {
 			100
 		);
 
-		Applicazione applicazione = new Applicazione(2, 3000, 2, opzioniDB);
+		Applicazione applicazione = new Applicazione(4, 3000, 4, opzioniDB);
 		applicazione.avvia();
 		applicazione.finalizza();
 	}

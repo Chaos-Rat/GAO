@@ -1,12 +1,14 @@
 package aste.server;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import org.apache.commons.dbcp2.BasicDataSource;
 
 public class GestoreDatabase {
 	private BasicDataSource dataSource;
+	private Opzioni opzioni;
 
 	public static class Opzioni {
 		private String nomeDriver;
@@ -36,6 +38,8 @@ public class GestoreDatabase {
 	}
 
 	public GestoreDatabase(Opzioni opzioni) {
+		this.opzioni = opzioni;
+
 		dataSource = new BasicDataSource();
 
 		dataSource.setDriverClassName(opzioni.nomeDriver);
@@ -48,6 +52,6 @@ public class GestoreDatabase {
 	}
 
 	public Connection getConnection() throws SQLException {
-		return dataSource.getConnection();
+		return DriverManager.getConnection(opzioni.url, opzioni.username, opzioni.password);
 	}
 }

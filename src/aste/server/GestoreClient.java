@@ -13,6 +13,7 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -519,14 +520,60 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		if (articoliUtente.isEmpty()) {
-			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
-			return;
+		for (int i = 0; i < idArticoliInput.length; ++i) {
+			if (!articoliUtente.contains(idArticoliInput[i])) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idArticoli" };
+				return;
+			}
 		}
 
-		for (int i = 0; i < idArticoliInput.length; ++i) {
+		String queryCreazioneLotto = "INSERT INTO Lotti(nome)\n" +
+			"VALUES (?);"
+		;
+
+		StringBuilder builder = new StringBuilder("UPDATE Articoli\n" +
+			"SET Rif_lotto = ?\n" +
+			"WHERE Id_articolo IN (?");
+		
+		for (int i = 1; i < idArticoliInput.length; ++i) {
+			builder.append(", ?");
+		}
+
+		builder.append(");");
+		
+		String queryAssegnazioneArticoli = builder.toString();
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement statement = connection.prepareStatement(queryCreazioneLotto, new String[]{ "Id_lotto" });
+			statement.setString(1, nomeInput);
+			statement.executeUpdate();
+			ResultSet resultSet = statement.getGeneratedKeys();
+
+			if (!resultSet.next()) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+				return;
+			}
+
+			int idLotto = resultSet.getInt(1);
+
+			statement = connection.prepareStatement(queryAssegnazioneArticoli);
+			statement.setInt(1, idLotto);
 			
+			for (int i = 0; i < idArticoliInput.length; ++i) {
+				statement.setInt(i + 2, idArticoliInput[i]);
+			}
+
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di creazione lotto. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
 	}
 
@@ -733,7 +780,7 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		if (immaginePrincipaleInput == null || immaginePrincipaleInput < 0 || immaginePrincipaleInput >= immaginiArticoloInput.length) {
+		if (immaginePrincipaleInput == null || immaginePrincipaleInput < 0 || (immaginePrincipaleInput >= immaginiArticoloInput.length && immaginePrincipaleInput != 0)) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "immaginePrincipale"};
 			return;
@@ -1377,7 +1424,7 @@ public class GestoreClient implements Runnable {
         "JOIN articoli_categorie ON articoli.Id_articolo=articoli_categorie.Rif_articolo"+ 
         "JOIN categorie "+ 
         "ON articoli_categorie.Rif_categoria=categorie.Id_categoria "+ 
-        "WHERE Articolo.nome like '"+ stringaRicerca+ "%' OR Lotto.nome like '"+ stringaRicerca+ "%'"+ 
+        "WHERE Articoli.nome like '"+ stringaRicerca+ "%' OR Lotto.nome like '"+ stringaRicerca+ "%'"+ 
         "LIMIT 5 OFFSET "+ ((numeroPagina-1)*numeroAste)+ ";";
 
         
