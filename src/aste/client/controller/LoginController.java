@@ -63,7 +63,7 @@ public class LoginController {
         richiesta.payload[1] = PassField.getText();
         HelloApplication.output.writeObject(richiesta);
         Risposta risposta = (Risposta) HelloApplication.input.readObject();
-         if (risposta.tipoRisposta.equals(Risposta.TipoRisposta.OK))
+        if (risposta.tipoRisposta.equals(Risposta.TipoRisposta.OK))
         {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Home.fxml"));
             Parent root = loader.load();

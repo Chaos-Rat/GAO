@@ -70,6 +70,7 @@ public class GestoreClient implements Runnable {
 				}
 
 				outputStream.writeObject(rispostaUscente);
+				outputStream.flush();
 			}
 		} catch (IOException e) {
 			System.err.println("[" + Thread.currentThread().getName() +
@@ -473,6 +474,7 @@ public class GestoreClient implements Runnable {
 	}
 
 	private byte[] generaPassword(String password, byte[] sale) {
+		// TODO: change back to 65535
 		KeySpec specification = new PBEKeySpec(password.toCharArray(), sale, 4, 512);
 		SecretKeyFactory factory;
 
@@ -589,7 +591,7 @@ public class GestoreClient implements Runnable {
 				if (immagineProfilo == 1) {
 					stream = new FileInputStream("res\\profili\\" + idInput + ".png");
 				} else {
-					stream = new FileInputStream("static_resources/default_user.png");
+					stream = new FileInputStream("static_resources\\default_user.png");
 				}
 
 				rispostaUscente.payload = new Object[]{ stream.readAllBytes() };

@@ -10,7 +10,7 @@ CREATE TABLE Utenti (
 	citta_residenza VARCHAR(255) NOT NULL,
 	cap INT UNSIGNED NOT NULL,
 	indirizzo VARCHAR(255) NOT NULL,
-	email VARCHAR(255) NOT NULL,
+	email VARCHAR(255) NOT NULL UNIQUE,
 	sale_password BINARY(16) NOT NULL,
 	hash_password BINARY(64) NOT NULL,
 	iban VARCHAR(255) NOT NULL,
