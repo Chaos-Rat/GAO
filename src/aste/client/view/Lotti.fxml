@@ -36,7 +36,7 @@
                <children>
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
-                        <Circle fill="WHITE" radius="60.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
+                        <Circle fx:id="avatar" fill="WHITE" radius="60.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
                      </children>
                   </HBox>
                   <HBox alignment="TOP_CENTER" prefHeight="60.0" prefWidth="116.0">
@@ -94,6 +94,13 @@
                </children>
             </VBox>
          </left>
+         <center>
+            <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <top>
+                  <HBox prefHeight="63.0" prefWidth="955.0" BorderPane.alignment="CENTER" />
+               </top>
+            </BorderPane>
+         </center>
       </BorderPane>
    </children>
 </AnchorPane>
