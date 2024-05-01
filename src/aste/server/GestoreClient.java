@@ -258,7 +258,7 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.payload = buffer.toArray();
 		} catch (SQLException e) {
 			System.err.println("[" + Thread.currentThread().getName() +
-				"]: C'e' stato un errore nella query di visualizzazione delle categorie. " + e.getSQLState()
+				"]: C'e' stato un errore nella query di visualizzazione delle categorie. " + e.getMessage()
 			);
 
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
@@ -351,7 +351,7 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		} catch (SQLException e) {
 			System.err.println("[" + Thread.currentThread().getName() +
-				"]: C'e' stato un errore nella query di creazione categoria. " + e.getSQLState()
+				"]: C'e' stato un errore nella query di creazione categoria. " + e.getMessage()
 			);
 
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
