@@ -552,7 +552,7 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		if (quantitaInput != null || quantitaInput <= 0) {
+		if (quantitaInput == null || quantitaInput <= 0) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "quantita"};
 			return;
