@@ -38,7 +38,7 @@
                <children>
                   <HBox prefHeight="85.0" prefWidth="116.0">
                      <children>
-                        <Circle fill="WHITE" radius="60.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
+                        <Circle fx:id="avatar" fill="WHITE" radius="60.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
                      </children></HBox>
                   <HBox alignment="TOP_CENTER" prefHeight="60.0" prefWidth="116.0">
                      <children>

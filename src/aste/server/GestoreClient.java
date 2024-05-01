@@ -557,7 +557,7 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		String queryCreazioneArticolo = "INSERT INTO Articolo(nome, condizione, descrizione, Rif_lotto, Rif_utente, Rif_categoria, quantita)\n" +
+		String queryCreazioneArticolo = "INSERT INTO Articoli(nome, condizione, descrizione, Rif_lotto, Rif_utente, Rif_categoria, quantita)\n" +
 				"VALUES (?, ?, ?, ?, ?, ?, ?);"
 			;
 

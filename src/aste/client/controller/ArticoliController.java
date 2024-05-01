@@ -64,6 +64,7 @@ public class ArticoliController
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+        AddCategory.setVisible(false);
         Richiesta richiest2 = new Richiesta();
         richiest2.tipoRichiesta = Richiesta.TipoRichiesta.VERIFICA_ADMIN;
         HelloApplication.output.writeObject(richiest2);

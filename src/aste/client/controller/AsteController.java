@@ -1,21 +1,33 @@
 package aste.client.controller;
 
+import aste.Richiesta;
+import aste.Risposta;
+import aste.client.HelloApplication;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.ImagePattern;
+import javafx.scene.shape.Circle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 
 public class AsteController
 {
     @FXML
     private Button addB;
+
+    @FXML
+    private Circle avatar;
 
     @FXML
     private VBox asteList;
@@ -37,6 +49,32 @@ public class AsteController
 
     @FXML
     private Button ProfileB;
+
+    @FXML
+    public void initialize() throws IOException, ClassNotFoundException {
+        Richiesta richiesta = new Richiesta();
+        richiesta.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_IMMAGINE_PROFILO;
+        richiesta.payload = new Object[]{0};
+        HelloApplication.output.writeObject(richiesta);
+        Risposta risposta = (Risposta) HelloApplication.input.readObject();
+        if (risposta.tipoRisposta == Risposta.TipoRisposta.OK) {
+            FileOutputStream picture = new FileOutputStream("imagine.png");
+            picture.write((byte[]) risposta.payload[0]);
+            picture.close();
+            FileInputStream defaultImg = new FileInputStream("imagine.png");
+            Image image = new Image(defaultImg);
+            ImageView imageView = new ImageView();
+            imageView.setImage(image);
+            imageView.setPreserveRatio(true);
+            avatar.setFill(new ImagePattern(imageView.getImage()));
+            defaultImg.close();
+        }
+        else
+        {
+            System.out.println(risposta.tipoRisposta.toString());
+            System.out.println(((Risposta.TipoErrore) risposta.payload[0]).toString());
+        }
+    }
 
     @FXML
     void HomeClicked(ActionEvent event) throws IOException
