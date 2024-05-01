@@ -506,24 +506,24 @@ public class GestoreClient implements Runnable {
 			idCategoriaInput = (Integer)richiestaEntrante.payload[6];
 		} catch (ClassCastException e) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "categorie"};
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria"};
 			return;
 		}
 
 		if (idCategoriaInput == null) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "categorie"};
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria"};
 			return;
 		}
 
-		String queryControlloLotto = "SELECT Id_categoria\n" +
+		String queryControlloCategoria = "SELECT Id_categoria\n" +
 			"FROM Categorie\n" + 
 			"WHERE Id_categoria = ?;"
 		;
 
 		try {
 			Connection connection = gestoreDatabase.getConnection();
-			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloLotto);
+			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloCategoria);
 			preparedStatement.setInt(1, idCategoriaInput);
 			ResultSet resultSet = preparedStatement.executeQuery();
 
@@ -1410,14 +1410,172 @@ public class GestoreClient implements Runnable {
 		// Implementazione dell'annullamento di un'asta
 	}
 
+	// Metodo visualliza articoli 
 	private void visualizzaArticoli() {
-		String queryVisualizzazione = "SELECT Articoli.Id_articolo, Articoli.nome, Articoli.condizione, Immagini.Id_immagine\n" + 
-			"FROM Articoli\n" +
-			"JOIN Immagini ON Articoli.Id_articolo = Immagini.Id_immagine\n" +
-			"WHERE Articoli.Rif_utente = ? AND Articoli.Rif_categoria = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1\n" +
-			"LIMIT ? OFFSET ?;"
+		// conmtrollo se l'utente e conesso 
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
+
+		// Funzione per avere il numero degli articoli 
+		Integer numeroArticoli;
+
+		try {
+			numeroArticoli = (Integer)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroArticoli"};
+			return;
+		}
+
+		if (numeroArticoli == null || numeroArticoli <= 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroArticoli"};
+			return;
+		}
+
+		// Funzione per avere il numero della pagina 
+		Integer numeroPagina;
+
+		try {
+			numeroPagina = (Integer)richiestaEntrante.payload[1];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroPagina"};
+			return;
+		}
+
+		if (numeroPagina == null || numeroArticoli <= 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroPagina"};
+			return;
+		}
+
+		// Funzione per ls ricerca degli articoli 
+		String stringaRicerca;
+
+		try {
+			stringaRicerca = (String)richiestaEntrante.payload[2];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "stringaRicerca"};
+			return;
+		}
+
+		if (stringaRicerca == null) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "stringaRicerca"};
+			return;
+		}
+
+		// Funzione per avere le categoria 
+		Integer idCategoriaInput;
+
+		try {
+			idCategoriaInput = (Integer)richiestaEntrante.payload[3];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria"};
+			return;
+		}
+
+		if (idCategoriaInput == null) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria"};
+			return;
+		}
+
+		// controllo se la categoria presa esiste 
+		String queryControlloCategoria = "SELECT Id_categoria\n" +
+			"FROM Categorie\n" + 
+			"WHERE Id_categoria = ?;"
 		;
 
-		String stringaRicerca = "%qualcosa%";
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloCategoria);
+			preparedStatement.setInt(1, idCategoriaInput);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			if (!resultSet.next()) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria" };
+				return;
+			}
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di controllo dell'idCategoria nella creazione dell'articolo. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
+
+		// Impostazione della query finale 
+		String queryVisualizzazione = "SELECT Articoli.Id_articolo, Articoli.nome, Articoli.condizione, Immagini.Id_immagine\n" + 
+			"FROM Articoli\n" +
+			"LEFT JOIN Immagini ON Articoli.Id_articolo = Immagini.Id_immagine\n" +
+			"WHERE Articoli.Rif_utente = ? AND Articoli.Rif_categoria = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1\n" +
+			"LIMIT ? OFFSET ?;";
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
+			preparedStatement.setInt(1, idUtente);
+			preparedStatement.setInt(2, idCategoriaInput);
+			preparedStatement.setString(3, "%"+ stringaRicerca+ "%");
+			preparedStatement.setInt(4, numeroArticoli);
+			preparedStatement.setInt(5, ((numeroPagina-1)*numeroArticoli));
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			// array list per gli oggetti del articolo 
+			ArrayList<Object> articoli= new ArrayList<>();
+
+			// While per caricare l'array list 
+			while (resultSet.next()) {
+				articoli.add(resultSet.getInt("Id_articolo"));
+				articoli.add(resultSet.getString("nome"));
+				articoli.add(resultSet.getString("condizione"));
+				
+				int idImmagine= resultSet.getInt("Id_immagine");
+				FileInputStream stream;
+				if (resultSet.wasNull()) {
+					stream= new FileInputStream("static_resources\\default_articolo.png");
+				} else {
+					stream= new FileInputStream("res\\immagini_articoli\\"+ idImmagine+ ".png");
+				}
+
+				articoli.add(stream.readAllBytes());
+
+				stream.close();
+			}
+
+			// If se l'array list ritorna vuoto 
+			if(articoli.size() == 0) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroPagina" };
+				return;
+			}
+
+			// Transformazione del array list in array e risposta nel payload uscita 
+			rispostaUscente.payload = articoli.toArray();
+			rispostaUscente.tipoRisposta= TipoRisposta.OK;
+
+		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di vissualizazione articoli. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+
+		} catch (IOException e) { // questo catch e per gli errori che potrebbe dare il caricamento del immagine del utente
+			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nell'apertura/scrittura delle immagine profilo. " + e.getMessage());
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
+
 	}
 }
