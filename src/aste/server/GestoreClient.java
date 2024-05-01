@@ -2,6 +2,7 @@ package aste.server;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
@@ -360,6 +361,12 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void creaArticolo() {
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
+
 		String nomeInput;
 
 		try {
@@ -418,21 +425,40 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		if (idLottoInput == null || idLottoInput <= 0) {
+		if (idLottoInput == null) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idLotto"};
 			return;
 		}
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
-		} catch (SQLException e) {
-			System.err.println("[" + Thread.currentThread().getName() +
-				"]: C'e' stato un errore nella query di controllo dell'idLotto nella creazione del pay. " + e.getMessage()
-			);
+		if (idLottoInput != 1) { // default
+			String queryControlloLotto = "SELECT DISTINCT Lotti.Id_lotto\n" +
+				"FROM Lotti\n" +
+				"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n" +
+				"JOIN Utenti ON Articoli.Rif_utente = Utenti.Id_utente\n" +
+				"WHERE Utenti.Id_utente = ? AND Lotti.Id_lotto = ?;"
+			;
 
-			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+			try {
+				Connection connection = gestoreDatabase.getConnection();
+				PreparedStatement preparedStatement = connection.prepareStatement(queryControlloLotto);
+				preparedStatement.setInt(1, idUtente);
+				preparedStatement.setInt(2, idLottoInput);
+				ResultSet resultSet = preparedStatement.executeQuery();
+
+				if (!resultSet.next()) {
+					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+					rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idLotto" };
+					return;
+				}
+			} catch (SQLException e) {
+				System.err.println("[" + Thread.currentThread().getName() +
+					"]: C'e' stato un errore nella query di controllo dell'idLotto nella creazione dell'articolo. " + e.getMessage()
+				);
+
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+			}
 		}
 
 		byte[][] immaginiArticoloInput;
@@ -451,6 +477,14 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
+		for (int i = 0; i < immaginiArticoloInput.length; ++i) {
+			if (immaginiArticoloInput[i] == null) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "immaginiArticolo[" + i + "]" };
+				return;
+			}
+		}
+
 		Integer immaginePrincipaleInput;
 
 		try {
@@ -467,23 +501,136 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		int[] categorieInput;
+		Integer idCategoriaInput;
 
 		try {
-			categorieInput = (int[])richiestaEntrante.payload[6];
+			idCategoriaInput = (Integer)richiestaEntrante.payload[6];
 		} catch (ClassCastException e) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "categorieInput"};
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "categorie"};
 			return;
 		}
 
-		if (categorieInput == null || categorieInput.length < 1) {
+		if (idCategoriaInput == null) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "categorieInput"};
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "categorie"};
 			return;
 		}
 
+		String queryControlloLotto = "SELECT Id_categoria\n" +
+			"FROM Categorie\n" + 
+			"WHERE Id_categoria = ?;"
+		;
 
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloLotto);
+			preparedStatement.setInt(1, idCategoriaInput);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			if (!resultSet.next()) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria" };
+				return;
+			}
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di controllo dell'idCategoria nella creazione dell'articolo. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
+
+		Integer quantitaInput;
+
+		try {
+			quantitaInput = (Integer)richiestaEntrante.payload[6];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "quantita"};
+			return;
+		}
+
+		if (quantitaInput != null || quantitaInput <= 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "quantita"};
+			return;
+		}
+
+		String queryCreazioneArticolo = "INSERT INTO Articolo(nome, condizione, descrizione, Rif_lotto, Rif_utente, Rif_categoria, quantita)\n" +
+				"VALUES (?, ?, ?, ?, ?, ?, ?);"
+			;
+
+		String queryCreazioneImmagine = "INSERT INTO Immagini(principale, Rif_articolo)\n" +
+			"VALUES (?, ?);"
+		;
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement statement = connection.prepareStatement(queryCreazioneArticolo, new String[]{ "Id_articolo" });
+			statement.setString(1, nomeInput);
+			statement.setString(2, condizioneInput);
+			statement.setString(3, descrizioneInput);
+			statement.setInt(4, idLottoInput);
+			statement.setInt(5, idUtente);
+			statement.setInt(6, idCategoriaInput);
+			statement.setInt(7, quantitaInput);
+			statement.executeUpdate();
+			ResultSet resultSet = statement.getGeneratedKeys();
+
+			if (!resultSet.next()) {
+				System.err.println("[" + Thread.currentThread().getName() +
+					"]: Non è stato possibile ottenere la chiava autogenerata dalla creazione dell'articolo."
+				);
+
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+				return;
+			}
+
+			int chiaveArticolo = resultSet.getInt(1);
+
+			for (int i = 0; i < immaginiArticoloInput.length; ++i) {
+				statement = connection.prepareStatement(queryCreazioneImmagine, new String[] { "Id_immagine" });
+				statement.setInt(1, immaginePrincipaleInput == i ? 1 : 0);
+				statement.setInt(2, chiaveArticolo);
+				statement.executeUpdate();
+				resultSet = statement.getGeneratedKeys();
+
+				if (!resultSet.next()) {
+					System.err.println("[" + Thread.currentThread().getName() +
+						"]: Non è stato possibile ottenere la chiava autogenerata dalla creazione dell'immagine."
+					);
+	
+					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+					rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+					return;
+				}
+
+				int chiaveImmagine = resultSet.getInt(1);
+
+				FileOutputStream stream = new FileOutputStream("res\\immagini_articoli\\" + chiaveImmagine + ".png");
+				stream.write(immaginiArticoloInput[i]);
+				stream.close();
+			}
+
+			rispostaUscente.tipoRisposta = TipoRisposta.OK;
+		} catch (IOException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella scrittura/chiusura dell'immagine di un articolo. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di creazione dell'articolo. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO};
+		}
 	}
 
 	private void login() {

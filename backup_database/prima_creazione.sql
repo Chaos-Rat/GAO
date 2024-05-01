@@ -54,8 +54,17 @@ CREATE TABLE Puntate (
 	PRIMARY KEY (Id_puntata),
 	FOREIGN KEY (Rif_asta) REFERENCES Aste(Id_asta),
  	FOREIGN KEY (Rif_utente) REFERENCES Utenti(Id_utente),
-	CHECK(valore > 0)
+	CHECK (valore > 0)
 );
+
+CREATE TABLE Categorie (
+   	Id_categoria INT NOT NULL AUTO_INCREMENT,
+   	nome VARCHAR(255) NOT NULL UNIQUE,
+	PRIMARY KEY (Id_categoria)
+);
+
+INSERT INTO Categorie(nome)
+VALUES ("Altre categorie");
 
 CREATE TABLE Articoli (
    	Id_articolo INT NOT NULL AUTO_INCREMENT,
@@ -74,6 +83,7 @@ CREATE TABLE Articoli (
 
 CREATE TABLE Immagini (
 	Id_immagine INT NOT NULL AUTO_INCREMENT,
+	principale BOOLEAN NOT NULL,
 	Rif_articolo INT NOT NULL,
 	PRIMARY KEY (Id_immagine),
 	FOREIGN KEY (Rif_articolo) REFERENCES Articoli(Id_articolo)
@@ -86,15 +96,6 @@ CREATE TABLE Lotti_Immagini (
 	FOREIGN KEY (Rif_lotto) REFERENCES Lotti(Id_lotto),
 	FOREIGN KEY (Rif_immagine) REFERENCES Immagini(Id_immagine)
 );
-
-CREATE TABLE Categorie (
-   	Id_categoria INT NOT NULL AUTO_INCREMENT,
-   	nome VARCHAR(255) NOT NULL UNIQUE,
-	PRIMARY KEY (Id_categoria)
-);
-
-INSERT INTO Categorie(nome)
-VALUES ("Altre categorie");
 
 CREATE TABLE Salvataggi (
    	Rif_asta INT NOT NULL,
