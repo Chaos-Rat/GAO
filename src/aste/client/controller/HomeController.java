@@ -101,7 +101,6 @@ public class HomeController {
             Image image = new Image(defaultImg);
             ImageView imageView = new ImageView();
             imageView.setImage(image);
-            imageView.setPreserveRatio(true);
             avatar.setFill(new ImagePattern(imageView.getImage()));
             defaultImg.close();
         }
