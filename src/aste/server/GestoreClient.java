@@ -185,8 +185,45 @@ public class GestoreClient implements Runnable {
 			case VISUALIZZA_PUNTATE:
 				visualizzaPuntate();
 				break;
+			case VERIFICA_ADMIN:
+				verificaAdmin();
 			default:
 				break;
+		}
+	}
+
+	private void verificaAdmin() {
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
+
+		String queryAdmin = "SELECT utente_admin\n" +
+			"FROM Utenti\n" +
+			"WHERE Id_utente = ?;"
+		;
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement statement = connection.prepareStatement(queryAdmin);
+			statement.setInt(1, idUtente);
+			ResultSet resultSet = statement.executeQuery();
+
+			while (resultSet.next()) {
+				rispostaUscente.tipoRisposta = TipoRisposta.OK;
+				rispostaUscente.payload = new Object[]{
+					Boolean.valueOf(resultSet.getInt("utente_admin") == 1)
+				};
+				return;
+			}
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nella query di verifica admin. " + e.getSQLState());
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
 	}
 
@@ -557,6 +594,12 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void visualizzaImmagineProfilo() {
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
+
 		Integer idInput;
 
 		try {

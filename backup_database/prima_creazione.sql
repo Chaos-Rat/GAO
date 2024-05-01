@@ -1,3 +1,5 @@
+DROP DATABASE gestione_aste_online;
+
 CREATE DATABASE gestione_aste_online;
 
 USE gestione_aste_online;
@@ -15,6 +17,7 @@ CREATE TABLE Utenti (
 	hash_password BINARY(64) NOT NULL,
 	iban VARCHAR(255) NOT NULL,
 	immagine_profilo BOOLEAN NOT NULL DEFAULT 0,
+	utente_admin BOOLEAN NOT NULL DEFAULT 0,
 	PRIMARY KEY (Id_utente)
 );
 

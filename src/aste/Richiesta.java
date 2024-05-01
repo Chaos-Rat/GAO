@@ -39,6 +39,7 @@ public class Richiesta implements Serializable {
 		VISUALIZZA_CATEGORIE,
 		VISUALIZZA_PUNTATE,
 		EFFETTUA_PUNTATA,
+		VERIFICA_ADMIN,
 		LOGOUT
 	}
 }
