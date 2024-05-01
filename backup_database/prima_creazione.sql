@@ -89,14 +89,6 @@ CREATE TABLE Immagini (
 	FOREIGN KEY (Rif_articolo) REFERENCES Articoli(Id_articolo)
 );
 
-CREATE TABLE Lotti_Immagini (
-	Rif_lotto INT NOT NULL,
-	Rif_immagine INT NOT NULL,
-	PRIMARY KEY (Rif_lotto, Rif_immagine),
-	FOREIGN KEY (Rif_lotto) REFERENCES Lotti(Id_lotto),
-	FOREIGN KEY (Rif_immagine) REFERENCES Immagini(Id_immagine)
-);
-
 CREATE TABLE Salvataggi (
    	Rif_asta INT NOT NULL,
    	Rif_utente INT NOT NULL,
