@@ -288,8 +288,7 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void creaLotto() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'creaLotto'");
+		
 	}
 
 	private void creaCategoria() {
@@ -1350,35 +1349,13 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void visualizzaArticoli() {
-		// Implementazione della visualizzazione degli articoli
-		// Definiamo la query SQL per selezionare tutti gli articoli
-		String query = "SELECT * FROM Articoli WHERE Id_articolo";
+		String queryVisualizzazione = "SELECT Articoli.Id_articolo, Articoli.nome, Articoli.condizione, Immagini.Id_immagine\n" + 
+			"FROM Articoli\n" +
+			"JOIN Immagini ON Articoli.Id_articolo = Immagini.Id_immagine\n" +
+			"WHERE Articoli.Rif_utente = ? AND Articoli.Rif_categoria = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1\n" +
+			"LIMIT ? OFFSET ?;"
+		;
 
-		// Utilizziamo un oggetto Statement per eseguire la query
-		try {
-			Statement stmt = gestoreDatabase.getConnection().createStatement();
-			// Eseguiamo la query e otteniamo il risultato
-			ResultSet rs = stmt.executeQuery(query);
-
-			// Iteriamo attraverso ogni riga del risultato
-			while (rs.next()) {
-				// Leggiamo i valori di ogni colonna per la riga corrente
-				String nome = rs.getString("nome");
-				String condizione = rs.getString("condizione");
-				String descrizione = rs.getString("descrizione");
-				int rifLotto = rs.getInt("Rif_lotto");
-				int rifUtente = rs.getInt("Rif_utente");
-
-				// Stampiamo le informazioni della riga corrente
-				System.out.println("Nome: " + nome);
-				System.out.println("Condizione: " + condizione);
-				System.out.println("Descrizione: " + descrizione);
-				System.out.println("Riferimento Lotto: " + rifLotto);
-				System.out.println("Riferimento Utente: " + rifUtente);
-				System.out.println("-----------------------------------------");
-			}
-		} catch (SQLException e) {
-
-		}
+		String stringaRicerca = "%qualcosa%";
 	}
 }
