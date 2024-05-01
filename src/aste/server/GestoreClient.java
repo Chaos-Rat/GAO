@@ -1752,6 +1752,85 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
 			return;
 		}
+
+		// Funzione per avere un'asta 
+		Integer idAstaInput;
+
+		try {
+			idAstaInput = (Integer)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+			return;
+		}
+
+		if (idAstaInput == null) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+			return;
+		}
+
+		// Impostazione della query finale 
+		String queryVisualizzazione = "SELECT DISTINCT Aste.dataOraInizio, Aste.descrizione_annullamento, Aste.durata, Aste.prezzo_attuale, Aste.Rif_lotto, Lotti.nome, Immagini.Id_immagine\n"+ 
+		"FROM Aste\n"+
+		"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n"+
+		"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n"+
+		"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n"+
+		"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n"+
+		"WHERE Id_aste = ?";
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
+			preparedStatement.setInt(1, idAstaInput);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			// While per caricare l'array list 
+			if (!resultSet.next()) {
+				// 
+				rispostaUscente.tipoRisposta= TipoRisposta.OK;
+
+				rispostaUscente.payload[0]= resultSet.getTime("data_ora_inizio");
+				rispostaUscente.payload[1]= resultSet.getTime("durata");
+				rispostaUscente.payload[2]= resultSet.getFloat("prezzo_inizio");
+				rispostaUscente.payload[2]= resultSet.getFloat("prezzo_attuale");
+				rispostaUscente.payload[3]= resultSet.getInt("ip_multicast");
+				rispostaUscente.payload[4]= resultSet.getString("descrizione_annullamento");
+				rispostaUscente.payload[5]= resultSet.getInt("Id_lotto");
+				rispostaUscente.payload[6]= resultSet.getString("nome_lotto");
+				rispostaUscente.payload[7]= resultSet.getByte("immagini_articolo");
+
+				//
+				FileInputStream stream;
+
+				if (resultSet.wasNull()) {
+					stream= new FileInputStream("static_resources\\default_articolo.png");
+				} else {
+					stream= new FileInputStream("res\\immagini_articoli\\"+ idImmagine+ ".png");
+				}
+
+				stream.readAllBytes();
+
+				stream.close();
+			}
+
+		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di vissualizazione asta. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+
+		} catch (IOException e) { // questo catch e per gli errori che potrebbe dare il caricamento del immagine del utente
+			System.err.println("[" +
+				Thread.currentThread().getName() +
+				"]: C'e' stato un errore nell'apertura/scrittura/chiusura delle immagini dell'asta. "
+				+ e.getMessage()
+			);
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
 	}
 
 	private void salvaAsta() {
