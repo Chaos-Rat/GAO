@@ -251,8 +251,70 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void creaCategoria() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'creaCategoria'");
+		if (!admin) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
+
+		String nomeInput;
+
+		try {
+			nomeInput = (String)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "nome"};
+			return;
+		}
+
+		if (nomeInput == null || nomeInput.equals("")) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "nome"};
+		
+			return;
+		}
+
+		String queryValidazione = "SELECT Id_categoria\n" +
+			"FROM Categorie\n" +
+			"WHERE nome = ?"
+		;
+
+		String queryCreazione = "INSERT INTO Categorie(nome)\n" +
+			"VALUES (?);"
+		;
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(queryValidazione);
+			preparedStatement.setString(1, nomeInput);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			while (resultSet.next()) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+				return;
+			}
+
+			preparedStatement = connection.prepareStatement(queryCreazione, new String[]{ "Id_categoria" });
+			preparedStatement.setString(1, nomeInput);
+			preparedStatement.executeUpdate();
+			resultSet = preparedStatement.getGeneratedKeys();
+
+			while (resultSet.next()) {
+				rispostaUscente.tipoRisposta = TipoRisposta.OK;
+				rispostaUscente.payload = new Object[] { Integer.valueOf(resultSet.getInt("Id_categoria")) };
+			}
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di creazione categoria. " + e.getSQLState()
+			);
+			
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
 	}
 
 	private void creaArticolo() {
