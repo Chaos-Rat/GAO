@@ -113,10 +113,10 @@ public class GestoreClient implements Runnable {
 				effettuaPuntata();
 				break;
 			case ELIMINA_ARTICOLO:
-				creaArticolo();
+				eliminaArticolo();
 				break;
 			case ELIMINA_LOTTO:
-				creaLotto();
+				eliminaLotto();
 				break;
 			case LOGIN:
 				login();
@@ -194,6 +194,16 @@ public class GestoreClient implements Runnable {
 		}
 	}
 
+	private void eliminaLotto() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'eliminaLotto'");
+	}
+
+	private void eliminaArticolo() {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'eliminaArticolo'");
+	}
+
 	private void verificaAdmin() {
 		if (idUtente == 0) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
@@ -228,7 +238,8 @@ public class GestoreClient implements Runnable {
 		}
 
 		String queryVisualizzazione = "SELECT Id_categoria, nome\n" +
-			"FROM Categorie;"
+			"FROM Categorie" +
+			"ORDER BY nome ASC;"
 		;
 
 		try {
@@ -348,8 +359,117 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void creaArticolo() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'creaArticolo'");
+		String nomeInput;
+
+		try {
+			nomeInput = (String)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "nome"};
+			return;
+		}
+
+		if (nomeInput == null || nomeInput.equals("")) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "nome"};
+			return;
+		}
+
+		String condizioneInput;
+
+		try {
+			condizioneInput = (String)richiestaEntrante.payload[1];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "condizione"};
+			return;
+		}
+
+		if (condizioneInput == null || condizioneInput.equals("")) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "condizione"};
+			return;
+		}
+
+		String descrizioneInput;
+
+		try {
+			descrizioneInput = (String)richiestaEntrante.payload[2];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "descizione"};
+			return;
+		}
+
+		if (descrizioneInput == null || descrizioneInput.equals("")) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "descrizione"};
+			return;
+		}
+
+		Integer idLottoInput;
+
+		try {
+			idLottoInput = (Integer)richiestaEntrante.payload[3];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idLotto"};
+			return;
+		}
+
+		if (idLottoInput == null || idLottoInput <= 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idLotto"};
+			return;
+		}
+
+		byte[][] immaginiArticoloInput;
+
+		try {
+			immaginiArticoloInput = (byte[][])richiestaEntrante.payload[4];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "immaginiArticolo"};
+			return;
+		}
+
+		if (immaginiArticoloInput == null) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "immaginiArticolo"};
+			return;
+		}
+
+		Integer immaginePrincipaleInput;
+
+		try {
+			immaginePrincipaleInput = (Integer)richiestaEntrante.payload[5];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "immaginePrincipale"};
+			return;
+		}
+
+		if (immaginePrincipaleInput == null || immaginePrincipaleInput < 0 || immaginePrincipaleInput >= immaginiArticoloInput.length) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "immaginePrincipale"};
+			return;
+		}
+
+		int[] categorieInput;
+
+		try {
+			categorieInput = (int[])richiestaEntrante.payload[6];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "categorieInput"};
+			return;
+		}
+
+		if (categorieInput == null || categorieInput.length < 1) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "categorieInput"};
+			return;
+		}
 	}
 
 	private void login() {
@@ -410,7 +530,7 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void registrazione() {
-		String nomeInput;
+		String idLottoInput;
 		
 		try {
 			nomeInput = (String)richiestaEntrante.payload[0];

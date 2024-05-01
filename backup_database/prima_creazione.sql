@@ -27,8 +27,8 @@ CREATE TABLE Lotti (
 	PRIMARY KEY (Id_lotto)
 );
 
-INSERT INTO Lotti(Id_lotto, nome)
-VALUES (0, "Default");
+INSERT INTO Lotti(nome)
+VALUES ("Default");
 
 CREATE TABLE Aste (
 	Id_asta INT NOT NULL AUTO_INCREMENT,
@@ -62,7 +62,7 @@ CREATE TABLE Articoli (
    	nome VARCHAR(255) NOT NULL,
    	condizione VARCHAR(255) NOT NULL,
    	descrizione VARCHAR(255) NOT NULL,
-   	Rif_lotto INT NOT NULL DEFAULT 0,
+   	Rif_lotto INT NOT NULL DEFAULT 1,
    	Rif_utente INT NOT NULL,
 	quantita INT UNSIGNED NOT NULL,
 	PRIMARY KEY (Id_articolo),
@@ -90,6 +90,9 @@ CREATE TABLE Categorie (
    	nome VARCHAR(255) NOT NULL UNIQUE,
 	PRIMARY KEY (Id_categoria)
 );
+
+INSERT INTO Categorie(nome)
+VALUES ("Altre categorie");
 
 CREATE TABLE Articoli_Categorie (
    	Rif_articolo INT NOT NULL,
