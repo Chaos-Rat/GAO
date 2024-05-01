@@ -64,10 +64,12 @@ CREATE TABLE Articoli (
    	descrizione VARCHAR(255) NOT NULL,
    	Rif_lotto INT NOT NULL DEFAULT 1,
    	Rif_utente INT NOT NULL,
+	Rif_categoria INT NOT NULL,
 	quantita INT UNSIGNED NOT NULL,
 	PRIMARY KEY (Id_articolo),
    	FOREIGN KEY (Rif_lotto) REFERENCES Lotti(Id_lotto),
-   	FOREIGN KEY (Rif_utente) REFERENCES Utenti(Id_utente)
+   	FOREIGN KEY (Rif_utente) REFERENCES Utenti(Id_utente),
+	FOREIGN KEY (Rif_categoria) REFERENCES Categorie(Id_categoria)
 );
 
 CREATE TABLE Immagini (
@@ -93,14 +95,6 @@ CREATE TABLE Categorie (
 
 INSERT INTO Categorie(nome)
 VALUES ("Altre categorie");
-
-CREATE TABLE Articoli_Categorie (
-   	Rif_articolo INT NOT NULL,
-   	Rif_categoria INT NOT NULL,
-	PRIMARY KEY (Rif_articolo, Rif_categoria),
-   	FOREIGN KEY (Rif_articolo) REFERENCES Articoli(Id_articolo),
-   	FOREIGN KEY (Rif_categoria) REFERENCES Categorie(Id_categoria)
-);
 
 CREATE TABLE Salvataggi (
    	Rif_asta INT NOT NULL,

@@ -238,7 +238,7 @@ public class GestoreClient implements Runnable {
 		}
 
 		String queryVisualizzazione = "SELECT Id_categoria, nome\n" +
-			"FROM Categorie" +
+			"FROM Categorie\n" +
 			"ORDER BY nome ASC;"
 		;
 
@@ -344,6 +344,7 @@ public class GestoreClient implements Runnable {
 			while (resultSet.next()) {
 				rispostaUscente.tipoRisposta = TipoRisposta.OK;
 				rispostaUscente.payload = new Object[] { Integer.valueOf(resultSet.getInt("Id_categoria")) };
+				return;
 			}
 
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
@@ -423,6 +424,17 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di controllo dell'idLotto nella creazione del pay. " + e.getSQLState()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
+
 		byte[][] immaginiArticoloInput;
 
 		try {
@@ -470,6 +482,8 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "categorieInput"};
 			return;
 		}
+
+
 	}
 
 	private void login() {
@@ -530,7 +544,7 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void registrazione() {
-		String idLottoInput;
+		String nomeInput;
 		
 		try {
 			nomeInput = (String)richiestaEntrante.payload[0];
