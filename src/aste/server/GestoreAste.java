@@ -62,7 +62,7 @@ public class GestoreAste {
 			Statement statement = connection.createStatement();
 			statement.executeUpdate(queryInserimento, new String[]{"Id_asta"});
 			ResultSet result = statement.getGeneratedKeys();
-			idAsta = result.getInt("Id_asta");
+			idAsta = result.getInt(1);
 		} catch (SQLException e) {
 			throw new Error("[" + Thread.currentThread().getName() + "]: " + e.getMessage());
 		}

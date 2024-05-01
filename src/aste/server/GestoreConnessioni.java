@@ -37,7 +37,7 @@ public class GestoreConnessioni {
         while (true) {
 			try {
 				Socket clientSocket = serverSocket.accept();
-				System.out.println("Accettata connessione da un client.");	
+				System.out.println("Accettata connessione da un client.");
 				poolConnessioni.execute(new GestoreClient(clientSocket, gestoreDatabase, gestoreAste));
 			} catch (IOException e) {
 				System.err.println("[" + Thread.currentThread().getName() +

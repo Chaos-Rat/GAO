@@ -343,7 +343,7 @@ public class GestoreClient implements Runnable {
 
 			while (resultSet.next()) {
 				rispostaUscente.tipoRisposta = TipoRisposta.OK;
-				rispostaUscente.payload = new Object[] { Integer.valueOf(resultSet.getInt("Id_categoria")) };
+				rispostaUscente.payload = new Object[] { Integer.valueOf(resultSet.getInt(1)) };
 				return;
 			}
 
@@ -428,7 +428,7 @@ public class GestoreClient implements Runnable {
 			Connection connection = gestoreDatabase.getConnection();
 		} catch (SQLException e) {
 			System.err.println("[" + Thread.currentThread().getName() +
-				"]: C'e' stato un errore nella query di controllo dell'idLotto nella creazione del pay. " + e.getSQLState()
+				"]: C'e' stato un errore nella query di controllo dell'idLotto nella creazione del pay. " + e.getMessage()
 			);
 
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
@@ -533,7 +533,7 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
 		} catch (SQLException e) {
-			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nella query di login. " + e.getSQLState());
+			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nella query di login. " + e.getMessage());
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
@@ -709,7 +709,7 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.tipoRisposta = TipoRisposta.OK;
 		} catch (SQLException e) {
 			System.err.println("[" + Thread.currentThread().getName() +
-				"]: C'e' stato un errore nella query di registrazione." + e.getSQLState()
+				"]: C'e' stato un errore nella query di registrazione." + e.getMessage()
 			);
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
@@ -850,7 +850,7 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
 		} catch (SQLException e) {
-			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nella query di visualizzazione immagine. " + e.getSQLState());
+			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nella query di visualizzazione immagine. " + e.getMessage());
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		} catch (IOException e) {
