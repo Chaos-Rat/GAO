@@ -35,4 +35,5 @@ lib/
 /.vscode
 
 # dynamic resources
-/res/
+/res/immagini_articoli/*
+/res/profili/*
