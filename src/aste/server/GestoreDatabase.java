@@ -11,6 +11,7 @@ public class GestoreDatabase {
 	private Opzioni opzioni;
 
 	public static class Opzioni {
+		private boolean pool;
 		private String nomeDriver;
 		private String url;
 		private String username;
@@ -19,7 +20,9 @@ public class GestoreDatabase {
 		private int maxIdle;
 		private int maxOpenPreparedStatements;
 		
-		public Opzioni(String nomeDriver,
+		public Opzioni(
+			boolean pool,	
+			String nomeDriver,
 			String url,
 			String username,
 			String password,
@@ -27,6 +30,7 @@ public class GestoreDatabase {
 			int maxIdle,
 			int maxOpenPreparedStatements
 		) {
+			this.pool = pool;
 			this.nomeDriver = nomeDriver;
 			this.url = url;
 			this.username = username;
@@ -40,18 +44,24 @@ public class GestoreDatabase {
 	public GestoreDatabase(Opzioni opzioni) {
 		this.opzioni = opzioni;
 
-		dataSource = new BasicDataSource();
-
-		dataSource.setDriverClassName(opzioni.nomeDriver);
-		dataSource.setUrl(opzioni.url);
-		dataSource.setUsername(opzioni.username);
-		dataSource.setPassword(opzioni.password);
-		dataSource.setMinIdle(opzioni.minIdle);
-		dataSource.setMaxIdle(opzioni.maxIdle);
-		dataSource.setMaxOpenPreparedStatements(opzioni.maxOpenPreparedStatements);
+		if (opzioni.pool)
+		{
+			dataSource = new BasicDataSource();
+			dataSource.setDriverClassName(opzioni.nomeDriver);
+			dataSource.setUrl(opzioni.url);
+			dataSource.setUsername(opzioni.username);
+			dataSource.setPassword(opzioni.password);
+			dataSource.setMinIdle(opzioni.minIdle);
+			dataSource.setMaxIdle(opzioni.maxIdle);
+			dataSource.setMaxOpenPreparedStatements(opzioni.maxOpenPreparedStatements);
+		}
 	}
 
 	public Connection getConnection() throws SQLException {
+		if (opzioni.pool) {
+			return dataSource.getConnection();
+		}
+
 		return DriverManager.getConnection(opzioni.url, opzioni.username, opzioni.password);
 	}
 }

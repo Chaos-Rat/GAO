@@ -1,7 +1,11 @@
 package aste.server;
 
 import java.sql.Statement;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
@@ -118,7 +122,24 @@ public class GestoreAste {
 
     }
 
-    public synchronized void effettuaOfferta(int idAsta, int idUtente, int valore) {
-
+    public synchronized void effettuaOfferta(int idAsta,
+		InetAddress indirizzo,
+		int idUtente,
+		String email,
+		int valore,
+		LocalDateTime dataOra
+	) {
+		MulticastSocket socket = null;
+		try {
+			socket = new MulticastSocket(3000);
+		} catch (IOException e) {
+			System.err.println("[" + 
+			Thread.currentThread().getName() +
+			"]: C'e' stato un errore nella diffusione della puntata mediante multicast.");
+		} finally {
+			if (socket != null) {
+				socket.close();
+			}
+		}
     }
 }

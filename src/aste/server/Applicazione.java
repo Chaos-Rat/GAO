@@ -20,7 +20,8 @@ public class Applicazione {
 	}
 
 	public static void main(String[] args) {
-		GestoreDatabase.Opzioni opzioniDB = new GestoreDatabase.Opzioni("com.mysql.cj.jdbc.Driver",
+		GestoreDatabase.Opzioni opzioniDB = new GestoreDatabase.Opzioni(false,
+			"com.mysql.cj.jdbc.Driver",
 			"jdbc:mysql://localhost:3306/gestione_aste_online",
 			"server",
 			"JUiv[xDc*OCqCg26",
