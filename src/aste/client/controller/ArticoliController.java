@@ -105,38 +105,39 @@ public class ArticoliController
         HelloApplication.output.writeObject(richiestaArticoli);
         Risposta rispostaArticoli = new Risposta();
         rispostaArticoli = (Risposta) HelloApplication.input.readObject();
-        for (int i = 0; i <rispostaArticoli.payload.length/4; i++)
-        {
-            HBox box = new HBox();
-            FileOutputStream out = new FileOutputStream("cache/Articolo.png");
-            out.write((byte[]) rispostaArticoli.payload[i*4+3]);
-            out.close();
-            FileInputStream in = new FileInputStream("cache/Articolo.png");
-            Image img = new Image(in);
-            in.close();
-            ImageView item = new ImageView();
-            item.setImage(img);
-            item.setFitWidth(100);
-            item.setFitHeight(100);
-            item.setPreserveRatio(true);
-            String nome = (String) rispostaArticoli.payload[i*4+1];
-            String cond = (String) rispostaArticoli.payload[i*4+2];
-            Text nomeT = new Text("Nome: " + nome);
-            Text condT = new Text("Condition: " +cond);
-            Integer id = (Integer) rispostaArticoli.payload[i*4+0];
-            Text idT = new Text("Id: +" + id.toString());
-            VBox vbox = new VBox();
-            VBox vbox2 = new VBox();
-            vbox2.setAlignment(Pos.CENTER);
-            vbox.setAlignment(Pos.CENTER);
-            vbox.getChildren().add(item);
-            vbox2.getChildren().addAll(nomeT,condT);
-            box.setPrefWidth(940);
-            box.setAlignment(Pos.CENTER);
-            box.getChildren().addAll(vbox,vbox2);
-            articoliList.getChildren().add(box);
+        if (rispostaArticoli.tipoRisposta == Risposta.TipoRisposta.OK) {
+            for (int i = 0; i < rispostaArticoli.payload.length / 4; i++) {
+                HBox box = new HBox();
+                FileOutputStream out = new FileOutputStream("cache/Articolo.png");
+                out.write((byte[]) rispostaArticoli.payload[i * 4 + 3]);
+                out.close();
+                FileInputStream in = new FileInputStream("cache/Articolo.png");
+                Image img = new Image(in);
+                in.close();
+                ImageView item = new ImageView();
+                item.setImage(img);
+                item.setFitWidth(100);
+                item.setFitHeight(100);
+                item.setPreserveRatio(true);
+                String nome = (String) rispostaArticoli.payload[i * 4 + 1];
+                String cond = (String) rispostaArticoli.payload[i * 4 + 2];
+                Text nomeT = new Text("Nome: " + nome);
+                Text condT = new Text("Condition: " + cond);
+                Integer id = (Integer) rispostaArticoli.payload[i * 4 + 0];
+                Text idT = new Text("Id: +" + id.toString());
+                VBox vbox = new VBox();
+                VBox vbox2 = new VBox();
+                vbox2.setAlignment(Pos.CENTER);
+                vbox.setAlignment(Pos.CENTER);
+                vbox.getChildren().add(item);
+                vbox2.getChildren().addAll(nomeT, condT);
+                box.setPrefWidth(940);
+                box.setAlignment(Pos.CENTER);
+                box.getChildren().addAll(vbox, vbox2);
+                articoliList.getChildren().add(box);
+            }
         }
-        if (rispostaArticoli.payload[0] == Risposta.TipoErrore.CAMPI_INVALIDI)
+        else if (rispostaArticoli.payload[0] == Risposta.TipoErrore.CAMPI_INVALIDI)
         {
             System.out.println(rispostaArticoli.payload[0]);
             System.out.println(rispostaArticoli.payload[1]);
