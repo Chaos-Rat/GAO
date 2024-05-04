@@ -8,9 +8,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-/**
- * Il client dovrebbe aspettarsi un'array di lunghezza massima di 256 byte
- */
 public class Offerta implements Serializable {
 	public int idUtente;
 	public float valore;

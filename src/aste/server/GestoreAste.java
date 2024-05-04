@@ -8,6 +8,7 @@ import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
 import java.net.NetworkInterface;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
@@ -123,7 +124,24 @@ public class GestoreAste {
     }
 
     public synchronized void annullaAsta(int idAsta, String descrizioneAnnullamento) {
+		if (!mappaFuturi.get(idAsta).cancel(false)) {
+			// TODO: libera indirizzo
+		}
 		
+		String queryAnnullamento = "UPDATE Aste\n" +
+			"SET descrizione_annullamento = ?\n" +
+			"WHERE Id_asta = ?;"
+		;
+		
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement statement = connection.prepareStatement(queryAnnullamento);
+			statement.setString(1, descrizioneAnnullamento);
+			statement.setInt(2, idAsta);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			throw new Error("[" + Thread.currentThread().getName() + "]: " + e.getMessage());
+		}
     }
 
     public synchronized void effettuaOfferta(int idAsta,
