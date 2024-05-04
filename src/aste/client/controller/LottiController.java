@@ -23,6 +23,9 @@ import java.io.IOException;
 public class LottiController
 {
     @FXML
+    private Button addLotto;
+
+    @FXML
     private Button ArticoliB;
 
     @FXML
@@ -67,6 +70,20 @@ public class LottiController
             System.out.println(risposta.tipoRisposta.toString());
             System.out.println(((Risposta.TipoErrore) risposta.payload[0]).toString());
         }
+    }
+    @FXML
+    void AddLottoClicked(ActionEvent event) throws IOException
+    {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Lotto.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setTitle("The AuctionHouse");
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+        Stage stage1 = (Stage) addLotto.getScene().getWindow();
+        stage1.close();
     }
 
     @FXML

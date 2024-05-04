@@ -109,47 +109,6 @@ public class HomeController {
             System.out.println(risposta.tipoRisposta.toString());
             System.out.println(((Risposta.TipoErrore) risposta.payload[0]).toString());
         }
-//        int page = 1;
-//        Richiesta richiesta = new Richiesta();
-//        richiesta.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_IMMAGINE_PROFILO;
-//        for (int i = 0;i < 15 ; i++)
-//        {
-//            HBox box = new HBox();
-//            Image img = new Image(getClass().getResourceAsStream("../view/Screenshot.png"));
-//            Text des = new Text();
-//            Text date = new Text();
-//            Text status = new Text();
-//            des.setText("Description: Un vaso nero");
-//            status.setText("Status: Ongoing");
-//            date.setText("Date: 2-5-2042" );
-//            ImageView item = new ImageView();
-//            item.setImage(img);
-//            item.setFitWidth(100);
-//            item.setFitHeight(100);
-//            item.setPreserveRatio(true);
-//            VBox vbox = new VBox();
-//            VBox vbox2 = new VBox();
-//            VBox vbox3 = new VBox();
-//            vbox2.setAlignment(Pos.CENTER);
-//            vbox2.getChildren().addAll(des,date);
-//            vbox3.getChildren().addAll(status);
-//            vbox3.setAlignment(Pos.CENTER);
-//            vbox.setAlignment(Pos.CENTER);
-//            vbox.getChildren().add(item);
-//            box.setPrefWidth(940);
-//            box.setAlignment(Pos.CENTER);
-//            box.getChildren().addAll(vbox,vbox2,vbox3);
-//            asteList.getChildren().add(box);
-//            if (i == 14)
-//            {
-//                page++;
-//            }
-//        }
-//        Button b = new Button();
-//        b.setText(String.valueOf(page));
-//        b.getStyleClass().add("PageButton.css");
-//        PageMenu.getItems().addAll(b);
-
     }
 
     @FXML
