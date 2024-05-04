@@ -2,10 +2,12 @@ package aste.server;
 
 import java.sql.Statement;
 import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.Duration;
@@ -18,6 +20,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+
+import aste.Offerta;
 
 public class GestoreAste {
 	private GestoreDatabase gestoreDatabase;
@@ -37,7 +41,7 @@ public class GestoreAste {
 		indirizziLiberi = new ArrayList<>();
 		mappaFuturi = new Hashtable<>();
 		executorScheduler = Executors.newScheduledThreadPool(threadPoolAste);
-		INDIRIZZO_BASE = new byte[]{(byte)224, (byte)0, (byte)0, (byte)0};
+		INDIRIZZO_BASE = new byte[]{(byte)224, (byte)0, (byte)1, (byte)0};
 
 		for (int i = 0; i < 256; ++i) {
 			indirizziLiberi.add((byte)i);
@@ -114,24 +118,32 @@ public class GestoreAste {
 		}
     }
 
-    public void modificaAsta(int idAsta, int prezzoInizio, LocalDateTime dataOraInizio, LocalTime durata, boolean astaAutomatica, int rifLotto) {
-
+    public synchronized void modificaAsta(int idAsta, int prezzoInizio, LocalDateTime dataOraInizio, LocalTime durata, boolean astaAutomatica, int rifLotto) {
+		
     }
 
     public synchronized void annullaAsta(int idAsta, String descrizioneAnnullamento) {
-
+		
     }
 
     public synchronized void effettuaOfferta(int idAsta,
-		InetAddress indirizzo,
-		int idUtente,
-		String email,
-		int valore,
-		LocalDateTime dataOra
+		InetAddress indirizzoMulticast,
+		InetAddress indirizzoServer,
+		Offerta offerta
 	) {
 		MulticastSocket socket = null;
+		
 		try {
-			socket = new MulticastSocket(3000);
+			InetSocketAddress indirizzoSocket = new InetSocketAddress(indirizzoMulticast, 3000);
+			NetworkInterface interfaccia = NetworkInterface.getByInetAddress(indirizzoServer);
+			
+			socket = new MulticastSocket();
+			socket.joinGroup(indirizzoSocket, interfaccia);
+
+			byte[] datiOfferta = Offerta.toByteArray(offerta);
+			
+			DatagramPacket pacchetto = new DatagramPacket(datiOfferta, datiOfferta.length, indirizzoSocket);
+			socket.send(pacchetto);
 		} catch (IOException e) {
 			System.err.println("[" + 
 			Thread.currentThread().getName() +
