@@ -599,7 +599,7 @@ public class GestoreClient implements Runnable {
 		String queryControlloArticoli = "SELECT Articoli.Id_articolo\n" +
 			"FROM Utenti\n" +
 			"JOIN Articoli ON Articoli.Rif_utente = Utenti.Id_utente\n" +
-			"WHERE Rif_lotto = 1 AND Utenti.Id_utente = ?;"
+			"WHERE Articoli.Rif_lotto = 1 AND Utenti.Id_utente = ?;"
 		;
 
 		ArrayList<Integer> articoliUtente = new ArrayList<>();
@@ -1728,13 +1728,21 @@ public class GestoreClient implements Runnable {
 		// TODO: Controllo sul database
 		String controlloLotto1 = "SELECT 1\n" +
 			"FROM Aste\n" +
-			"WHERE Rif_lotto = Id_lotto AND ADDTIME(Aste.data_ora_inizio, Aste.durata) > CURRENT_TIMESTAMP;"
+			"WHERE Rif_lotto = ? AND ADDTIME(Aste.data_ora_inizio, Aste.durata) > CURRENT_TIMESTAMP;"
 		;
+
 		String controlloLotto2 = "SELECT 1\n" +
 			"FROM Aste\n" +
 			"JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
-			"WHERE Rif_lotto = L.Id_lotto;"
+			"WHERE Rif_lotto = ?;"
 		;
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement statement = connection.prepareStatement(controlloLotto1);
+		} catch (SQLException e) {
+
+		}
 	}
 
 	private void modificaAsta() {
@@ -1942,12 +1950,36 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
 
+		Boolean assegnabiliInput;
+
+		try {
+			assegnabiliInput = (Boolean)richiestaEntrante.payload[4];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "assegnabili" };
+			return;
+		}
+
+		if (assegnabiliInput == null) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "assegnabili" };
+			return;
+		}
+
 		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT Articoli.Id_articolo, Articoli.nome, Articoli.condizione, Immagini.Id_immagine\n" + 
+		String queryVisualizzazione = assegnabiliInput ? ("SELECT Articoli.Id_articolo, Articoli.nome, " +
+			"Articoli.condizione, Immagini.Id_immagine\n" + 
+			"FROM Articoli\n" +
+			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
+			"WHERE Articoli.Rif_lotto = 1 AND Articoli.Rif_utente = ? AND " +
+			"Articoli.Rif_categoria = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1\n" +
+			"LIMIT ? OFFSET ?;"
+		) : ("SELECT Articoli.Id_articolo, Articoli.nome, Articoli.condizione, Immagini.Id_immagine\n" + 
 			"FROM Articoli\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
 			"WHERE Articoli.Rif_utente = ? AND Articoli.Rif_categoria = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1\n" +
-			"LIMIT ? OFFSET ?;";
+			"LIMIT ? OFFSET ?;"
+		);
 
 		try {
 			Connection connection = gestoreDatabase.getConnection();
