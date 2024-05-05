@@ -31,10 +31,14 @@ public class GestoreAste {
     private ScheduledExecutorService executorScheduler;
 
 	private static class AstaFutura {
+		public Runnable taskCreazione;
+		public Runnable taskDistruzione;
 		public ScheduledFuture<?> futuraCreazione;
 		public ScheduledFuture<?> futuraDistruzione;
 
-		public AstaFutura(ScheduledFuture<?> futuraCrezione, ScheduledFuture<?> futuraDistruzione) {
+		public AstaFutura(Runnable taskCreazione, Runnable taskDistruzione, ScheduledFuture<?> futuraCrezione, ScheduledFuture<?> futuraDistruzione) {
+			this.taskCreazione = taskCreazione;
+			this.taskDistruzione = taskDistruzione;
 			this.futuraCreazione = futuraCrezione;
 			this.futuraDistruzione = futuraDistruzione;
 		}
@@ -88,16 +92,37 @@ public class GestoreAste {
 		};
 
 		Runnable taskDistruzione = () -> {
-			String queryControllo = "SELECT asta_automatica, ip_multicast\n" +
+			String queryControlloVincita = "SELECT 1\n" +
+				"FROM Aste\n" + 
+				"JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
+				"WHERE Id_asta = ?;"
+			;
+			
+			String queryControlloAutomatica = "SELECT asta_automatica, data_ora_inizio, durata, ip_multicast\n" +
 				"FROM Aste\n" +
 				"WHERE Id_asta = ?;"
 			;
 
+			String queryAggiornamento = "UPDATE Aste\n" +
+				"SET data_ora_inizio = CURRENT_TIMESTAMP;"
+			;			
+
 			try {
 				Connection connection = gestoreDatabase.getConnection();
-				PreparedStatement statement = connection.prepareStatement(queryControllo);
+				PreparedStatement statement = connection.prepareStatement(queryControlloVincita);
 				statement.setInt(1, idAsta);
 				ResultSet resultSet = statement.executeQuery();
+
+				if (resultSet.next()) {
+					byte indirizzoLibero = resultSet.getBytes("ip_multicast")[3];
+					indirizziLiberi.add(indirizzoLibero);
+					return;
+				}
+
+				
+				statement = connection.prepareStatement(queryControlloAutomatica);
+				statement.setInt(1, idAsta);
+				resultSet = statement.executeQuery();
 
 				if (!resultSet.next()) {
 					System.err.println("[" + Thread.currentThread().getName() + "]: L'idLotto fornito per la creazione dell'asta non esiste.");
@@ -105,10 +130,13 @@ public class GestoreAste {
 				}
 
 				boolean automatica = resultSet.getInt("asta_automatica") == 1;
+				
+				statement = connection.prepareStatement(queryAggiornamento);
+				statement.executeUpdate(queryAggiornamento);
 
 				if (automatica) {
-					// TODO: finish
-					mappaFuturi.put(idAsta, new AstaFutura(null, null));
+					AstaFutura astaFutura = mappaFuturi.get(idAsta);
+					astaFutura.futuraDistruzione = executorScheduler.schedule(astaFutura.taskDistruzione, durata.toHours(), TimeUnit.HOURS);
 				} else {
 					byte indirizzoLibero = resultSet.getBytes("ip_multicast")[3];
 					indirizziLiberi.add(indirizzoLibero);
@@ -120,6 +148,8 @@ public class GestoreAste {
 
 		mappaFuturi.put(idAsta,
 				new AstaFutura(
+					taskCrezione,
+					taskDistruzione,
 					executorScheduler.scheduleWithFixedDelay(taskCrezione,
 						ChronoUnit.SECONDS.between(LocalDateTime.now(), dataOraInizio),
 						0,
