@@ -599,7 +599,7 @@ public class GestoreClient implements Runnable {
 		String queryControlloArticoli = "SELECT Articoli.Id_articolo\n" +
 			"FROM Utenti\n" +
 			"JOIN Articoli ON Articoli.Rif_utente = Utenti.Id_utente\n" +
-			"WHERE Id_lotto = 1 AND Utenti.Id_utente = ?;"
+			"WHERE Rif_lotto = 1 AND Utenti.Id_utente = ?;"
 		;
 
 		ArrayList<Integer> articoliUtente = new ArrayList<>();
@@ -649,7 +649,7 @@ public class GestoreClient implements Runnable {
 
 		try {
 			Connection connection = gestoreDatabase.getConnection();
-			PreparedStatement statement = connection.prepareStatement(queryCreazioneLotto, new String[]{ "Rif_lotto" });
+			PreparedStatement statement = connection.prepareStatement(queryCreazioneLotto, new String[]{ "Id_lotto" });
 			statement.setString(1, nomeInput);
 			statement.executeUpdate();
 			ResultSet resultSet = statement.getGeneratedKeys();
