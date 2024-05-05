@@ -177,23 +177,50 @@ public class LottoController
         }
     }
     @FXML
-    void CreateClicked(ActionEvent event)
-    {
+    void CreateClicked(ActionEvent event) throws IOException, ClassNotFoundException {
 		String nomeLotto = lottoF.getText();
-
 		if (nomeLotto == null || nomeLotto.isEmpty()) {
 			// TODO: Lancia errore
 			return;
 		}
-
 		ArrayList<Integer> idArticoli = new ArrayList<>();
 		Set<Entry<Integer, Boolean>> entrySet = articoliSelezionati.entrySet();
-
 		entrySet.forEach((Entry<Integer, Boolean> entry) -> {
 			if (entry.getValue()) {
 				idArticoli.add(entry.getKey());
 			}
 		});
+        Richiesta richiestaLotto  = new Richiesta();
+        richiestaLotto.tipoRichiesta = Richiesta.TipoRichiesta.CREA_LOTTO;
+        richiestaLotto.payload = new Object[2];
+        richiestaLotto.payload[0] = nomeLotto;
+        int [] Articoli = new int [idArticoli.size()];
+        for (int i = 0 ; i < idArticoli.size(); i++)
+        {
+            Articoli[i] = idArticoli.get(i);
+        }
+        richiestaLotto.payload[1] = Articoli;
+        HelloApplication.output.writeObject(richiestaLotto);
+        Risposta rispostaLotto = (Risposta) HelloApplication.input.readObject();
+        System.out.println(idArticoli);
+        if (rispostaLotto.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            System.out.println("L'articolo è stato creato con successo");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Lotti.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            stage.setTitle("The AuctionHouse");
+            stage.setScene(scene);
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.show();
+            Stage stage1 = (Stage) createB.getScene().getWindow();
+            stage1.close();
+        }else if (rispostaLotto.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+        {
+            System.out.println(rispostaLotto.payload[0]);
+            System.out.println(rispostaLotto.payload[1]);
+        }
 	}
     @FXML
     void ArticoliClicked(ActionEvent event) throws IOException

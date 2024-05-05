@@ -3,6 +3,7 @@ package aste.client.controller;
 import aste.Richiesta;
 import aste.Risposta;
 import aste.client.HelloApplication;
+import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -10,6 +11,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
@@ -21,6 +23,8 @@ import javafx.stage.Stage;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.HashMap;
 
 public class AsteController
@@ -56,8 +60,34 @@ public class AsteController
     private ComboBox<String> category;
 
     @FXML
+    private Label timerLabel;
+
+    @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+        LocalTime end = LocalTime.now().plusHours(1);
+        AnimationTimer timer = new AnimationTimer()
+        {
+            @Override
+            public void handle(long l)
+            {
+                Duration remaining = Duration.between(LocalTime.now(), end);
+                if (remaining.isPositive()) {
+                    timerLabel.setText(format(remaining));
+                } else {
+                    timerLabel.setText(format(Duration.ZERO));
+                    stop();
+                }
+            }
+            private String format(Duration remaining) {
+                return String.format("%02d:%02d:%02d",
+                        remaining.toHoursPart(),
+                        remaining.toMinutesPart(),
+                        remaining.toSecondsPart()
+                );
+            }
+        };
+        timer.start();
         Richiesta richiestacat = new Richiesta();
         richiestacat.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_CATEGORIE;
         HelloApplication.output.writeObject(richiestacat);

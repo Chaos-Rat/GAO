@@ -3,12 +3,15 @@ package aste.client.controller;
 import aste.Richiesta;
 import aste.Risposta;
 import aste.client.HelloApplication;
+import javafx.animation.Animation;
+import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.ImagePattern;
@@ -19,6 +22,8 @@ import  javafx.scene.control.ComboBox;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalTime;
 import java.util.HashMap;
 
 public class LottiController
@@ -49,6 +54,7 @@ public class LottiController
 
     @FXML
     private ComboBox<String> category;
+
 
 
     @FXML
@@ -104,6 +110,7 @@ public class LottiController
             System.out.println(((Risposta.TipoErrore) risposta.payload[0]).toString());
         }
     }
+
     @FXML
     void AddLottoClicked(ActionEvent event) throws IOException
     {
