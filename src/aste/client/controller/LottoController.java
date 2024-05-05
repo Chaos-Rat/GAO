@@ -21,11 +21,15 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class LottoController
 {
@@ -62,9 +66,12 @@ public class LottoController
     @FXML
     private TextField lottoF;
 
+	private HashMap<Integer, Boolean> articoliSelezionati;
+
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+		articoliSelezionati = new HashMap<>();
         Richiesta richiestaProfile = new Richiesta();
         richiestaProfile.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_IMMAGINE_PROFILO;
         richiestaProfile.payload = new Object[]{0};
@@ -147,8 +154,14 @@ public class LottoController
                 box.setSpacing(50);
                 check.setOnAction(event ->
                 {
-                    System.out.println("id = " + id + " " + "Name = " + nome);
-
+					Boolean selezionato = articoliSelezionati.get(id);
+					
+					if (selezionato == null || !selezionato) {
+						articoliSelezionati.put(id, true);
+						return;
+					}
+					
+					articoliSelezionati.put(id, false);
                 });
                 vbox2.setAlignment(Pos.CENTER);
                 vbox.setAlignment(Pos.CENTER);
@@ -166,8 +179,22 @@ public class LottoController
     @FXML
     void CreateClicked(ActionEvent event)
     {
+		String nomeLotto = lottoF.getText();
 
-    }
+		if (nomeLotto == null || nomeLotto.isEmpty()) {
+			// TODO: Lancia errore
+			return;
+		}
+
+		ArrayList<Integer> idArticoli = new ArrayList<>();
+		Set<Entry<Integer, Boolean>> entrySet = articoliSelezionati.entrySet();
+
+		entrySet.forEach((Entry<Integer, Boolean> entry) -> {
+			if (entry.getValue()) {
+				idArticoli.add(entry.getKey());
+			}
+		});
+	}
     @FXML
     void ArticoliClicked(ActionEvent event) throws IOException
     {

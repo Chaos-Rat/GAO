@@ -37,3 +37,4 @@ lib/
 # dynamic resources
 /res/immagini_articoli/*.png
 /res/profili/*.png
+/cache/*.png
