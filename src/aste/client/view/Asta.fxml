@@ -6,6 +6,7 @@
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -98,20 +99,29 @@
                <top>
                   <VBox BorderPane.alignment="CENTER">
                      <children>
-                        <HBox prefHeight="66.0" prefWidth="950.0" />
-                        <HBox prefHeight="56.0" prefWidth="950.0">
+                        <HBox prefHeight="191.0" prefWidth="960.0">
                            <children>
                               <VBox prefHeight="200.0" prefWidth="100.0" />
                               <VBox alignment="CENTER_RIGHT" prefHeight="200.0" prefWidth="100.0">
                                  <children>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Name : " />
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Date:">
+                                       <VBox.margin>
+                                          <Insets bottom="9.0" />
+                                       </VBox.margin></Text>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Time:">
+                                       <VBox.margin>
+                                          <Insets bottom="5.0" />
+                                       </VBox.margin>
+                                    </Text>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Price:" />
                                  </children>
                               </VBox>
                               <VBox prefHeight="55.0" prefWidth="8.0" />
-                              <VBox alignment="CENTER" prefHeight="56.0" prefWidth="213.0">
+                              <VBox alignment="CENTER" prefHeight="191.0" prefWidth="224.0">
                                  <children>
-                                    <DatePicker fx:id="dateF" />
-                                    <Spinner fx:id="spinner" prefHeight="25.0" prefWidth="172.0" />
+                                    <DatePicker fx:id="dateF" prefHeight="25.0" prefWidth="223.0" promptText="Please enter a date for the auction" />
+                                    <Spinner fx:id="spinner" prefHeight="25.0" prefWidth="221.0" />
+                                    <TextField fx:id="priceF" prefHeight="25.0" prefWidth="0.0" promptText="Please enter the initial price" />
                                  </children>
                               </VBox>
                               <VBox prefHeight="56.0" prefWidth="11.0" />
