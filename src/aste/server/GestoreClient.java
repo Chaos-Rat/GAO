@@ -1676,6 +1676,12 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void creaAsta() {
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
+
 		LocalDateTime dataOraInizioInput;
 
 		try {
@@ -1751,7 +1757,7 @@ public class GestoreClient implements Runnable {
 
 			if (resultSet.next()) {
 				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idLotto" };
+				rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
 				return;
 			}
 
@@ -1761,7 +1767,7 @@ public class GestoreClient implements Runnable {
 
 			if (resultSet.next()) {
 				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idLotto" };
+				rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
 				return;
 			}
 		} catch (SQLException e) {
@@ -1778,8 +1784,11 @@ public class GestoreClient implements Runnable {
 			"VALUES (?, ?, ?, ?, ?);"
 		;
 
+		Connection connection = null;
+		
 		try {
-			Connection connection = gestoreDatabase.getConnection();
+			connection = gestoreDatabase.getConnection();
+			connection.setAutoCommit(false);
 			PreparedStatement statement = connection.prepareStatement(queryCreazione, new String[]{ "Id_asta" });
 			statement.setFloat(1, prezzoInizioInput);
 			statement.setTimestamp(2, Timestamp.valueOf(dataOraInizioInput));
@@ -1788,19 +1797,52 @@ public class GestoreClient implements Runnable {
 			statement.setInt(5, idLottoInput);
 			statement.executeUpdate();
 			ResultSet resultSet = statement.getGeneratedKeys();
-			
+			resultSet.next();
 
+			gestoreAste.creaAsta(resultSet.getInt(1), dataOraInizioInput, durataInput);
+			connection.commit();
 			
-			FileInputStream f = new FileInputStream("flkanf");
+			rispostaUscente.tipoRisposta = TipoRisposta.OK;
 		} catch (SQLException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				System.err.println("[" + Thread.currentThread().getName() +
+					"]: C'e' stato un errore del server sul rollback nella creazione asta. " + e1.getMessage()
+				);
+			}
+
 			System.err.println("[" + Thread.currentThread().getName() +
-				"]: C'e' stato un errore nella query di controllo sull'idLotto nella creazione asta. " + e.getMessage()
+				"]: C'e' stato un errore nella query di creazione asta. " + e.getMessage()
 			);
 
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
-		} catch (IOException e) {
+		} catch (IllegalStateException e) {
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				System.err.println("[" + Thread.currentThread().getName() +
+					"]: C'e' stato un errore del server sul rollback nella creazione asta. " + e1.getMessage()
+				);
+			}
 
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore del server per la creazione asta. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		} finally {
+			if (connection != null) {
+				try {
+					connection.setAutoCommit(true);
+				} catch (SQLException e) {
+					System.err.println("[" + Thread.currentThread().getName() +
+						"]: C'e' stato un errore del server per il reset dell'autocommit asta. " + e.getMessage()
+					);
+				}
+			}
 		}
 	}
 
