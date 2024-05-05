@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
@@ -20,6 +21,7 @@ import javafx.stage.Stage;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class AsteController
 {
@@ -51,8 +53,40 @@ public class AsteController
     private Button ProfileB;
 
     @FXML
+    private ComboBox<String> category;
+
+    @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+        Richiesta richiestacat = new Richiesta();
+        richiestacat.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_CATEGORIE;
+        HelloApplication.output.writeObject(richiestacat);
+        Risposta rispostacat = (Risposta) HelloApplication.input.readObject();
+        HashMap<String, Integer> catmap = new HashMap<String, Integer>();
+        if (rispostacat.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            for (int i = 0 ; i < rispostacat.payload.length/2 ; i++)
+            {
+                catmap.put((String) rispostacat.payload[i*2+1], (Integer) rispostacat.payload[i*2]);
+            }
+            catmap.put("Tutte le categorie",0);
+            category.getSelectionModel().select("Altre categorie");
+            category.getItems().addAll(catmap.keySet());
+        }
+        Richiesta richiestaAste = new Richiesta();
+        richiestaAste.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_ASTE;
+        richiestaAste.payload = new Object[4];
+        richiestaAste.payload[0] = 10;
+        richiestaAste.payload[1] = 1;
+        richiestaAste.payload[2] = "";
+        richiestaAste.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
+        HelloApplication.output.writeObject(richiestaAste);
+        Risposta rispostaAste = new Risposta();
+        rispostaAste = (Risposta) HelloApplication.input.readObject();
+        if (rispostaAste.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+
+        }
         Richiesta richiesta = new Richiesta();
         richiesta.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_IMMAGINE_PROFILO;
         richiesta.payload = new Object[]{0};

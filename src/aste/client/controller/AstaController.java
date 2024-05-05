@@ -134,8 +134,6 @@ public class AstaController
         {
             System.out.println(rispostaCrea.payload[0]);
         }
-
-
     }
     @FXML
     void ArticoliClicked(ActionEvent event) throws IOException
