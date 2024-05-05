@@ -106,14 +106,22 @@
                                  <children>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Date:">
                                        <VBox.margin>
-                                          <Insets bottom="9.0" />
+                                          <Insets bottom="10.0" />
                                        </VBox.margin></Text>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Time:">
                                        <VBox.margin>
-                                          <Insets bottom="5.0" />
+                                          <Insets bottom="10.0" />
                                        </VBox.margin>
                                     </Text>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Price:" />
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Price:">
+                                       <VBox.margin>
+                                          <Insets bottom="10.0" />
+                                       </VBox.margin></Text>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Duration:">
+                                       <VBox.margin>
+                                          <Insets bottom="2.0" />
+                                       </VBox.margin>
+                                    </Text>
                                  </children>
                               </VBox>
                               <VBox prefHeight="55.0" prefWidth="8.0" />
@@ -122,6 +130,7 @@
                                     <DatePicker fx:id="dateF" prefHeight="25.0" prefWidth="223.0" promptText="Please enter a date for the auction" />
                                     <Spinner fx:id="spinner" prefHeight="25.0" prefWidth="221.0" />
                                     <TextField fx:id="priceF" prefHeight="25.0" prefWidth="0.0" promptText="Please enter the initial price" />
+                                    <Spinner fx:id="spinnerEnd" prefHeight="25.0" prefWidth="221.0" />
                                  </children>
                               </VBox>
                               <VBox prefHeight="56.0" prefWidth="11.0" />
@@ -144,7 +153,7 @@
                <center>
                   <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                      <content>
-                        <VBox fx:id="articoliList" prefHeight="564.0" prefWidth="953.0">
+                        <VBox fx:id="lottiList" prefHeight="564.0" prefWidth="953.0">
                            <children>
                               <HBox prefHeight="100.0" prefWidth="900.0" />
                            </children>

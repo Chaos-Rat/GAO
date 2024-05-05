@@ -111,11 +111,7 @@
                               <Button fx:id="addB" mnemonicParsing="false" onAction="#AddClicked" stylesheets="@CSS/add.css" text="+" />
                            </children>
                         </HBox>
-                        <HBox prefHeight="100.0" prefWidth="200.0">
-                           <children>
-                              <Label fx:id="timerLabel" text="Label" />
-                           </children>
-                        </HBox>
+                        <Label fx:id="timerLabel" text="Label" />
                      </children>
                   </VBox>
                </content>

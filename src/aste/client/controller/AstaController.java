@@ -23,12 +23,16 @@ import javafx.stage.Stage;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class AstaController
 {
@@ -51,13 +55,13 @@ public class AstaController
     private Button ProfileB;
 
     @FXML
-    private VBox articoliList;
+    private VBox lottiList;
 
     @FXML
     private Circle avatar;
 
     @FXML
-    private ComboBox<?> category;
+    private ComboBox<String> category;
 
     @FXML
     private Button createB;
@@ -72,10 +76,16 @@ public class AstaController
     private TextField priceF;
 
     @FXML
+    private Spinner<LocalTime>spinnerEnd;
+
+    private HashMap<Integer, Boolean> lottiSelezionati;
+
+    @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+        lottiSelezionati = new HashMap<>();
         category.setVisible(false);
-
+        spinnerEnd.setEditable(true);
         spinner.setEditable(true);
         SpinnerValueFactory<LocalTime> factory = new SpinnerValueFactory<LocalTime>() {
             {
@@ -96,22 +106,165 @@ public class AstaController
                 setValue(value == null ? defaultValue() : value.plusHours(steps));
             }
         };
+        SpinnerValueFactory<LocalTime> factory2 = new SpinnerValueFactory<LocalTime>() {
+            {
+                setValue(defaultValue());
+            }
+
+            private LocalTime defaultValue() {
+                return LocalTime.now().truncatedTo(ChronoUnit.MINUTES);
+            }
+            @Override
+            public void decrement(int steps) {
+                LocalTime value = getValue();
+                setValue(value == null ? defaultValue() : value.minusMinutes(steps));
+            }
+            @Override
+            public void increment(int steps) {
+                LocalTime value = getValue();
+                setValue(value == null ? defaultValue() : value.plusMinutes(steps));
+            }
+        };
+        spinnerEnd.setValueFactory(factory2);
         spinner.setValueFactory(factory);
+        Richiesta richiestacat = new Richiesta();
+        richiestacat.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_CATEGORIE;
+        HelloApplication.output.writeObject(richiestacat);
+        Risposta rispostacat = (Risposta) HelloApplication.input.readObject();
+        HashMap<String, Integer> catmap = new HashMap<String, Integer>();
+        if (rispostacat.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            for (int i = 0 ; i < rispostacat.payload.length/2 ; i++)
+            {
+                catmap.put((String) rispostacat.payload[i*2+1], (Integer) rispostacat.payload[i*2]);
+            }
+            catmap.put("Tutte le categorie",0);
+            category.getSelectionModel().select("Altre categorie");
+            category.getItems().addAll(catmap.keySet());
+        }
+        Richiesta richiestaLotti = new Richiesta();
+        richiestaLotti.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_LOTTI;
+        richiestaLotti.payload = new Object[5];
+        richiestaLotti.payload[0] = 10 ;
+        richiestaLotti.payload[1] = 1;
+        richiestaLotti.payload[2] = "";
+        richiestaLotti.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
+        richiestaLotti.payload[4] = false;
+        HelloApplication.output.writeObject(richiestaLotti);
+        Risposta rispostaLotti = (Risposta) HelloApplication.input.readObject();
+        if (rispostaLotti.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            for (int i = 0; i < rispostaLotti.payload.length / 3; i++) {
+                CheckBox check = new CheckBox();
+                HBox box = new HBox();
+                FileOutputStream out = new FileOutputStream("cache/Articolo.png");
+                out.write((byte[]) rispostaLotti.payload[i * 3 + 2]);
+                out.close();
+                FileInputStream in = new FileInputStream("cache/Articolo.png");
+                Image img = new Image(in);
+                in.close();
+                ImageView item = new ImageView();
+                item.setImage(img);
+                item.setFitWidth(100);
+                item.setFitHeight(100);
+                item.setPreserveRatio(true);
+                String nome = (String) rispostaLotti.payload[i * 3 + 1];
+                Text nomeT = new Text("Nome: " + nome);
+                Integer id = (Integer) rispostaLotti.payload[i * 3 + 0];
+                Text idT = new Text("Id: +" + id.toString());
+                nomeT.setWrappingWidth(150);
+                idT.setWrappingWidth(150);
+                VBox vbox = new VBox();
+                VBox vbox2 = new VBox();
+                VBox vbox3 = new VBox();
+                box.setSpacing(50);
+                check.setOnAction(event ->
+                {
+                    Boolean selezionato = lottiSelezionati.get(id);
+                    if (selezionato == null || !selezionato) {
+                        lottiSelezionati.put(id, true);
+                        return;
+                    }
+                    lottiSelezionati.put(id, false);
+                });
+                vbox2.setAlignment(Pos.CENTER);
+                vbox.setAlignment(Pos.CENTER);
+                vbox.getChildren().add(item);
+                vbox2.getChildren().addAll(nomeT);
+                vbox3.getChildren().addAll(check);
+                box.setPrefWidth(940);
+                box.setAlignment(Pos.CENTER);
+                box.getChildren().addAll(vbox, vbox2,vbox3);
+                lottiList.getChildren().add(box);
+            }
+        }else if (rispostaLotti.payload[0] == Risposta.TipoRisposta.ERRORE)
+        {
+            System.out.println(rispostaLotti.payload[0]);
+            System.out.println(rispostaLotti.payload[1]);
+        }
 
     }
     @FXML
-    void CreateClicked(ActionEvent event) throws IOException, ClassNotFoundException {
+    void CreateClicked(ActionEvent event) throws IOException, ClassNotFoundException
+    {
+        Integer idArticoli;
+        Set<Map.Entry<Integer, Boolean>> entrySet = lottiSelezionati.entrySet();
+        entrySet.forEach((Map.Entry<Integer, Boolean> entry) -> {
+            if (entry.getValue()) {
+                idArticoli = entry.getKey();
+            }
+        });
+        Integer id;
         LocalDate startDate = dateF.getValue();
         LocalTime time = spinner.getValue();
         String datetimestr = (startDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))+" "+time.format(DateTimeFormatter.ofPattern("HH:mm")));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         LocalDateTime dateTime = LocalDateTime.parse(datetimestr,formatter);
+        LocalTime end = spinnerEnd.getValue();
+        Duration timeduration = Duration.between(time,end);
         System.out.println((String) dateTime.format(formatter));
+        Richiesta richiestacat = new Richiesta();
+        richiestacat.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_CATEGORIE;
+        HelloApplication.output.writeObject(richiestacat);
+        Risposta rispostacat = (Risposta) HelloApplication.input.readObject();
+        HashMap<String, Integer> catmap = new HashMap<String, Integer>();
+        if (rispostacat.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            for (int i = 0 ; i < rispostacat.payload.length/2 ; i++)
+            {
+                catmap.put((String) rispostacat.payload[i*2+1], (Integer) rispostacat.payload[i*2]);
+            }
+            catmap.put("Tutte le categorie",0);
+            category.getSelectionModel().select("Altre categorie");
+            category.getItems().addAll(catmap.keySet());
+        }
+        Richiesta richiestaArticoli = new Richiesta();
+        richiestaArticoli.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_ARTICOLI;
+        richiestaArticoli.payload = new Object[5];
+        richiestaArticoli.payload[0] = 10;
+        richiestaArticoli.payload[1] = 1;
+        richiestaArticoli.payload[2] = "";
+        richiestaArticoli.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
+        richiestaArticoli.payload[4] = true;
+        HelloApplication.output.writeObject(richiestaArticoli);
+        Risposta rispostaArticoli = new Risposta();
+        rispostaArticoli = (Risposta) HelloApplication.input.readObject();
+        if (rispostaArticoli.tipoRisposta == Risposta.TipoRisposta.OK) {
+            for (int i = 0; i < rispostaArticoli.payload.length / 4; i++) {
+                HBox box = new HBox();
+                FileOutputStream out = new FileOutputStream("cache/Articolo.png");
+                out.write((byte[]) rispostaArticoli.payload[i * 4 + 3]);
+                out.close();
+                String nome = (String) rispostaArticoli.payload[i * 4 + 1];
+                String cond = (String) rispostaArticoli.payload[i * 4 + 2];
+                id = (Integer) rispostaArticoli.payload[i * 4 + 0];
+            }
+        }
         Richiesta richiestaCrea = new Richiesta();
         richiestaCrea.tipoRichiesta = Richiesta.TipoRichiesta.CREA_ASTA;
         richiestaCrea.payload = new Object[5];
         richiestaCrea.payload[0] = dateTime;
-        richiestaCrea.payload[1] = 0;
+        richiestaCrea.payload[1] = timeduration;
         richiestaCrea.payload[2] = Float.valueOf(priceF.getText());
 //        richiestaCrea.payload[3] = ;
 //        richiestaCrea.payload[4] = ;
