@@ -16,6 +16,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -359,6 +361,7 @@ public class GestoreClient implements Runnable {
 			"Articoli.Rif_categoria = ? AND\n" +
 			"Lotti.nome LIKE ? AND\n" + 
 			"Immagini.principale = 1 AND\n" +
+			"AND Lotti.Id_lotto != 1\n" +
 			"(NOT EXIST (\n" +
 				"SELECT 1\n" +
 				"FROM Aste\n" +
@@ -375,6 +378,7 @@ public class GestoreClient implements Runnable {
 			"JOIN Articoli ON Articoli.Rif_lotto = Lotti.Id_lotto\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
 			"WHERE Articoli.Rif_utente = ? AND Articoli.Rif_categoria = ? AND Lotti.nome LIKE ? AND Immagini.principale = 1\n" +
+			"AND Lotti.Id_lotto != 1\n" +
 			"LIMIT ? OFFSET ?;"
 		);
 
@@ -474,8 +478,7 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void visualizzaArticolo() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'visualizzaArticolo'");
+		
 	}
 
 	private void modificaLotto() {
@@ -1669,63 +1672,62 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void creaAsta() {
-		LocalDateTime dataOraInizio;
+		LocalDateTime dataOraInizioInput;
 
 		try {
-			dataOraInizio = (LocalDateTime)richiestaEntrante.payload[0];
+			dataOraInizioInput = (LocalDateTime)richiestaEntrante.payload[0];
 		} catch (ClassCastException e) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "dataOraInizio" };
 			return;
 		}
 
-		if (dataOraInizio.isBefore(LocalDateTime.now())) {
+		if (dataOraInizioInput.isBefore(LocalDateTime.now())) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "dataOraInizio" };
 			return;
 		}
 
-		Duration durata;
+		Duration durataInput;
 
 		try {
-			durata = (Duration)richiestaEntrante.payload[1];
+			durataInput = (Duration)richiestaEntrante.payload[1];
 		} catch (ClassCastException e) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "durata" };
 			return;
 		}
 
-		Float prezzoInizio;
+		Float prezzoInizioInput;
 
 		try {
-			prezzoInizio = (Float)richiestaEntrante.payload[2];
+			prezzoInizioInput = (Float)richiestaEntrante.payload[2];
 		} catch (ClassCastException e) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "prezzoInizio" };
 			return;
 		}
 
-		Boolean astaAutomatica;
+		Boolean astaAutomaticaInput;
 
 		try {
-			astaAutomatica = (Boolean)richiestaEntrante.payload[3];
+			astaAutomaticaInput = (Boolean)richiestaEntrante.payload[3];
 		} catch (ClassCastException e) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "astaAutomatica" };
 			return;
 		}
 
-		Integer idLotto;
+		Integer idLottoInput;
 
 		try {
-			idLotto = (Integer)richiestaEntrante.payload[4];
+			idLottoInput = (Integer)richiestaEntrante.payload[4];
 		} catch (ClassCastException e) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idLotto" };
 			return;
 		}
 
-		// TODO: Controllo sul database
 		String controlloLotto1 = "SELECT 1\n" +
 			"FROM Aste\n" +
 			"WHERE Rif_lotto = ? AND ADDTIME(Aste.data_ora_inizio, Aste.durata) > CURRENT_TIMESTAMP;"
@@ -1740,7 +1742,54 @@ public class GestoreClient implements Runnable {
 		try {
 			Connection connection = gestoreDatabase.getConnection();
 			PreparedStatement statement = connection.prepareStatement(controlloLotto1);
+			statement.setInt(1, idLottoInput);
+			ResultSet resultSet = statement.executeQuery();
+
+			if (resultSet.next()) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idLotto" };
+				return;
+			}
+
+			statement = connection.prepareStatement(controlloLotto2);
+			statement.setInt(1, idLottoInput);
+			resultSet = statement.executeQuery();
+
+			if (resultSet.next()) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idLotto" };
+				return;
+			}
 		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di controllo sull'idLotto nella creazione asta. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+			return;
+		}
+
+		String queryCreazione = "INSERT INTO Aste(prezzo_inizio, data_ora_inizio, durata, asta_automatica, Rif_lotto)\n" +
+			"VALUES (?, ?, ?, ?, ?);"
+		;
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement statement = connection.prepareStatement(queryCreazione);
+			statement.setFloat(1, prezzoInizioInput);
+			statement.setTimestamp(2, Timestamp.valueOf(dataOraInizioInput));
+			// statement.setTime(3, Time.valueOf(LocalTime.from(durataInput)));
+
+			FileInputStream f = new FileInputStream("flkanf");
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di controllo sull'idLotto nella creazione asta. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		} catch (IOException e) {
 
 		}
 	}
@@ -1751,6 +1800,7 @@ public class GestoreClient implements Runnable {
 
 	// Metodo visualizza asta 
 	private void visualizzaAsta() {
+		//TODO: implementare
 		// conmtrollo se l'utente e conesso 
 		if (idUtente == 0) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
@@ -1827,7 +1877,6 @@ public class GestoreClient implements Runnable {
 
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
-
 		} catch (IOException e) { // questo catch e per gli errori che potrebbe dare il caricamento del immagine del utente
 			System.err.println("[" +
 				Thread.currentThread().getName() +
