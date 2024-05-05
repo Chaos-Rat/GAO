@@ -116,11 +116,12 @@ public class LottoController
         }
         Richiesta richiestaArticoli = new Richiesta();
         richiestaArticoli.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_ARTICOLI;
-        richiestaArticoli.payload = new Object[4];
+        richiestaArticoli.payload = new Object[5];
         richiestaArticoli.payload[0] = 10;
         richiestaArticoli.payload[1] = 1;
         richiestaArticoli.payload[2] = "";
         richiestaArticoli.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
+		richiestaArticoli.payload[4] = true;
         HelloApplication.output.writeObject(richiestaArticoli);
         Risposta rispostaArticoli = new Risposta();
         rispostaArticoli = (Risposta) HelloApplication.input.readObject();
