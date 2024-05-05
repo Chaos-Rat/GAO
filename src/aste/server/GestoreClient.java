@@ -353,7 +353,7 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale
-		String queryVisualizzazione = assegnabili ? ("SELECT DISTINCT Lotti.Id_lotto, Lotti.nome, Immagini.Id_immagine\n" + 
+		String queryVisualizzazione = assegnabili ? ("SELECT Lotti.Id_lotto, Lotti.nome, Immagini.Id_immagine\n" + 
 			"FROM Lotti AS L\n" +
 			"JOIN Articoli ON Articoli.Rif_lotto = Lotti.Id_lotto\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
@@ -372,13 +372,15 @@ public class GestoreClient implements Runnable {
 				"JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
 				"WHERE Rif_lotto = L.Id_lotto\n" +
 			"))\n" +
+			"GROUP BY Lotti.Id_lotto, Lotti.nome\n" +
 			"LIMIT ? OFFSET ?;"
-		) : ("SELECT DISTINCT Lotti.Id_lotto, Lotti.nome, Immagini.Id_immagine\n" + 
+		) : ("SELECT Lotti.Id_lotto, Lotti.nome, Immagini.Id_immagine\n" + 
 			"FROM Lotti\n" +
 			"JOIN Articoli ON Articoli.Rif_lotto = Lotti.Id_lotto\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
 			"WHERE Articoli.Rif_utente = ? AND Articoli.Rif_categoria = ? AND Lotti.nome LIKE ? AND Immagini.principale = 1\n" +
 			"AND Lotti.Id_lotto != 1\n" +
+			"GROUP BY Lotti.Id_lotto, Lotti.nome\n" +
 			"LIMIT ? OFFSET ?;"
 		);
 
@@ -673,6 +675,8 @@ public class GestoreClient implements Runnable {
 			}
 
 			statement.executeUpdate();
+
+			rispostaUscente.tipoRisposta = TipoRisposta.OK;
 		} catch (SQLException e) {
 			System.err.println("[" + Thread.currentThread().getName() +
 				"]: C'e' stato un errore nella query di creazione lotto. " + e.getMessage()
@@ -1776,11 +1780,17 @@ public class GestoreClient implements Runnable {
 
 		try {
 			Connection connection = gestoreDatabase.getConnection();
-			PreparedStatement statement = connection.prepareStatement(queryCreazione);
+			PreparedStatement statement = connection.prepareStatement(queryCreazione, new String[]{ "Id_asta" });
 			statement.setFloat(1, prezzoInizioInput);
 			statement.setTimestamp(2, Timestamp.valueOf(dataOraInizioInput));
-			// statement.setTime(3, Time.valueOf(LocalTime.from(durataInput)));
+			statement.setTime(3, Time.valueOf(LocalTime.of(0, 0).plus(durataInput)));
+			statement.setInt(4, astaAutomaticaInput ? 1 : 0);
+			statement.setInt(5, idLottoInput);
+			statement.executeUpdate();
+			ResultSet resultSet = statement.getGeneratedKeys();
+			
 
+			
 			FileInputStream f = new FileInputStream("flkanf");
 		} catch (SQLException e) {
 			System.err.println("[" + Thread.currentThread().getName() +
