@@ -1,7 +1,6 @@
 package aste.server;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InvalidClassException;
@@ -13,19 +12,16 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.crypto.SecretKeyFactory;
@@ -33,7 +29,6 @@ import javax.crypto.spec.PBEKeySpec;
 
 import aste.Richiesta;
 import aste.Risposta;
-import aste.Richiesta.TipoRichiesta;
 import aste.Risposta.TipoErrore;
 import aste.Risposta.TipoRisposta;
 
@@ -367,7 +362,7 @@ public class GestoreClient implements Runnable {
 			"(NOT EXIST (\n" +
 				"SELECT 1\n" +
 				"FROM Aste\n" +
-				"WHERE Rif_lotto = L.Id_lotto AND ADDTIME(Aste.data_ora_inizio, Aste.durata) > CURRENT_TIMESTAMP\n" +
+				"WHERE Rif_lotto = L.Id_lotto AND ADDTIME(data_ora_inizio, durata) > CURRENT_TIMESTAMP\n" +
 			") OR NOT EXIST(\n" +
 				"SELECT 1\n" +
 				"FROM Aste\n" +
@@ -654,7 +649,7 @@ public class GestoreClient implements Runnable {
 
 		try {
 			Connection connection = gestoreDatabase.getConnection();
-			PreparedStatement statement = connection.prepareStatement(queryCreazioneLotto, new String[]{ "Id_lotto" });
+			PreparedStatement statement = connection.prepareStatement(queryCreazioneLotto, new String[]{ "Rif_lotto" });
 			statement.setString(1, nomeInput);
 			statement.executeUpdate();
 			ResultSet resultSet = statement.getGeneratedKeys();
@@ -1730,7 +1725,16 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		String controlloLotto = "SELECT ";
+		// TODO: Controllo sul database
+		String controlloLotto1 = "SELECT 1\n" +
+			"FROM Aste\n" +
+			"WHERE Rif_lotto = Id_lotto AND ADDTIME(Aste.data_ora_inizio, Aste.durata) > CURRENT_TIMESTAMP;"
+		;
+		String controlloLotto2 = "SELECT 1\n" +
+			"FROM Aste\n" +
+			"JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
+			"WHERE Rif_lotto = L.Id_lotto;"
+		;
 	}
 
 	private void modificaAsta() {
