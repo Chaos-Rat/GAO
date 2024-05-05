@@ -126,6 +126,9 @@ public class ArticoliController
                 Text condT = new Text("Condition: " + cond);
                 Integer id = (Integer) rispostaArticoli.payload[i * 4 + 0];
                 Text idT = new Text("Id: +" + id.toString());
+                nomeT.setWrappingWidth(150);
+                condT.setWrappingWidth(150);
+                idT.setWrappingWidth(150);
                 VBox vbox = new VBox();
                 VBox vbox2 = new VBox();
                 vbox2.setAlignment(Pos.CENTER);
@@ -138,7 +141,7 @@ public class ArticoliController
                 articoliList.getChildren().add(box);
             }
         }
-        else if (rispostaArticoli.payload[0] == Risposta.TipoErrore.CAMPI_INVALIDI)
+        else if (rispostaArticoli.payload[0] == Risposta.TipoRisposta.ERRORE)
         {
             System.out.println(rispostaArticoli.payload[0]);
             System.out.println(rispostaArticoli.payload[1]);

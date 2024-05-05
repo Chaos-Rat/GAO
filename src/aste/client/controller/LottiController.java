@@ -8,13 +8,17 @@ import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.ImagePattern;
+import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.shape.Circle;
@@ -28,6 +32,9 @@ import java.util.HashMap;
 
 public class LottiController
 {
+    @FXML
+    private VBox lottiList;
+
     @FXML
     private Button addLotto;
 
@@ -60,33 +67,68 @@ public class LottiController
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
-//        Richiesta richiestacat = new Richiesta();
-//        richiestacat.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_CATEGORIE;
-//        HelloApplication.output.writeObject(richiestacat);
-//        Risposta rispostacat = (Risposta) HelloApplication.input.readObject();
-//        HashMap<String, Integer> catmap = new HashMap<String, Integer>();
-//        if (rispostacat.tipoRisposta == Risposta.TipoRisposta.OK)
-//        {
-//            for (int i = 0 ; i < rispostacat.payload.length/2 ; i++)
-//            {
-//                catmap.put((String) rispostacat.payload[i*2+1], (Integer) rispostacat.payload[i*2]);
-//            }
-//            catmap.put("Tutte le categorie",0);
-//            category.getSelectionModel().select("Altre categorie");
-//            category.getItems().addAll(catmap.keySet());
-//        }
-//        Richiesta richiestaLotti = new Richiesta();
-//        richiestaLotti.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_LOTTI;
-//        richiestaLotti.payload[0] = 10 ;
-//        richiestaLotti.payload[1] = 1;
-//        richiestaLotti.payload[2] = "";
-//        richiestaLotti.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
-//        HelloApplication.output.writeObject(richiestaLotti);
-//        Risposta rispostaLotti = (Risposta) HelloApplication.input.readObject();
-//        if (rispostaLotti.tipoRisposta == Risposta.TipoRisposta.OK)
-//        {
-//
-//        }
+        Richiesta richiestacat = new Richiesta();
+        richiestacat.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_CATEGORIE;
+        HelloApplication.output.writeObject(richiestacat);
+        Risposta rispostacat = (Risposta) HelloApplication.input.readObject();
+        HashMap<String, Integer> catmap = new HashMap<String, Integer>();
+        if (rispostacat.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            for (int i = 0 ; i < rispostacat.payload.length/2 ; i++)
+            {
+                catmap.put((String) rispostacat.payload[i*2+1], (Integer) rispostacat.payload[i*2]);
+            }
+            catmap.put("Tutte le categorie",0);
+            category.getSelectionModel().select("Altre categorie");
+            category.getItems().addAll(catmap.keySet());
+        }
+        Richiesta richiestaLotti = new Richiesta();
+        richiestaLotti.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_LOTTI;
+        richiestaLotti.payload = new Object[5];
+        richiestaLotti.payload[0] = 10 ;
+        richiestaLotti.payload[1] = 1;
+        richiestaLotti.payload[2] = "";
+        richiestaLotti.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
+        richiestaLotti.payload[4] = false;
+        HelloApplication.output.writeObject(richiestaLotti);
+        Risposta rispostaLotti = (Risposta) HelloApplication.input.readObject();
+        if (rispostaLotti.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            for (int i = 0; i < rispostaLotti.payload.length / 3; i++) {
+                HBox box = new HBox();
+                FileOutputStream out = new FileOutputStream("cache/Articolo.png");
+                out.write((byte[]) rispostaLotti.payload[i * 3 + 2]);
+                out.close();
+                FileInputStream in = new FileInputStream("cache/Articolo.png");
+                Image img = new Image(in);
+                in.close();
+                ImageView item = new ImageView();
+                item.setImage(img);
+                item.setFitWidth(100);
+                item.setFitHeight(100);
+                item.setPreserveRatio(true);
+                String nome = (String) rispostaLotti.payload[i * 3 + 1];
+                Text nomeT = new Text("Nome: " + nome);
+                Integer id = (Integer) rispostaLotti.payload[i * 3 + 0];
+                Text idT = new Text("Id: +" + id.toString());
+                nomeT.setWrappingWidth(150);
+                idT.setWrappingWidth(150);
+                VBox vbox = new VBox();
+                VBox vbox2 = new VBox();
+                vbox2.setAlignment(Pos.CENTER);
+                vbox.setAlignment(Pos.CENTER);
+                vbox.getChildren().add(item);
+                vbox2.getChildren().addAll(nomeT);
+                box.setPrefWidth(940);
+                box.setAlignment(Pos.CENTER);
+                box.getChildren().addAll(vbox, vbox2);
+                lottiList.getChildren().add(box);
+            }
+        }else if (rispostaLotti.payload[0] == Risposta.TipoRisposta.ERRORE)
+        {
+            System.out.println(rispostaLotti.payload[0]);
+            System.out.println(rispostaLotti.payload[1]);
+        }
         Richiesta richiesta = new Richiesta();
         richiesta.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_IMMAGINE_PROFILO;
         richiesta.payload = new Object[]{0};

@@ -156,12 +156,10 @@ public class LottoController
                 check.setOnAction(event ->
                 {
 					Boolean selezionato = articoliSelezionati.get(id);
-					
 					if (selezionato == null || !selezionato) {
 						articoliSelezionati.put(id, true);
 						return;
 					}
-					
 					articoliSelezionati.put(id, false);
                 });
                 vbox2.setAlignment(Pos.CENTER);
