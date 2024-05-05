@@ -99,7 +99,7 @@
                <content>
                   <VBox fx:id="asteList">
                      <children>
-                        <HBox alignment="CENTER_RIGHT" prefHeight="28.0" prefWidth="940.0">
+                        <HBox alignment="CENTER_RIGHT" prefHeight="28.0" prefWidth="948.0">
                            <children>
                               <Button fx:id="addB" mnemonicParsing="false" onAction="#AddClicked" stylesheets="@CSS/add.css" text="+" />
                            </children>

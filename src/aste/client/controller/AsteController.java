@@ -51,7 +51,8 @@ public class AsteController
     private Button ProfileB;
 
     @FXML
-    public void initialize() throws IOException, ClassNotFoundException {
+    public void initialize() throws IOException, ClassNotFoundException
+    {
         Richiesta richiesta = new Richiesta();
         richiesta.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_IMMAGINE_PROFILO;
         richiesta.payload = new Object[]{0};

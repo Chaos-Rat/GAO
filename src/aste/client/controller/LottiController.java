@@ -15,10 +15,11 @@ import javafx.scene.paint.ImagePattern;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.shape.Circle;
-
+import  javafx.scene.control.ComboBox;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class LottiController
 {
@@ -47,7 +48,39 @@ public class LottiController
     private Button ProfileB;
 
     @FXML
-    public void initialize() throws IOException, ClassNotFoundException {
+    private ComboBox<String> category;
+
+
+    @FXML
+    public void initialize() throws IOException, ClassNotFoundException
+    {
+//        Richiesta richiestacat = new Richiesta();
+//        richiestacat.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_CATEGORIE;
+//        HelloApplication.output.writeObject(richiestacat);
+//        Risposta rispostacat = (Risposta) HelloApplication.input.readObject();
+//        HashMap<String, Integer> catmap = new HashMap<String, Integer>();
+//        if (rispostacat.tipoRisposta == Risposta.TipoRisposta.OK)
+//        {
+//            for (int i = 0 ; i < rispostacat.payload.length/2 ; i++)
+//            {
+//                catmap.put((String) rispostacat.payload[i*2+1], (Integer) rispostacat.payload[i*2]);
+//            }
+//            catmap.put("Tutte le categorie",0);
+//            category.getSelectionModel().select("Altre categorie");
+//            category.getItems().addAll(catmap.keySet());
+//        }
+//        Richiesta richiestaLotti = new Richiesta();
+//        richiestaLotti.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_LOTTI;
+//        richiestaLotti.payload[0] = 10 ;
+//        richiestaLotti.payload[1] = 1;
+//        richiestaLotti.payload[2] = "";
+//        richiestaLotti.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
+//        HelloApplication.output.writeObject(richiestaLotti);
+//        Risposta rispostaLotti = (Risposta) HelloApplication.input.readObject();
+//        if (rispostaLotti.tipoRisposta == Risposta.TipoRisposta.OK)
+//        {
+//
+//        }
         Richiesta richiesta = new Richiesta();
         richiesta.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_IMMAGINE_PROFILO;
         richiesta.payload = new Object[]{0};

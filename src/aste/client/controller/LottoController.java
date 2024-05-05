@@ -147,12 +147,8 @@ public class LottoController
                 box.setSpacing(50);
                 check.setOnAction(event ->
                 {
-                      if (check.isSelected())
-                      {
-//                          Integer idCheck = Integer.parseInt(idT.getText());
-                          String nomeCheck = nomeT.getText();
-                          System.out.println(  " nome = "+ nomeCheck);
-                      }
+                    System.out.println("id = " + id + " " + "Name = " + nome);
+
                 });
                 vbox2.setAlignment(Pos.CENTER);
                 vbox.setAlignment(Pos.CENTER);
@@ -166,6 +162,11 @@ public class LottoController
                 articoliList.getChildren().add(box);
             }
         }
+    }
+    @FXML
+    void CreateClicked(ActionEvent event)
+    {
+
     }
     @FXML
     void ArticoliClicked(ActionEvent event) throws IOException

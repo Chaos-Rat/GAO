@@ -115,7 +115,7 @@
                               <VBox prefHeight="56.0" prefWidth="11.0" />
                               <VBox alignment="CENTER" prefHeight="56.0" prefWidth="57.0">
                                  <children>
-                                    <Button fx:id="createB" mnemonicParsing="false" stylesheets="@CSS/add.css" text="Create" />
+                                    <Button fx:id="createB" mnemonicParsing="false" onAction="#CreateClicked" stylesheets="@CSS/add.css" text="Create" />
                                  </children>
                               </VBox>
                               <VBox prefHeight="56.0" prefWidth="11.0" />
