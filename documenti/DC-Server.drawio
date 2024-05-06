@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
-        <mxGraphModel dx="2112" dy="1692" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+        <mxGraphModel dx="2903" dy="1692" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
             <root>
                 <mxCell id="WIyWlLk6GJQsqaUBKTNV-0"/>
                 <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0"/>
@@ -83,7 +83,7 @@
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="v3DQ-bfv8pe52D6u4r51-0" value="GestoreAste" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
-                    <mxGeometry x="-1220" y="325" width="740" height="210" as="geometry"/>
+                    <mxGeometry x="-1220" y="325" width="740" height="230" as="geometry"/>
                 </mxCell>
                 <mxCell id="v3DQ-bfv8pe52D6u4r51-1" value="&lt;div&gt;- gestoreDatabase : GestoreDatabase&lt;/div&gt;&lt;div&gt;- indirizziLiberi : ArrayList&amp;lt;Byte&amp;gt;&lt;/div&gt;&lt;div&gt;- mappaFuturi : Hashtable&amp;lt;Integer, AstaFutura&amp;gt;&lt;/div&gt;&lt;div&gt;- executorScheduler : ScheduledExecutorService&lt;/div&gt;&lt;div&gt;- INDIRIZZO_BASE : byte[]&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="v3DQ-bfv8pe52D6u4r51-0" vertex="1">
                     <mxGeometry y="26" width="740" height="84" as="geometry"/>
@@ -91,8 +91,8 @@
                 <mxCell id="v3DQ-bfv8pe52D6u4r51-2" value="" style="line;strokeWidth=1;fillColor=none;align=left;verticalAlign=middle;spacingTop=-1;spacingLeft=3;spacingRight=3;rotatable=0;labelPosition=right;points=[];portConstraint=eastwest;strokeColor=inherit;" parent="v3DQ-bfv8pe52D6u4r51-0" vertex="1">
                     <mxGeometry y="110" width="740" height="8" as="geometry"/>
                 </mxCell>
-                <mxCell id="v3DQ-bfv8pe52D6u4r51-3" value="&lt;div&gt;+ GestoreAste(threadPoolAste : int, gestoreDatabase : GestoreDatabase)&lt;/div&gt;&lt;div&gt;+ creaAsta(prezzoInizio : int, dataOraInizio : LocalDateTime, durata : LocalTime, astaAutomatica : boolean, rifLotto : int)&lt;/div&gt;&lt;div&gt;+ modificaAsta(idAsta : int, prezzoInizio : int, dataOraInizio : LocalDateTime, durata : Duration, astaAutomatica : boolean, rifLotto : int)&lt;/div&gt;&lt;div&gt;+ annullaAsta(id : int, descrizioneAnnullamento : String)&lt;/div&gt;&lt;div&gt;+ effettuaOfferta(idAsta : int, idUtente : int, valore : int)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="v3DQ-bfv8pe52D6u4r51-0" vertex="1">
-                    <mxGeometry y="118" width="740" height="92" as="geometry"/>
+                <mxCell id="v3DQ-bfv8pe52D6u4r51-3" value="&lt;div&gt;+ GestoreAste(threadPoolAste : int, gestoreDatabase : GestoreDatabase)&lt;/div&gt;&lt;div&gt;+ creaAsta(prezzoInizio : int, dataOraInizio : LocalDateTime, durata : LocalTime, astaAutomatica : boolean, rifLotto : int)&lt;/div&gt;&lt;div&gt;+ modificaAsta(idAsta : int, prezzoInizio : int, dataOraInizio : LocalDateTime, durata : Duration, astaAutomatica : boolean, rifLotto : int)&lt;/div&gt;&lt;div&gt;+ annullaAsta(id : int, descrizioneAnnullamento : String)&lt;/div&gt;&lt;div&gt;+ effettuaOfferta(idAsta : int, idUtente : int, valore : int)&lt;/div&gt;&lt;div&gt;- liberaIndirizzo(idAsta : int, indirizzoLibero : byte)&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="v3DQ-bfv8pe52D6u4r51-0" vertex="1">
+                    <mxGeometry y="118" width="740" height="112" as="geometry"/>
                 </mxCell>
                 <mxCell id="v3DQ-bfv8pe52D6u4r51-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=open;endFill=0;dashed=1;elbow=vertical;dashPattern=8 8;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="vKtqIuH14qnzgkjS9spN-1" target="v3DQ-bfv8pe52D6u4r51-0" edge="1">
                     <mxGeometry relative="1" as="geometry">
