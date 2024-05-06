@@ -56,7 +56,12 @@ public class GestoreClient implements Runnable {
 
 	@Override
 	public void run() {
+		String clientAddress = socket.getRemoteSocketAddress().toString();
+		System.out.println("Il client " + clientAddress + " si è disconnesso.");
+
 		try {
+			
+
 			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
 
@@ -81,6 +86,8 @@ public class GestoreClient implements Runnable {
 				"."
 			);
 		} finally {
+			System.out.println("Disconnessione dal client " + clientAddress + ".");
+
 			try {
 				socket.close();
 			} catch (IOException e) {
@@ -1591,7 +1598,7 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, MAX(Puntate.valore) AS prezzo_attuale, " +
+		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
 			"Lotti.nome, Immagini.Id_immagine\n" + 
 			"FROM Aste\n" +
 			"LEFT JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
@@ -1619,7 +1626,10 @@ public class GestoreClient implements Runnable {
 			while (resultSet.next()) {
 				aste.add(resultSet.getInt("Id_asta"));
 				aste.add(Duration.between(LocalTime.of(0, 0), resultSet.getTime("durata").toLocalTime()));
-				aste.add(resultSet.getFloat("prezzo_attuale"));
+				
+				float prezzo_attuale = resultSet.getFloat("prezzo_attuale");
+				aste.add(prezzo_attuale == 0 ? resultSet.getFloat("prezzo_inizio") : prezzo_attuale);
+
 				aste.add(resultSet.getString("nome"));
 				
 				int idImmagine = resultSet.getInt("Id_immagine");

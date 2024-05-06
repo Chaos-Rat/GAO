@@ -42,7 +42,7 @@ public class GestoreAste {
 		}
 	}
 
-	private static final byte[] INDIRIZZO_BASE = new byte[]{(byte)224, (byte)0, (byte)1, (byte)0};
+	private static final byte[] INDIRIZZO_BASE = new byte[]{(byte)239, (byte)0, (byte)0, (byte)0};
     
     public GestoreAste(int threadPoolAste, GestoreDatabase gestoreDatabase) throws IllegalArgumentException {
 		if (threadPoolAste <= 0) {
