@@ -152,10 +152,11 @@ public class AstaController
         richiestaLotti.payload[4] = false;
         HelloApplication.output.writeObject(richiestaLotti);
         Risposta rispostaLotti = (Risposta) HelloApplication.input.readObject();
+        ToggleGroup group = new ToggleGroup();
         if (rispostaLotti.tipoRisposta == Risposta.TipoRisposta.OK)
         {
             for (int i = 0; i < rispostaLotti.payload.length / 3; i++) {
-                CheckBox check = new CheckBox();
+                RadioButton check = new RadioButton();
                 HBox box = new HBox();
                 FileOutputStream out = new FileOutputStream("cache/Articolo.png");
                 out.write((byte[]) rispostaLotti.payload[i * 3 + 2]);
@@ -178,6 +179,7 @@ public class AstaController
                 VBox vbox2 = new VBox();
                 VBox vbox3 = new VBox();
                 box.setSpacing(50);
+                check.setToggleGroup(group);
                 check.setOnAction(event ->
                 {
                     Boolean selezionato = lottiSelezionati.get(id);
@@ -207,13 +209,7 @@ public class AstaController
     @FXML
     void CreateClicked(ActionEvent event) throws IOException, ClassNotFoundException
     {
-        Integer idArticoli;
-        Set<Map.Entry<Integer, Boolean>> entrySet = lottiSelezionati.entrySet();
-        entrySet.forEach((Map.Entry<Integer, Boolean> entry) -> {
-            if (entry.getValue()) {
-                idArticoli = entry.getKey();
-            }
-        });
+
         Integer id;
         LocalDate startDate = dateF.getValue();
         LocalTime time = spinner.getValue();
