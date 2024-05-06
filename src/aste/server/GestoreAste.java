@@ -194,7 +194,7 @@ public class GestoreAste {
 		}
     }
 
-    public synchronized void effettuaOfferta(int idAsta,
+    public synchronized void effettuaPuntata(int idAsta,
 		InetAddress indirizzoMulticast,
 		InetAddress indirizzoServer,
 		Offerta offerta
