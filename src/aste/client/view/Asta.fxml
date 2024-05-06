@@ -153,11 +153,7 @@
                <center>
                   <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                      <content>
-                        <VBox fx:id="lottiList" prefHeight="564.0" prefWidth="953.0">
-                           <children>
-                              <HBox prefHeight="100.0" prefWidth="900.0" />
-                           </children>
-                        </VBox>
+                        <VBox fx:id="lottiList" prefHeight="495.0" prefWidth="953.0" />
                      </content>
                   </ScrollPane>
                </center>
