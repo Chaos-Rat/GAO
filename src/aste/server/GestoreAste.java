@@ -1,6 +1,5 @@
 package aste.server;
 
-import java.sql.Statement;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
@@ -14,7 +13,6 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.concurrent.Executors;
@@ -155,11 +153,11 @@ public class GestoreAste {
 			new AstaFutura(taskCrezione,
 				taskDistruzione,
 				executorScheduler.schedule(taskCrezione,
-					durata.toMinutes(),
-					TimeUnit.SECONDS
+					Duration.between(LocalDateTime.now(), dataOraInizio).toMinutes(),
+					TimeUnit.MINUTES
 				),
 				executorScheduler.schedule(taskDistruzione,
-					durata.toMinutes(),
+					Duration.between(LocalDateTime.now(), dataOraInizio.plus(durata).plusMinutes(1)).toMinutes(),
 					TimeUnit.MINUTES
 				)
 			)
