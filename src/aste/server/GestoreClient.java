@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InvalidClassException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -29,6 +30,7 @@ import java.util.regex.Pattern;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
+import aste.Offerta;
 import aste.Richiesta;
 import aste.Risposta;
 import aste.Risposta.TipoErrore;
@@ -501,7 +503,7 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void effettuaPuntata() {
-		// controllo se l'utente e conesso 
+		// controllo se l'utente e' conesso 
 		if (idUtente == 0) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
@@ -509,54 +511,92 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Funzione per prendere un'asta 
-		Integer idAsta;
+		Integer idAstaInput;
 
 		try {
-			idAsta = (Integer)richiestaEntrante.payload[0];
+			idAstaInput = (Integer)richiestaEntrante.payload[0];
 		} catch (ClassCastException e) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroAste"};
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
 			return;
 		}
 
-		if (idAsta == null || idAsta <= 0) {
+		if (idAstaInput == null || idAstaInput <= 0) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroAste"};
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
 			return;
 		}
 
-		// Funzione per prendere un valore 
-		Float valore;
-
-		try {
-			valore = (Float)richiestaEntrante.payload[1];
-		} catch (ClassCastException e) {
-			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroAste"};
-			return;
-		}
-
-		if (valore == null || valore <= 0) {
-			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroAste"};
-			return;
-		}
-
-		// controllo se la categoria presa esiste 
-		String queryControlloCategoria = "SELECT Aste.prezzo_attuale, Puntate.valore\n" +
-			"FROM Puntate\n" + 
-			"JOIN Aste ON Puntate.Rif_asta = Aste.Id_asta\n" + 
-			"WHERE Aste.prezzo_attuale < Puntate.valore;"
+		String queryControlloAsta = "SELECT 1\n" +
+			"FROM Aste AS A\n" +
+			"WHERE Id_asta = ? AND " +
+			"(CURRENT_TIMESTAMP > data_ora_inizio) AND " +
+			"(CURRENT_TIMESTAMP < ADDTIME(data_ora_inizio, durata)) AND " +
+			"NOT EXIST (\n" +
+				"SELECT 1\n" +
+				"FROM Aste\n" +
+				"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
+				"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n" +
+				"JOIN Utenti ON Articoli.Rif_utente = Utenti.Id_utente\n" +
+				"WHERE Aste.Id_asta = A.Id_asta AND Utenti.Id_utente = ?\n" +
+			");"
 		;
 
 		try {
 			Connection connection = gestoreDatabase.getConnection();
-			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloCategoria);
+			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloAsta);
+			preparedStatement.setInt(1, idAstaInput);
+			preparedStatement.setInt(2, idAstaInput);
+			preparedStatement.setInt(3, idUtente);
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			if (!resultSet.next()) {
 				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "valore" };
+				rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+				return;
+			}
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di controllo sull'idAsta nell'effetta puntata. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+			return;
+		}
+
+		// Funzione per prendere un valore 
+		Float valoreInput;
+
+		try {
+			valoreInput = (Float)richiestaEntrante.payload[1];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "valore"};
+			return;
+		}
+
+		if (valoreInput == null || valoreInput <= 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "valore"};
+			return;
+		}
+
+		String queryControlloValore = "SELECT MAX(Puntate.valore) AS prezzo_attuale\n" +
+			"FROM Puntate\n" +  
+			"WHERE Rif_asta = ?;"
+		;
+
+		try {
+			Connection connection = gestoreDatabase.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloValore);
+			preparedStatement.setInt(1, idAstaInput);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			resultSet.next();
+
+			if (valoreInput <= resultSet.getFloat("prezzo_attuale")) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
 				return;
 			}
 		} catch (SQLException e) {
@@ -566,6 +606,65 @@ public class GestoreClient implements Runnable {
 
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+			return;
+		}
+
+		String queryPuntata = "INSERT INTO Puntate(valore, Rif_asta, Rif_utente)\n" +
+			"VALUES (?, ?, ?);"
+		;
+
+		String queryAsta = "SELECT ip_multicast\n" + 
+			"FROM Aste\n" +
+			"WHERE Id_asta = ?;"
+		;
+
+		Connection connection = null;
+
+		try {
+			connection = gestoreDatabase.getConnection();
+			connection.setAutoCommit(false);
+			PreparedStatement statement = connection.prepareStatement(queryPuntata, new String[]{ "data_ora_effettuazione" });
+			statement.setFloat(1, valoreInput);
+			statement.setInt(2, idAstaInput);
+			statement.setInt(3, idUtente);
+			statement.executeUpdate();
+			ResultSet resultSet = statement.getGeneratedKeys();
+			LocalDateTime dataOraEffettuazione = resultSet.getTimestamp(1).toLocalDateTime();
+
+			statement = connection.prepareStatement(queryAsta);
+			statement.setInt(1, idAstaInput);
+			resultSet = statement.executeQuery();
+			InetAddress indirizzoMulticast = InetAddress.getByAddress(resultSet.getBytes("ip_multicast"));
+
+			gestoreAste.effettuaPuntata(idAstaInput,
+				indirizzoMulticast,
+				socket.getLocalAddress(),
+				new Offerta(idUtente, valoreInput, dataOraEffettuazione)
+			);
+
+			connection.commit();
+
+			rispostaUscente.tipoRisposta = TipoRisposta.OK;
+		} catch (SQLException e) {
+			if (connection != null) {
+				try {
+					// TODO: Finish
+					connection.rollback();
+					connection.setAutoCommit(true);
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di effettuazione puntata. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		} catch (IOException e) {
+
 		}
 	}
 

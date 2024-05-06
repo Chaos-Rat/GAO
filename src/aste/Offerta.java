@@ -14,6 +14,12 @@ public class Offerta implements Serializable {
 	public LocalDateTime dataOra;
 	public static final int MAX_SERIALIZED_SIZE = 146;
 	
+	public Offerta(int idUtente, float valore, LocalDateTime dataOra) {
+		this.idUtente = idUtente;
+		this.valore = valore;
+		this.dataOra = dataOra;
+	}
+
 	private static final long serialVersionUID = -6694998038211513079L;
 
 	public static byte[] toByteArray(Offerta offerta) {
