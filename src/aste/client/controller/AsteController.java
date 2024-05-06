@@ -65,12 +65,10 @@ public class AsteController
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
-        LocalTime end = LocalTime.now().plusHours(1);
-        AnimationTimer timer = new AnimationTimer()
-        {
+        LocalTime end = LocalTime.now().plusMinutes(5);
+        AnimationTimer timer = new AnimationTimer() {
             @Override
-            public void handle(long l)
-            {
+            public void handle(long l) {
                 Duration remaining = Duration.between(LocalTime.now(), end);
                 if (remaining.isPositive()) {
                     timerLabel.setText(format(remaining));
@@ -79,6 +77,7 @@ public class AsteController
                     stop();
                 }
             }
+
             private String format(Duration remaining) {
                 return String.format("%02d:%02d:%02d",
                         remaining.toHoursPart(),
