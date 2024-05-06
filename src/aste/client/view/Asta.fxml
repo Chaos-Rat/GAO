@@ -104,20 +104,20 @@
                               <VBox prefHeight="200.0" prefWidth="100.0" />
                               <VBox alignment="CENTER_RIGHT" prefHeight="200.0" prefWidth="100.0">
                                  <children>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Date:">
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Date :">
                                        <VBox.margin>
                                           <Insets bottom="10.0" />
                                        </VBox.margin></Text>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Time:">
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Starts at :">
                                        <VBox.margin>
                                           <Insets bottom="10.0" />
                                        </VBox.margin>
                                     </Text>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Price:">
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Price :">
                                        <VBox.margin>
                                           <Insets bottom="10.0" />
                                        </VBox.margin></Text>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Duration:">
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Ends at :">
                                        <VBox.margin>
                                           <Insets bottom="2.0" />
                                        </VBox.margin>

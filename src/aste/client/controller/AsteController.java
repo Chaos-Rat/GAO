@@ -111,11 +111,31 @@ public class AsteController
         richiestaAste.payload[2] = "";
         richiestaAste.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
         HelloApplication.output.writeObject(richiestaAste);
-        Risposta rispostaAste = new Risposta();
-        rispostaAste = (Risposta) HelloApplication.input.readObject();
+        Risposta rispostaAste = (Risposta) HelloApplication.input.readObject();
+        rispostaAste.payload = new Object[5];
         if (rispostaAste.tipoRisposta == Risposta.TipoRisposta.OK)
         {
+            for (int i = 0; i < rispostaAste.payload.length/5; i++)
+            {
+                Integer idAsta = (Integer) rispostaAste.payload[i*5+0];
+                Duration duration = (Duration)rispostaAste.payload[i*5+1];
+                Float price = (Float)rispostaAste.payload[i*5+2];
+                String Lottoname = (String)rispostaAste.payload[i*5+3];
+                FileOutputStream out = new FileOutputStream("cache/Articolo.png");
+                out.write((byte[]) rispostaAste.payload[i * 5 + 4]);
+                out.close();
+                FileInputStream in = new FileInputStream("cache/Articolo.png");
+                Image img = new Image(in);
+                in.close();
+                ImageView item = new ImageView();
+                item.setImage(img);
 
+            }
+            
+        } else if (rispostaAste.payload[0]== Risposta.TipoRisposta.ERRORE)
+        {
+            System.out.println(rispostaAste.payload[0]);
+            System.out.println((rispostaAste.payload[1]));
         }
         Richiesta richiesta = new Richiesta();
         richiesta.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_IMMAGINE_PROFILO;

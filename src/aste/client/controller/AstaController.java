@@ -92,17 +92,17 @@ public class AstaController
             }
 
             private LocalTime defaultValue() {
-                return LocalTime.now().truncatedTo(ChronoUnit.HOURS);
+                return LocalTime.now().truncatedTo(ChronoUnit.MINUTES);
             }
             @Override
             public void decrement(int steps) {
                 LocalTime value = getValue();
-                setValue(value == null ? defaultValue() : value.minusHours(steps));
+                setValue(value == null ? defaultValue() : value.minusMinutes(steps));
             }
             @Override
             public void increment(int steps) {
                 LocalTime value = getValue();
-                setValue(value == null ? defaultValue() : value.plusHours(steps));
+                setValue(value == null ? defaultValue() : value.plusMinutes(steps));
             }
         };
         SpinnerValueFactory<LocalTime> factory2 = new SpinnerValueFactory<LocalTime>() {
@@ -110,7 +110,8 @@ public class AstaController
                 setValue(defaultValue());
             }
 
-            private LocalTime defaultValue() {
+            private LocalTime defaultValue()
+            {
                 return LocalTime.now().truncatedTo(ChronoUnit.MINUTES);
             }
             @Override
@@ -190,6 +191,7 @@ public class AstaController
                 vbox2.setAlignment(Pos.CENTER);
                 vbox.setAlignment(Pos.CENTER);
                 vbox.getChildren().add(item);
+                vbox3.setAlignment(Pos.CENTER);
                 vbox2.getChildren().addAll(nomeT);
                 vbox3.getChildren().addAll(check);
                 box.setPrefWidth(940);
