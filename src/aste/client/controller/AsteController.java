@@ -112,7 +112,6 @@ public class AsteController
         richiestaAste.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
         HelloApplication.output.writeObject(richiestaAste);
         Risposta rispostaAste = (Risposta) HelloApplication.input.readObject();
-        rispostaAste.payload = new Object[5];
         if (rispostaAste.tipoRisposta == Risposta.TipoRisposta.OK)
         {
             for (int i = 0; i < rispostaAste.payload.length/5; i++)
@@ -122,7 +121,7 @@ public class AsteController
                 Float price = (Float)rispostaAste.payload[i*5+2];
                 String Lottoname = (String)rispostaAste.payload[i*5+3];
                 FileOutputStream out = new FileOutputStream("cache/Articolo.png");
-                out.write((byte[]) rispostaAste.payload[i * 5 + 4]);
+                out.write((byte[])rispostaAste.payload[i * 5 + 4]);
                 out.close();
                 FileInputStream in = new FileInputStream("cache/Articolo.png");
                 Image img = new Image(in);
