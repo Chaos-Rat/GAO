@@ -11,14 +11,14 @@ public class GestoreDatabase {
 	private Opzioni opzioni;
 
 	public static class Opzioni {
-		private boolean pool;
-		private String nomeDriver;
-		private String url;
-		private String username;
-		private String password;
-		private int minIdle;
-		private int maxIdle;
-		private int maxOpenPreparedStatements;
+		public boolean pool;
+		public String nomeDriver;
+		public String url;
+		public String username;
+		public String password;
+		public int minIdle;
+		public int maxIdle;
+		public int maxOpenPreparedStatements;
 		
 		public Opzioni(
 			boolean pool,	

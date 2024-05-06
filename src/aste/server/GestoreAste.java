@@ -92,20 +92,21 @@ public class GestoreAste {
 		};
 
 		Runnable taskDistruzione = () -> {
-			String queryControlloVincita = "SELECT 1\n" +
-				"FROM Aste\n" + 
+			String queryControlloVincita = "SELECT Aste.ip_multicast\n" +
+				"FROM Aste\n" +
 				"JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
 				"WHERE Id_asta = ?;"
 			;
 			
-			String queryControlloAutomatica = "SELECT asta_automatica, data_ora_inizio, durata, ip_multicast\n" +
+			String queryControlloAutomatica = "SELECT asta_automatica, durata\n" +
 				"FROM Aste\n" +
 				"WHERE Id_asta = ?;"
 			;
 
 			String queryAggiornamento = "UPDATE Aste\n" +
-				"SET data_ora_inizio = CURRENT_TIMESTAMP;"
-			;			
+				"SET data_ora_inizio = CURRENT_TIMESTAMP\n" +
+				"WHERE Id_asta = ?;"
+			;
 
 			try {
 				Connection connection = gestoreDatabase.getConnection();
@@ -113,13 +114,14 @@ public class GestoreAste {
 				statement.setInt(1, idAsta);
 				ResultSet resultSet = statement.executeQuery();
 
+				byte indirizzoLibero = resultSet.getBytes("ip_multicast")[3];
+
+				// Asta vinta
 				if (resultSet.next()) {
-					byte indirizzoLibero = resultSet.getBytes("ip_multicast")[3];
-					indirizziLiberi.add(indirizzoLibero);
+					liberaIndirizzo(idAsta, indirizzoLibero);
 					return;
 				}
 
-				
 				statement = connection.prepareStatement(queryControlloAutomatica);
 				statement.setInt(1, idAsta);
 				resultSet = statement.executeQuery();
@@ -129,39 +131,44 @@ public class GestoreAste {
 					return;
 				}
 
-				boolean automatica = resultSet.getInt("asta_automatica") == 1;
+				if (resultSet.getInt("asta_automatica") == 1) {
+					AstaFutura astaFutura = mappaFuturi.get(idAsta);
+					LocalTime durataDatabase = resultSet.getTime("durata").toLocalTime();
+					astaFutura.futuraDistruzione = executorScheduler.schedule(astaFutura.taskDistruzione,
+						Duration.between(LocalTime.of(0, 0), durataDatabase).toMinutes(),
+						TimeUnit.MINUTES
+					);
+					return;
+				}
 				
 				statement = connection.prepareStatement(queryAggiornamento);
-				statement.executeUpdate(queryAggiornamento);
+				statement.setInt(1, idAsta);
+				statement.executeUpdate();
 
-				if (automatica) {
-					AstaFutura astaFutura = mappaFuturi.get(idAsta);
-					astaFutura.futuraDistruzione = executorScheduler.schedule(astaFutura.taskDistruzione, durata.toHours(), TimeUnit.HOURS);
-				} else {
-					byte indirizzoLibero = resultSet.getBytes("ip_multicast")[3];
-					indirizziLiberi.add(indirizzoLibero);
-				}
+				liberaIndirizzo(idAsta, indirizzoLibero);
 			} catch (SQLException e) {
 				throw new Error("[" + Thread.currentThread().getName() + "]: " + e.getMessage());
 			}
 		};
 
 		mappaFuturi.put(idAsta,
-				new AstaFutura(
-					taskCrezione,
-					taskDistruzione,
-					executorScheduler.scheduleWithFixedDelay(taskCrezione,
-						ChronoUnit.SECONDS.between(LocalDateTime.now(), dataOraInizio),
-						0,
-						TimeUnit.SECONDS
-					),
-					executorScheduler.scheduleWithFixedDelay(taskDistruzione,
-						ChronoUnit.SECONDS.between(LocalDateTime.now(), dataOraInizio),
-						0,
-						TimeUnit.SECONDS
-					)
+			new AstaFutura(taskCrezione,
+				taskDistruzione,
+				executorScheduler.schedule(taskCrezione,
+					durata.toMinutes(),
+					TimeUnit.SECONDS
+				),
+				executorScheduler.schedule(taskDistruzione,
+					durata.toMinutes(),
+					TimeUnit.MINUTES
 				)
-			);
+			)
+		);
+	}
+
+	private void liberaIndirizzo(int idAsta, byte indirizzoLibero) {
+		indirizziLiberi.add(indirizzoLibero);
+		mappaFuturi.remove(idAsta);
 	}
 
     public synchronized void modificaAsta(int idAsta, int prezzoInizio, LocalDateTime dataOraInizio, LocalTime durata, boolean astaAutomatica, int rifLotto) {
