@@ -155,18 +155,14 @@
                 <mxCell id="4" value="+ AstaFutura(taskCreazione : Runnable, taskDistruzione : Runnable,&#10;    futuraCreazione : ScheduledFuture&lt;?&gt;, futuraDistruzione : ScheduledFuture)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" parent="1" vertex="1">
                     <mxGeometry y="108" width="440" height="42" as="geometry"/>
                 </mxCell>
-                <mxCell id="6" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=circlePlus;endFill=0;startArrow=open;startFill=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="7" target="v3DQ-bfv8pe52D6u4r51-3">
+                <mxCell id="6" style="html=1;endArrow=circlePlus;endFill=0;startArrow=open;startFill=0;exitX=0.5;exitY=0;exitDx=0;exitDy=0;" edge="1" parent="WIyWlLk6GJQsqaUBKTNV-1" source="7" target="vKtqIuH14qnzgkjS9spN-4">
                     <mxGeometry relative="1" as="geometry">
                         <mxPoint x="-1380" y="482" as="sourcePoint"/>
                         <mxPoint x="-1140" y="560" as="targetPoint"/>
-                        <Array as="points">
-                            <mxPoint x="-1390" y="600"/>
-                            <mxPoint x="-850" y="600"/>
-                        </Array>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="7" value="DatiPassword" style="swimlane;fontStyle=1;align=center;verticalAlign=top;childLayout=stackLayout;horizontal=1;startSize=26;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;" vertex="1" parent="WIyWlLk6GJQsqaUBKTNV-1">
-                    <mxGeometry x="-1610" y="650" width="440" height="150" as="geometry"/>
+                    <mxGeometry x="-195.25" y="1460" width="440" height="150" as="geometry"/>
                 </mxCell>
                 <mxCell id="8" value="+ sale : byte [ ]&#10;+ hash : byte [ ] " style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;" vertex="1" parent="7">
                     <mxGeometry y="26" width="440" height="74" as="geometry"/>
