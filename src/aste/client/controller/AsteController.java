@@ -88,54 +88,6 @@ public class AsteController
             }
         };
         timer.start();
-        Richiesta richiestacat = new Richiesta();
-        richiestacat.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_CATEGORIE;
-        HelloApplication.output.writeObject(richiestacat);
-        Risposta rispostacat = (Risposta) HelloApplication.input.readObject();
-        HashMap<String, Integer> catmap = new HashMap<String, Integer>();
-        if (rispostacat.tipoRisposta == Risposta.TipoRisposta.OK)
-        {
-            for (int i = 0 ; i < rispostacat.payload.length/2 ; i++)
-            {
-                catmap.put((String) rispostacat.payload[i*2+1], (Integer) rispostacat.payload[i*2]);
-            }
-            catmap.put("Tutte le categorie",0);
-            category.getSelectionModel().select("Altre categorie");
-            category.getItems().addAll(catmap.keySet());
-        }
-        Richiesta richiestaAste = new Richiesta();
-        richiestaAste.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_ASTE;
-        richiestaAste.payload = new Object[4];
-        richiestaAste.payload[0] = 10;
-        richiestaAste.payload[1] = 1;
-        richiestaAste.payload[2] = "";
-        richiestaAste.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
-        HelloApplication.output.writeObject(richiestaAste);
-        Risposta rispostaAste = (Risposta) HelloApplication.input.readObject();
-        if (rispostaAste.tipoRisposta == Risposta.TipoRisposta.OK)
-        {
-            for (int i = 0; i < rispostaAste.payload.length/5; i++)
-            {
-                Integer idAsta = (Integer) rispostaAste.payload[i*5+0];
-                Duration duration = (Duration)rispostaAste.payload[i*5+1];
-                Float price = (Float)rispostaAste.payload[i*5+2];
-                String Lottoname = (String)rispostaAste.payload[i*5+3];
-                FileOutputStream out = new FileOutputStream("cache/Articolo.png");
-                out.write((byte[])rispostaAste.payload[i * 5 + 4]);
-                out.close();
-                FileInputStream in = new FileInputStream("cache/Articolo.png");
-                Image img = new Image(in);
-                in.close();
-                ImageView item = new ImageView();
-                item.setImage(img);
-
-            }
-            
-        } else if (rispostaAste.payload[0]== Risposta.TipoRisposta.ERRORE)
-        {
-            System.out.println(rispostaAste.payload[0]);
-            System.out.println((rispostaAste.payload[1]));
-        }
         Richiesta richiesta = new Richiesta();
         richiesta.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_IMMAGINE_PROFILO;
         richiesta.payload = new Object[]{0};

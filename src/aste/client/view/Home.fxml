@@ -2,8 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -100,18 +100,18 @@
                <center>
                   <ScrollPane prefHeight="682.0" prefWidth="960.0" BorderPane.alignment="CENTER">
                      <content>
-                        <VBox />
+                        <VBox fx:id="asteList" />
                      </content>
                   </ScrollPane>
                </center>
                <top>
-                  <HBox prefHeight="35.0" prefWidth="955.0" style="-fx-background-color: #aca8bd;" BorderPane.alignment="CENTER">
+                  <HBox alignment="CENTER_RIGHT" prefHeight="35.0" prefWidth="955.0" BorderPane.alignment="CENTER">
                      <children>
-                        <ToolBar fx:id="PageMenu" prefHeight="35.0" prefWidth="957.0">
-                          <items>
-                            <Button mnemonicParsing="false" stylesheets="@CSS/PageButton.css" text="1" />
-                          </items>
-                        </ToolBar>
+                        <ComboBox fx:id="category" prefWidth="150.0">
+                           <HBox.margin>
+                              <Insets right="150.0" />
+                           </HBox.margin>
+                        </ComboBox>
                      </children>
                   </HBox>
                </top>
