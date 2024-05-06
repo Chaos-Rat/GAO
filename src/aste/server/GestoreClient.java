@@ -372,7 +372,7 @@ public class GestoreClient implements Runnable {
 				"JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
 				"WHERE Rif_lotto = L.Id_lotto\n" +
 			"))\n" +
-			"GROUP BY Lotti.Id_lotto, Lotti.nome\n" +
+			"GROUP BY Lotti.Id_lotto\n" +
 			"LIMIT ? OFFSET ?;"
 		) : ("SELECT Lotti.Id_lotto, Lotti.nome, Immagini.Id_immagine\n" + 
 			"FROM Lotti\n" +
@@ -1478,7 +1478,11 @@ public class GestoreClient implements Runnable {
 
     }
 
-    // Implementazione della visualizzazione delle aste
+	private int calcolaNumeroPagine(int elementiPagina, int elementiTotali) {
+		return Math.ceilDiv(elementiPagina, elementiTotali);
+	}
+
+    // Implementazione della visualizzazione delle aste (pagina home)
     private void visualizzaAste() {
         // conmtrollo se l'utente e conesso 
 		if (idUtente == 0) {
@@ -1520,6 +1524,11 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "numeroPagina"};
 			return;
 		}
+
+		// TODO: Completare
+		String queryControlloPagina = "SELECT COUNT(Id_asta) AS numero_aste\n" +
+			"FROM Aste\n"
+		;
 
 		// Funzione per la ricerca delle aste 
 		String stringaRicerca;
