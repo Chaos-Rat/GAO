@@ -78,12 +78,11 @@ public class AstaController
     @FXML
     private Spinner<LocalTime>spinnerEnd;
 
-    private HashMap<Integer, Boolean> lottiSelezionati;
+    private Integer idLotto;
 
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
-        lottiSelezionati = new HashMap<>();
         category.setVisible(false);
         spinnerEnd.setEditable(true);
         spinner.setEditable(true);
@@ -182,12 +181,11 @@ public class AstaController
                 check.setToggleGroup(group);
                 check.setOnAction(event ->
                 {
-                    Boolean selezionato = lottiSelezionati.get(id);
-                    if (selezionato == null || !selezionato) {
-                        lottiSelezionati.put(id, true);
-                        return;
-                    }
-                    lottiSelezionati.put(id, false);
+                   if(check.isSelected())
+                   {
+                       idLotto = id;
+                       System.out.println(idLotto);
+                   }
                 });
                 vbox2.setAlignment(Pos.CENTER);
                 vbox.setAlignment(Pos.CENTER);
@@ -209,8 +207,7 @@ public class AstaController
     @FXML
     void CreateClicked(ActionEvent event) throws IOException, ClassNotFoundException
     {
-
-        Integer id;
+        Integer id ;
         LocalDate startDate = dateF.getValue();
         LocalTime time = spinner.getValue();
         String datetimestr = (startDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))+" "+time.format(DateTimeFormatter.ofPattern("HH:mm")));
@@ -219,51 +216,14 @@ public class AstaController
         LocalTime end = spinnerEnd.getValue();
         Duration timeduration = Duration.between(time,end);
         System.out.println((String) dateTime.format(formatter));
-        Richiesta richiestacat = new Richiesta();
-        richiestacat.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_CATEGORIE;
-        HelloApplication.output.writeObject(richiestacat);
-        Risposta rispostacat = (Risposta) HelloApplication.input.readObject();
-        HashMap<String, Integer> catmap = new HashMap<String, Integer>();
-        if (rispostacat.tipoRisposta == Risposta.TipoRisposta.OK)
-        {
-            for (int i = 0 ; i < rispostacat.payload.length/2 ; i++)
-            {
-                catmap.put((String) rispostacat.payload[i*2+1], (Integer) rispostacat.payload[i*2]);
-            }
-            catmap.put("Tutte le categorie",0);
-            category.getSelectionModel().select("Altre categorie");
-            category.getItems().addAll(catmap.keySet());
-        }
-        Richiesta richiestaArticoli = new Richiesta();
-        richiestaArticoli.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_ARTICOLI;
-        richiestaArticoli.payload = new Object[5];
-        richiestaArticoli.payload[0] = 10;
-        richiestaArticoli.payload[1] = 1;
-        richiestaArticoli.payload[2] = "";
-        richiestaArticoli.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
-        richiestaArticoli.payload[4] = true;
-        HelloApplication.output.writeObject(richiestaArticoli);
-        Risposta rispostaArticoli = new Risposta();
-        rispostaArticoli = (Risposta) HelloApplication.input.readObject();
-        if (rispostaArticoli.tipoRisposta == Risposta.TipoRisposta.OK) {
-            for (int i = 0; i < rispostaArticoli.payload.length / 4; i++) {
-                HBox box = new HBox();
-                FileOutputStream out = new FileOutputStream("cache/Articolo.png");
-                out.write((byte[]) rispostaArticoli.payload[i * 4 + 3]);
-                out.close();
-                String nome = (String) rispostaArticoli.payload[i * 4 + 1];
-                String cond = (String) rispostaArticoli.payload[i * 4 + 2];
-                id = (Integer) rispostaArticoli.payload[i * 4 + 0];
-            }
-        }
         Richiesta richiestaCrea = new Richiesta();
         richiestaCrea.tipoRichiesta = Richiesta.TipoRichiesta.CREA_ASTA;
         richiestaCrea.payload = new Object[5];
         richiestaCrea.payload[0] = dateTime;
         richiestaCrea.payload[1] = timeduration;
         richiestaCrea.payload[2] = Float.valueOf(priceF.getText());
-//        richiestaCrea.payload[3] = ;
-//        richiestaCrea.payload[4] = ;
+        richiestaCrea.payload[3] = false;
+        richiestaCrea.payload[4] = idLotto;
         HelloApplication.output.writeObject(richiestaCrea);
         Risposta rispostaCrea = (Risposta) HelloApplication.input.readObject();
         if (rispostaCrea.tipoRisposta == Risposta.TipoRisposta.OK) 
@@ -282,6 +242,7 @@ public class AstaController
         } else if (rispostaCrea.payload[0] == Risposta.TipoErrore.OPERAZIONE_INVALIDA || rispostaCrea.payload[0] == Risposta.TipoErrore.CAMPI_INVALIDI ||rispostaCrea.payload[0] == Risposta.TipoErrore.GENERICO)
         {
             System.out.println(rispostaCrea.payload[0]);
+            System.out.println(rispostaCrea.payload[1]);
         }
     }
     @FXML

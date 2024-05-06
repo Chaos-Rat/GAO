@@ -380,7 +380,7 @@ public class GestoreClient implements Runnable {
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
 			"WHERE Articoli.Rif_utente = ? AND Articoli.Rif_categoria = ? AND Lotti.nome LIKE ? AND Immagini.principale = 1\n" +
 			"AND Lotti.Id_lotto != 1\n" +
-			"GROUP BY Lotti.Id_lotto, Lotti.nome\n" +
+			"GROUP BY Lotti.Id_lotto\n" +
 			"LIMIT ? OFFSET ?;"
 		);
 
