@@ -30,6 +30,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -144,20 +145,15 @@ public class HomeController {
                 item.setFitWidth(100);
                 item.setFitHeight(100);
                 item.setPreserveRatio(true);
-                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
+
                 Label timerLabel = new Label();
-                String timerMinutes = String.format("%02d:%02d:%02d",
-                    duration.toHours(),
-                    duration.toMinutesPart(),
-                    duration.toSecondsPart());
-                System.out.println(timerMinutes);
-                LocalTime end = LocalTime.parse(timerMinutes,dtf);
+				LocalDateTime endDateTime = LocalDateTime.now().plus(duration);
                 AnimationTimer timer = new AnimationTimer()
                 {
                     @Override
                     public void handle(long l)
                     {
-                        Duration remaining = Duration.between(LocalTime.now(), end);
+                        Duration remaining = Duration.between(LocalDateTime.now(), endDateTime);
                         if (remaining.isPositive()) {
                             timerLabel.setText(format(remaining));
                         } else {
@@ -166,7 +162,8 @@ public class HomeController {
                         }
                     }
                     private String format(Duration remaining) {
-                        return String.format("%02d:%02d:%02d",
+                        return String.format("%02d, %02d:%02d:%02d",
+								remaining.toDays(),
                                 remaining.toHoursPart(),
                                 remaining.toMinutesPart(),
                                 remaining.toSecondsPart()

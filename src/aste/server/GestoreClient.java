@@ -2031,33 +2031,30 @@ public class GestoreClient implements Runnable {
 
 			// While per caricare l'array list 
 			if (!resultSet.next()) {
-				// 
-				rispostaUscente.tipoRisposta= TipoRisposta.OK;
-
-				rispostaUscente.payload[0]= resultSet.getTime("data_ora_inizio");
-				rispostaUscente.payload[1]= resultSet.getTime("durata");
-				rispostaUscente.payload[2]= resultSet.getFloat("prezzo_inizio");
-				rispostaUscente.payload[3]= resultSet.getFloat("prezzo_attuale");
-				rispostaUscente.payload[4]= resultSet.getInt("ip_multicast");
-				rispostaUscente.payload[5]= resultSet.getString("descrizione_annullamento");
-				rispostaUscente.payload[6]= resultSet.getInt("Id_lotto");
-				rispostaUscente.payload[7]= resultSet.getString("nome_lotto");
-				rispostaUscente.payload[8]= resultSet.getByte("immagini_articolo");
-
-				//
-				FileInputStream stream;
-
-				if (resultSet.wasNull()) {
-					stream= new FileInputStream("static_resources\\default_articolo.png");
-				} else {
-					// TODO: Fix (never)
-					stream= new FileInputStream("res\\immagini_articoli\\" + ".png");
-				}
-
-				stream.readAllBytes();
-
-				stream.close();
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta" };
+				return;
 			}
+
+			LocalDateTime dataOraInizio = resultSet.getTimestamp("data_ora_inizio").toLocalDateTime();
+			LocalTime durata;
+
+			rispostaUscente.tipoRisposta= TipoRisposta.OK;
+			
+
+			//
+			FileInputStream stream;
+
+			if (resultSet.wasNull()) {
+				stream= new FileInputStream("static_resources\\default_articolo.png");
+			} else {
+				// TODO: Fix (never)
+				stream= new FileInputStream("res\\immagini_articoli\\" + ".png");
+			}
+
+			stream.readAllBytes();
+
+			stream.close();
 
 		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
 			System.err.println("[" + Thread.currentThread().getName() +

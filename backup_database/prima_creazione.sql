@@ -1,3 +1,4 @@
+DROP DATABASE gestione_aste_online;
 
 CREATE DATABASE gestione_aste_online;
 
