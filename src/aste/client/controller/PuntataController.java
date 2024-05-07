@@ -3,18 +3,24 @@ package aste.client.controller;
 import aste.Richiesta;
 import aste.Risposta;
 import aste.client.HelloApplication;
+import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 public class PuntataController {
 
@@ -42,15 +48,73 @@ public class PuntataController {
     @FXML
     private TextField puntataF;
 
+	@FXML
+	private Label timerLabel;
+
+	@FXML
+	private Label astaName;
+
     @FXML
     private Button sendB;
 
+	@FXML
+	private TextFlow chatBox;
+
     public static  Integer idAsta;
 
+	public static LocalDateTime end ;
+
+	public static Duration duration;
+
+	public static String astaNome;
+
     @FXML
-    public void initialize()
+    public void initialize() throws IOException, ClassNotFoundException
     {
         System.out.println(idAsta);
+		astaName.setText("Asta :" + astaNome);
+				LocalDateTime endDateTime = LocalDateTime.now().plus(duration);
+                AnimationTimer timer = new AnimationTimer()
+                {
+                    @Override
+                    public void handle(long l)
+                    {
+                        Duration remaining = Duration.between(LocalDateTime.now(), endDateTime);
+                        if (remaining.isPositive()) {
+                            timerLabel.setText("Time Remaning: " + format(remaining));
+                        } else {
+                            timerLabel.setText("Time Remaning: " + format(Duration.ZERO));
+                            stop();
+                        }
+                    }
+                    private String format(Duration remaining) {
+                        return String.format("%01d days, %02d:%02d:%02d",
+								remaining.toDays(),
+                                remaining.toHoursPart(),
+                                remaining.toMinutesPart(),
+                                remaining.toSecondsPart()
+                        );
+                    }
+                };
+                timer.start();
+//				Richiesta richiestaPuntate = new Richiesta();
+//				richiestaPuntate.payload = new Object[1];
+//				richiestaPuntate.payload[0] = idAsta;
+//				HelloApplication.output.writeObject(richiestaPuntate);
+//				Risposta rispostaPuntate = (Risposta) HelloApplication.input.readObject();
+//
+//				if(rispostaPuntate.tipoRisposta == Risposta.TipoRisposta.OK)
+//				{
+//					for (int i = 0; i < rispostaPuntate.payload.length/5; i++) 
+//					{
+//					Integer idPuntata = (Integer) rispostaPuntate.payload[i / 5 + 0];
+//					float valore = (Float)rispostaPuntate.payload[i / 5 + 1];
+//					LocalDateTime messageDateTime = (LocalDateTime) rispostaPuntate.payload[i / 5 + 2];
+//					Integer idUser = (Integer) rispostaPuntate.payload[i / 5 + 3];
+//					String Username = (String)rispostaPuntate.payload[i / 5 + 4];
+//					}
+					
+//				}
     }
 
     @FXML
@@ -69,6 +133,10 @@ public class PuntataController {
 //        {
 //            System.out.println(rispostaPuntata.payload[0]);
 //        }
+
+		Text text = new Text(puntataF.getText() + "\n");
+		text.setStyle("-fx-font: 24 arial;");
+		chatBox.getChildren().addAll(text);
     }
 
     @FXML

@@ -145,7 +145,6 @@ public class HomeController {
                 item.setFitWidth(100);
                 item.setFitHeight(100);
                 item.setPreserveRatio(true);
-
                 Label timerLabel = new Label();
 				LocalDateTime endDateTime = LocalDateTime.now().plus(duration);
                 AnimationTimer timer = new AnimationTimer()
@@ -162,7 +161,7 @@ public class HomeController {
                         }
                     }
                     private String format(Duration remaining) {
-                        return String.format("%02d, %02d:%02d:%02d",
+                        return String.format("%01d days, %02d:%02d:%02d",
 								remaining.toDays(),
                                 remaining.toHoursPart(),
                                 remaining.toMinutesPart(),
@@ -205,6 +204,9 @@ public class HomeController {
                     {
                         try {
                             PuntataController.idAsta = idAsta;
+							PuntataController.duration = duration;
+							PuntataController.end = endDateTime;
+							PuntataController.astaNome = Lottoname;
                             FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Puntata.fxml"));
                             Parent root = loader.load();
                             Scene scene = new Scene(root);

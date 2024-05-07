@@ -135,6 +135,7 @@ public class ArticoliController
                 vbox.setAlignment(Pos.CENTER);
                 vbox.getChildren().add(item);
                 vbox2.getChildren().addAll(nomeT, condT);
+				box.setSpacing(50);
                 box.setPrefWidth(940);
                 box.setAlignment(Pos.CENTER);
                 box.getChildren().addAll(vbox, vbox2);
