@@ -1874,6 +1874,12 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
+		if (idLottoInput == null || idLottoInput <= 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idLotto" };
+			return;
+		}
+
 		String controlloLotto1 = "SELECT 1\n" +
 			"FROM Aste\n" +
 			"WHERE Rif_lotto = ? AND ADDTIME(Aste.data_ora_inizio, Aste.durata) > CURRENT_TIMESTAMP;"
@@ -2021,6 +2027,12 @@ public class GestoreClient implements Runnable {
 			"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
 			"WHERE Aste.Id_asta = ?\n" +
 			"GROUP BY Aste.Id_asta;"
+		;
+
+		String queryImmagini = "SELECT Immagini.Id_immagine\n" +
+			"FROM Immagini\n" +
+			"JOIN Articoli ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
+			"WHERE Articoli.Rif_lotto = ?;"
 		;
 
 		try {
