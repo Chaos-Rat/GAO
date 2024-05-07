@@ -1988,7 +1988,6 @@ public class GestoreClient implements Runnable {
 
 	// Metodo visualizza asta 
 	private void visualizzaAsta() {
-		//TODO: implementare
 		// conmtrollo se l'utente e conesso 
 		if (idUtente == 0) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
@@ -2014,13 +2013,15 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT DISTINCT Aste.dataOraInizio, Aste.descrizione_annullamento, Aste.durata, Aste.prezzo_attuale, Aste.Rif_lotto, Lotti.nome, Immagini.Id_immagine\n"+ 
-		"FROM Aste\n"+
-		"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n"+
-		"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n"+
-		"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n"+
-		"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n"+
-		"WHERE Id_aste = ?";
+		String queryVisualizzazione = "SELECT Aste.data_ora_inizio, Aste.durata, Aste.prezzo_inizio, " +
+			"MAX(Puntate.valore) AS prezzo_attuale, Aste.ip_multicast, Aste.descrizione_annullamento, " +
+			"Aste.durata, Aste.prezzo_attuale, Aste.Rif_lotto, Lotti.nome\n"+ 
+			"FROM Aste\n"+
+			"JOIN Puntate ON Aste.IdAsta = Puntate.Rif_asta\n" +
+			"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
+			"WHERE Aste.Id_asta = ?\n" +
+			"GROUP BY Aste.Id_asta;"
+		;
 
 		try {
 			Connection connection = gestoreDatabase.getConnection();
