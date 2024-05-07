@@ -1,13 +1,20 @@
 package aste.client.controller;
 
+import java.io.IOException;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 public class ArticoloDetailsController {
 
@@ -61,8 +68,14 @@ public class ArticoloDetailsController {
 
 	public static Integer idArticolo;
 
+	@FXML
+	public void initialize()
+	{
+		System.out.println(idArticolo);
+		
+	}
     @FXML
-    void ArticoliClicked(ActionEvent event) 
+    void ArticoliClicked(ActionEvent event) throws IOException 
 	{
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Articoli.fxml"));
         Parent root = loader.load();
@@ -77,7 +90,7 @@ public class ArticoloDetailsController {
     }
 
     @FXML
-    void AsteClicked(ActionEvent event) 
+    void AsteClicked(ActionEvent event) throws IOException 
 	{
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Aste.fxml"));
         Parent root = loader.load();
@@ -97,7 +110,7 @@ public class ArticoloDetailsController {
     }
 
     @FXML
-    void HomeClicked(ActionEvent event) 
+    void HomeClicked(ActionEvent event) throws IOException 
 	{
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Home.fxml"));
         Parent root = loader.load();
@@ -119,7 +132,7 @@ public class ArticoloDetailsController {
     }
 
     @FXML
-    void LottiClicked(ActionEvent event) 
+    void LottiClicked(ActionEvent event) throws IOException 
 	{
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Lotti.fxml"));
         Parent root = loader.load();
@@ -134,7 +147,7 @@ public class ArticoloDetailsController {
     }
 
     @FXML
-    void ProfileClicked(ActionEvent event) 
+    void ProfileClicked(ActionEvent event) throws IOException 
 	{
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Profile.fxml"));
         Parent root = loader.load();

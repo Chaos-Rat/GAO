@@ -211,7 +211,7 @@ public class ArticoliController
 				box.setSpacing(50);
                 box.setPrefWidth(940);
                 box.setAlignment(Pos.CENTER);
-                box.getChildren().addAll(vbox, vbox2);
+                box.getChildren().addAll(vbox,vbox2,vbox3);
                 articoliList.getChildren().add(box);
             }
         }
