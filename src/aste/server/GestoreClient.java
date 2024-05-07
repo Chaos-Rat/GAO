@@ -643,17 +643,15 @@ public class GestoreClient implements Runnable {
 			);
 
 			connection.commit();
-
 			rispostaUscente.tipoRisposta = TipoRisposta.OK;
 		} catch (SQLException e) {
 			if (connection != null) {
 				try {
-					// TODO: Finish
 					connection.rollback();
-					connection.setAutoCommit(true);
 				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					System.err.println("[" + Thread.currentThread().getName() +
+						"]: C'e' stato un errore nel rollback nell'effettuazione puntata. " + e1.getMessage()
+					);
 				}
 			}
 
@@ -664,7 +662,27 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		} catch (IOException e) {
+			if (connection != null) {
+				try {
+					connection.rollback();
+				} catch (SQLException e1) {
+					System.err.println("[" + Thread.currentThread().getName() +
+						"]: C'e' stato un errore nel rollback nell'effettuazione puntata. " + e1.getMessage()
+					);
+				}
+			}
 
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore interno nella diffusione della puntata. " + e.getMessage()
+			);
+		} finally {
+			try {
+				connection.setAutoCommit(true);
+			} catch (SQLException e) {
+				System.err.println("[" + Thread.currentThread().getName() +
+					"]: C'e' stato un errore nel reset dell'autocommit nell'effettuazione della puntata. " + e.getMessage()
+				);
+			}
 		}
 	}
 
