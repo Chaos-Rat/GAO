@@ -4,6 +4,7 @@ import aste.Richiesta;
 import aste.Risposta;
 import aste.client.HelloApplication;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -156,12 +157,57 @@ public class ArticoliController
                 nomeT.setWrappingWidth(150);
                 condT.setWrappingWidth(150);
                 idT.setWrappingWidth(150);
+				Button button = new Button();
+                button.setText("Details");
+                button.setStyle(".button\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #16f70a ;\n" +
+                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "}\n" +
+                        "\n" +
+                        ".button:hover\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #1aab13 ;\n" +
+                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "}\n" +
+                        "\n" +
+                        ".button:pressed\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #096e03 ;\n" +
+                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "}");
+
+						button.setOnAction(new EventHandler<ActionEvent>()
+                {
+                    @Override
+                    public void handle(ActionEvent event)
+                    {
+                        try {
+							ArticoloDetailsController.idArticolo = id;
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/ArticoloDetails.fxml"));
+                            Parent root = loader.load();
+                            Scene scene = new Scene(root);
+                            Stage stage = new Stage();
+                            stage.setTitle("The AuctionHouse");
+                            stage.setScene(scene);
+                            stage.initModality(Modality.APPLICATION_MODAL);
+                            stage.show();
+                            Stage stage1 = (Stage) button.getScene().getWindow();
+                            stage1.close();
+                        }catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
                 VBox vbox = new VBox();
                 VBox vbox2 = new VBox();
+				VBox vbox3 = new VBox();
                 vbox2.setAlignment(Pos.CENTER);
                 vbox.setAlignment(Pos.CENTER);
+				vbox3.setAlignment(Pos.CENTER);
                 vbox.getChildren().add(item);
                 vbox2.getChildren().addAll(nomeT, condT);
+				vbox3.getChildren().addAll(button);
 				box.setSpacing(50);
                 box.setPrefWidth(940);
                 box.setAlignment(Pos.CENTER);
