@@ -44,7 +44,7 @@
                   </HBox>
                   <HBox alignment="TOP_CENTER" prefHeight="60.0" prefWidth="116.0">
                      <children>
-                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Username">
+                        <Text fx:id="username" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Username">
                            <font>
                               <Font name="Dubai Regular" size="13.0" />
                            </font>

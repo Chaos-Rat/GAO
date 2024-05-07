@@ -30,6 +30,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -77,6 +78,9 @@ public class HomeController {
     private VBox vbox;
 
     @FXML
+    private Text username;
+
+    @FXML
     void ProfileClicked(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Profile.fxml"));
         Parent root = loader.load();
@@ -100,6 +104,29 @@ public class HomeController {
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+        Richiesta richiestaProfile = new Richiesta();
+        richiestaProfile.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PROFILO;
+        richiestaProfile.payload = new Object[1];
+        richiestaProfile.payload[0] = 0;
+        HelloApplication.output.writeObject(richiestaProfile);
+        Risposta rispostaProfile = (Risposta) HelloApplication.input.readObject();
+        if (rispostaProfile.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            String nome = (String) rispostaProfile.payload[0];
+            String cognome = (String) rispostaProfile.payload[1];
+            LocalDate birthdate = (LocalDate) rispostaProfile.payload[2];
+            String city = (String) rispostaProfile.payload[3];
+            Integer cap = (Integer) rispostaProfile.payload[4];
+            String address = (String) rispostaProfile.payload[5];
+            String email = (String) rispostaProfile.payload[6];
+            String iban = (String) rispostaProfile.payload[7];
+            String s1 = nome.substring(0,1).toUpperCase() + nome.substring(1);
+            String s2 = cognome.substring(0,1).toUpperCase() + cognome.substring(1);
+            username.setText(s1  + " " + s2);
+        } else if (rispostaProfile.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+        {
+            System.out.println(rispostaProfile.payload[0]);
+        }
         category.setVisible(false);
         Richiesta richiestacat = new Richiesta();
         richiestacat.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_CATEGORIE;
@@ -146,6 +173,7 @@ public class HomeController {
                 item.setFitHeight(100);
                 item.setPreserveRatio(true);
                 Label timerLabel = new Label();
+                timerLabel.setVisible(false);
 				LocalDateTime endDateTime = LocalDateTime.now().plus(duration);
                 AnimationTimer timer = new AnimationTimer()
                 {
@@ -161,8 +189,7 @@ public class HomeController {
                         }
                     }
                     private String format(Duration remaining) {
-                        return String.format("%01d days, %02d:%02d:%02d",
-								remaining.toDays(),
+                        return String.format("%02d:%02d:%02d",
                                 remaining.toHoursPart(),
                                 remaining.toMinutesPart(),
                                 remaining.toSecondsPart()

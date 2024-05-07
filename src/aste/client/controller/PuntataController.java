@@ -20,6 +20,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class PuntataController {
@@ -60,6 +61,9 @@ public class PuntataController {
 	@FXML
 	private TextFlow chatBox;
 
+    @FXML
+    private  Text username;
+
     public static  Integer idAsta;
 
 	public static LocalDateTime end ;
@@ -71,6 +75,29 @@ public class PuntataController {
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+        Richiesta richiestaProfilen = new Richiesta();
+        richiestaProfilen.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PROFILO;
+        richiestaProfilen.payload = new Object[1];
+        richiestaProfilen.payload[0] = 0;
+        HelloApplication.output.writeObject(richiestaProfilen);
+        Risposta rispostaProfilen = (Risposta) HelloApplication.input.readObject();
+        if (rispostaProfilen.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            String nome = (String) rispostaProfilen.payload[0];
+            String cognome = (String) rispostaProfilen.payload[1];
+            LocalDate birthdate = (LocalDate) rispostaProfilen.payload[2];
+            String city = (String) rispostaProfilen.payload[3];
+            Integer cap = (Integer) rispostaProfilen.payload[4];
+            String address = (String) rispostaProfilen.payload[5];
+            String email = (String) rispostaProfilen.payload[6];
+            String iban = (String) rispostaProfilen.payload[7];
+            String s1 = nome.substring(0,1).toUpperCase() + nome.substring(1);
+            String s2 = cognome.substring(0,1).toUpperCase() + cognome.substring(1);
+            username.setText(s1  + " " + s2);
+        } else if (rispostaProfilen.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+        {
+            System.out.println(rispostaProfilen.payload[0]);
+        }
         System.out.println(idAsta);
 		astaName.setText("Asta :" + astaNome);
 				LocalDateTime endDateTime = LocalDateTime.now().plus(duration);

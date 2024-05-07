@@ -26,6 +26,7 @@ import javafx.util.Duration;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -66,11 +67,37 @@ public class LottoController
     @FXML
     private TextField lottoF;
 
+    @FXML
+    private Text username;
+
 	private HashMap<Integer, Boolean> articoliSelezionati;
 
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+        Richiesta richiestaProfilen = new Richiesta();
+        richiestaProfilen.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PROFILO;
+        richiestaProfilen.payload = new Object[1];
+        richiestaProfilen.payload[0] = 0;
+        HelloApplication.output.writeObject(richiestaProfilen);
+        Risposta rispostaProfilen = (Risposta) HelloApplication.input.readObject();
+        if (rispostaProfilen.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            String nome = (String) rispostaProfilen.payload[0];
+            String cognome = (String) rispostaProfilen.payload[1];
+            LocalDate birthdate = (LocalDate) rispostaProfilen.payload[2];
+            String city = (String) rispostaProfilen.payload[3];
+            Integer cap = (Integer) rispostaProfilen.payload[4];
+            String address = (String) rispostaProfilen.payload[5];
+            String email = (String) rispostaProfilen.payload[6];
+            String iban = (String) rispostaProfilen.payload[7];
+            String s1 = nome.substring(0,1).toUpperCase() + nome.substring(1);
+            String s2 = cognome.substring(0,1).toUpperCase() + cognome.substring(1);
+            username.setText(s1  + " " + s2);
+        } else if (rispostaProfilen.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+        {
+            System.out.println(rispostaProfilen.payload[0]);
+        }
 		articoliSelezionati = new HashMap<>();
         Richiesta richiestaProfile = new Richiesta();
         richiestaProfile.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_IMMAGINE_PROFILO;
