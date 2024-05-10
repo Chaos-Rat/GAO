@@ -1999,29 +1999,33 @@ public class GestoreClient implements Runnable {
 			preparedStatement.setInt(1, idAstaInput);
 			ResultSet resultSet = preparedStatement.executeQuery();
 
-			// While per caricare l'array list 
 			if (!resultSet.next()) {
-				// 
-				rispostaUscente.tipoRisposta= TipoRisposta.OK;
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta" };
+				return;
+			}
 
-				rispostaUscente.payload[0]= resultSet.getTime("data_ora_inizio");
-				rispostaUscente.payload[1]= resultSet.getTime("durata");
-				rispostaUscente.payload[2]= resultSet.getFloat("prezzo_inizio");
-				rispostaUscente.payload[3]= resultSet.getFloat("prezzo_attuale");
-				rispostaUscente.payload[4]= resultSet.getInt("ip_multicast");
-				rispostaUscente.payload[5]= resultSet.getString("descrizione_annullamento");
-				rispostaUscente.payload[6]= resultSet.getInt("Id_lotto");
-				rispostaUscente.payload[7]= resultSet.getString("nome_lotto");
-				rispostaUscente.payload[8]= resultSet.getByte("immagini_articolo");
+			// TODO: Pick up from here
 
-				String nomeFile = resultSet.wasNull() ? 
-					"static_resources\\default_articolo.png" :
-					"res\\immagini_articoli\\" + ".png"
-				;
+			rispostaUscente.tipoRisposta= TipoRisposta.OK;
 
-				try (FileInputStream stream = new FileInputStream(nomeFile);) {
-					stream.readAllBytes();
-				}
+			rispostaUscente.payload[0]= resultSet.getTime("data_ora_inizio");
+			rispostaUscente.payload[1]= resultSet.getTime("durata");
+			rispostaUscente.payload[2]= resultSet.getFloat("prezzo_inizio");
+			rispostaUscente.payload[3]= resultSet.getFloat("prezzo_attuale");
+			rispostaUscente.payload[4]= resultSet.getInt("ip_multicast");
+			rispostaUscente.payload[5]= resultSet.getString("descrizione_annullamento");
+			rispostaUscente.payload[6]= resultSet.getInt("Id_lotto");
+			rispostaUscente.payload[7]= resultSet.getString("nome_lotto");
+			rispostaUscente.payload[8]= resultSet.getByte("immagini_articolo");
+
+			String nomeFile = resultSet.wasNull() ? 
+				"static_resources\\default_articolo.png" :
+				"res\\immagini_articoli\\" + ".png"
+			;
+
+			try (FileInputStream stream = new FileInputStream(nomeFile);) {
+				stream.readAllBytes();
 			}
 
 			LocalDateTime dataOraInizio = resultSet.getTimestamp("data_ora_inizio").toLocalDateTime();
