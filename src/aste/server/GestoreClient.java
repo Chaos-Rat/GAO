@@ -324,8 +324,7 @@ public class GestoreClient implements Runnable {
 			"WHERE Id_categoria = ?;"
 		;
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloCategoria);
 			preparedStatement.setInt(1, idCategoriaInput);
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -393,8 +392,7 @@ public class GestoreClient implements Runnable {
 			"LIMIT ? OFFSET ?;"
 		);
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
 			preparedStatement.setInt(1, idUtente);
 			preparedStatement.setInt(2, idCategoriaInput);
@@ -404,7 +402,7 @@ public class GestoreClient implements Runnable {
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			// array list per gli oggetti dei lotti 
-			ArrayList<Object> lotti= new ArrayList<>();
+			ArrayList<Object> lotti = new ArrayList<>();
 
 			// While per caricare l'array list 
 			while (resultSet.next()) {
@@ -412,21 +410,14 @@ public class GestoreClient implements Runnable {
 				lotti.add(resultSet.getString("nome"));
 				
 				int idImmagine= resultSet.getInt("Id_immagine");
-				
-				FileInputStream stream = null;
 
-				try {
-					if (resultSet.wasNull()) {
-						stream= new FileInputStream("static_resources\\default_articolo.png");
-					} else {
-						stream= new FileInputStream("res\\immagini_articoli\\"+ idImmagine+ ".png");
-					}
+				String nomeFile = resultSet.wasNull() ? 
+					"static_resources\\default_articolo.png" :
+					"res\\immagini_articoli\\"+ idImmagine+ ".png"
+				;
 
+				try (FileInputStream stream = new FileInputStream(nomeFile);) {
 					lotti.add(stream.readAllBytes());
-				} finally {
-					if (stream != null) {
-						stream.close();
-					}
 				}
 			}
 
@@ -464,8 +455,7 @@ public class GestoreClient implements Runnable {
 			"ORDER BY nome ASC;"
 		;
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			Statement statement = connection.createStatement();
 			ResultSet resultSet = statement.executeQuery(queryVisualizzazione);
 
@@ -542,8 +532,7 @@ public class GestoreClient implements Runnable {
 			");"
 		;
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloAsta);
 			preparedStatement.setInt(1, idAstaInput);
 			preparedStatement.setInt(2, idAstaInput);
@@ -587,8 +576,7 @@ public class GestoreClient implements Runnable {
 			"WHERE Rif_asta = ?;"
 		;
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();){
 			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloValore);
 			preparedStatement.setInt(1, idAstaInput);
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -664,7 +652,15 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		} catch (IOException e) {
-
+			// TODO: Implementare
+		} finally {
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				System.err.println("[" + Thread.currentThread().getName() +
+					"]: C'e' stato un errore nella chiusura della connessione al DB nell'effettuazione puntata. " + e.getMessage()
+				);
+			}
 		}
 	}
 
@@ -715,8 +711,7 @@ public class GestoreClient implements Runnable {
 
 		ArrayList<Integer> articoliUtente = new ArrayList<>();
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();){
 			PreparedStatement statement = connection.prepareStatement(queryControlloArticoli);
 			statement.setInt(1, idUtente);
 			ResultSet resultSet = statement.executeQuery();
@@ -758,8 +753,7 @@ public class GestoreClient implements Runnable {
 		
 		String queryAssegnazioneArticoli = builder.toString();
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement statement = connection.prepareStatement(queryCreazioneLotto, new String[]{ "Id_lotto" });
 			statement.setString(1, nomeInput);
 			statement.executeUpdate();
@@ -826,8 +820,7 @@ public class GestoreClient implements Runnable {
 			"VALUES (?);"
 		;
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryValidazione);
 			preparedStatement.setString(1, nomeInput);
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -940,8 +933,7 @@ public class GestoreClient implements Runnable {
 				"WHERE Utenti.Id_utente = ? AND Lotti.Id_lotto = ?;"
 			;
 
-			try {
-				Connection connection = gestoreDatabase.getConnection();
+			try (Connection connection = gestoreDatabase.getConnection();){
 				PreparedStatement preparedStatement = connection.prepareStatement(queryControlloLotto);
 				preparedStatement.setInt(1, idUtente);
 				preparedStatement.setInt(2, idLottoInput);
@@ -959,6 +951,7 @@ public class GestoreClient implements Runnable {
 
 				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 				rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+				return;
 			}
 		}
 
@@ -1023,8 +1016,7 @@ public class GestoreClient implements Runnable {
 			"WHERE Id_categoria = ?;"
 		;
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloCategoria);
 			preparedStatement.setInt(1, idCategoriaInput);
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -1067,8 +1059,7 @@ public class GestoreClient implements Runnable {
 			"VALUES (?, ?);"
 		;
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement statement = connection.prepareStatement(queryCreazioneArticolo, new String[]{ "Id_articolo" });
 			statement.setString(1, nomeInput);
 			statement.setString(2, condizioneInput);
@@ -1159,8 +1150,7 @@ public class GestoreClient implements Runnable {
 			"FROM Utenti;"
 		;
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();){
 			Statement statement = connection.createStatement();
 			ResultSet resultSet = statement.executeQuery(queryUtenti);
 
@@ -1340,8 +1330,7 @@ public class GestoreClient implements Runnable {
 			"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
 		;
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement statement = connection.prepareStatement(queryRegistrazione);
 			statement.setString(1, nomeInput);
 			statement.setString(2, cognomeInput);
@@ -1440,14 +1429,13 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		try {
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			if (idUtenteInput == 0) { // utente loggato
 				String queryVisualizzazione = "SELECT nome, cognome, data_nascita, citta_residenza, cap, indirizzo, email, iban\n" +
 					"FROM Utenti\n" +
 					"WHERE Id_utente = ?"
 				;
 	
-				Connection connection = gestoreDatabase.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
 				preparedStatement.setInt(1, idUtente);
 				ResultSet resultSet = preparedStatement.executeQuery();
@@ -1478,7 +1466,6 @@ public class GestoreClient implements Runnable {
 					"WHERE Id_utente = ?;"
 				;
 
-				Connection connection = gestoreDatabase.getConnection();
 				PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
 				preparedStatement.setInt(1, idUtenteInput);
 				ResultSet resultSet = preparedStatement.executeQuery();
@@ -1532,10 +1519,7 @@ public class GestoreClient implements Runnable {
 			"WHERE Id_utente = ?;"
 		;
 
-		FileInputStream stream = null;
-
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement statement = connection.prepareStatement(queryUtenti);
 			statement.setInt(1, idInput);
 			ResultSet resultSet = statement.executeQuery();
@@ -1545,13 +1529,15 @@ public class GestoreClient implements Runnable {
 
 				rispostaUscente.tipoRisposta = TipoRisposta.OK;
 
-				if (immagineProfilo == 1) {
-					stream = new FileInputStream("res\\profili\\" + idInput + ".png");
-				} else {
-					stream = new FileInputStream("static_resources\\default_user.png");
+				String nomeFile = immagineProfilo == 1 ? 
+					"res\\profili\\" + idInput + ".png" :
+					"static_resources\\default_user.png"
+				;
+
+				try (FileInputStream stream = new FileInputStream(nomeFile);) {
+					rispostaUscente.payload = new Object[]{ stream.readAllBytes() };
 				}
 
-				rispostaUscente.payload = new Object[]{ stream.readAllBytes() };
 				return;
 			}
 
@@ -1562,19 +1548,9 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		} catch (IOException e) {
-			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nell'apertura/scrittura delle immagine profilo. " + e.getMessage());
+			System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nell'apertura/scrittura/chiusura delle immagine profilo. " + e.getMessage());
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
-		} finally {
-			if (stream != null) {
-				try {
-					stream.close();
-				} catch (IOException e) {
-					System.err.println("[" + Thread.currentThread().getName() + "]: C'e' stato un errore nella chiusura dell'immagine profilo. " + e.getMessage());
-					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-					rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
-				}
-			}
 		}
 	}
 
@@ -1676,8 +1652,7 @@ public class GestoreClient implements Runnable {
 			"WHERE Id_categoria = ?;"
 		;
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloCategoria);
 			preparedStatement.setInt(1, idCategoriaInput);
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -1709,8 +1684,7 @@ public class GestoreClient implements Runnable {
 			"LIMIT ? OFFSET ?;"
 		;
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
 			preparedStatement.setInt(1, idCategoriaInput);
 			preparedStatement.setString(2, "%"+ stringaRicerca+ "%");
@@ -1733,22 +1707,14 @@ public class GestoreClient implements Runnable {
 				
 				int idImmagine = resultSet.getInt("Id_immagine");
 
-				FileInputStream stream = null;
+				String nomeFile = resultSet.wasNull() ? 
+					"static_resources\\default_articolo.png" :
+					"res\\immagini_articoli\\"+ idImmagine + ".png"
+				;
 
-				try {
-					if (resultSet.wasNull()) {
-						stream= new FileInputStream("static_resources\\default_articolo.png");
-					} else {
-						stream= new FileInputStream("res\\immagini_articoli\\"+ idImmagine+ ".png");
-					}
-	
+				try (FileInputStream stream = new FileInputStream(nomeFile);) {
 					aste.add(stream.readAllBytes());
-				} finally {
-					if (stream != null) {
-						stream.close();
-					}
 				}
-				
 			}
 
 			// Transformazione del array list in array e risposta nel payload uscita 
@@ -1867,8 +1833,7 @@ public class GestoreClient implements Runnable {
 			"WHERE Rif_lotto = ?;"
 		;
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement statement = connection.prepareStatement(controlloLotto1);
 			statement.setInt(1, idLottoInput);
 			ResultSet resultSet = statement.executeQuery();
@@ -1955,6 +1920,7 @@ public class GestoreClient implements Runnable {
 			if (connection != null) {
 				try {
 					connection.setAutoCommit(true);
+					connection.close();
 				} catch (SQLException e) {
 					System.err.println("[" + Thread.currentThread().getName() +
 						"]: C'e' stato un errore del server per il reset dell'autocommit asta. " + e.getMessage()
@@ -1970,7 +1936,7 @@ public class GestoreClient implements Runnable {
 
 	// Metodo visualizza asta 
 	private void visualizzaAsta() {
-		//TODO: implementare
+		//TODO: Implementare
 		// conmtrollo se l'utente e conesso 
 		if (idUtente == 0) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
@@ -2004,8 +1970,7 @@ public class GestoreClient implements Runnable {
 		"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n"+
 		"WHERE Id_aste = ?";
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
 			preparedStatement.setInt(1, idAstaInput);
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -2025,19 +1990,14 @@ public class GestoreClient implements Runnable {
 				rispostaUscente.payload[7]= resultSet.getString("nome_lotto");
 				rispostaUscente.payload[8]= resultSet.getByte("immagini_articolo");
 
-				//
-				FileInputStream stream;
+				String nomeFile = resultSet.wasNull() ? 
+					"static_resources\\default_articolo.png" :
+					"res\\immagini_articoli\\" + ".png"
+				;
 
-				if (resultSet.wasNull()) {
-					stream= new FileInputStream("static_resources\\default_articolo.png");
-				} else {
-					// TODO: Fix (never)
-					stream= new FileInputStream("res\\immagini_articoli\\" + ".png");
+				try (FileInputStream stream = new FileInputStream(nomeFile);) {
+					stream.readAllBytes();
 				}
-
-				stream.readAllBytes();
-
-				stream.close();
 			}
 
 		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
@@ -2149,8 +2109,7 @@ public class GestoreClient implements Runnable {
 			"WHERE Id_categoria = ?;"
 		;
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloCategoria);
 			preparedStatement.setInt(1, idCategoriaInput);
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -2200,8 +2159,7 @@ public class GestoreClient implements Runnable {
 			"LIMIT ? OFFSET ?;"
 		);
 
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
 			preparedStatement.setInt(1, idUtente);
 			preparedStatement.setInt(2, idCategoriaInput);
@@ -2220,18 +2178,15 @@ public class GestoreClient implements Runnable {
 				articoli.add(resultSet.getString("condizione"));
 				
 				int idImmagine= resultSet.getInt("Id_immagine");
-				
-				FileInputStream stream;
 
-				if (resultSet.wasNull()) {
-					stream= new FileInputStream("static_resources\\default_articolo.png");
-				} else {
-					stream= new FileInputStream("res\\immagini_articoli\\"+ idImmagine+ ".png");
+				String nomeFile = resultSet.wasNull() ? 
+					"static_resources\\default_articolo.png" :
+					"res\\immagini_articoli\\"+ idImmagine+ ".png"
+				;
+
+				try (FileInputStream stream = new FileInputStream(nomeFile);) {
+					articoli.add(stream.readAllBytes());
 				}
-
-				articoli.add(stream.readAllBytes());
-
-				stream.close();
 			}
 
 			// Transformazione del array list in array e risposta nel payload uscita 
@@ -2249,7 +2204,7 @@ public class GestoreClient implements Runnable {
 		} catch (IOException e) { // questo catch e per gli errori che potrebbe dare il caricamento del immagine del utente
 			System.err.println("[" +
 				Thread.currentThread().getName() +
-				"]: C'e' stato un errore nell'apertura/scrittura/chiusura delle immagini degli articoli. "
+				"]: C'e' stato un errore nell'apertura/scrittura delle immagini degli articoli. "
 				+ e.getMessage()
 			);
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;

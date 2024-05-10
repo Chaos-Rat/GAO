@@ -78,8 +78,7 @@ public class GestoreAste {
 				"WHERE Id_asta = ?;"
 			;
 
-			try {
-				Connection connection = gestoreDatabase.getConnection();
+			try (Connection connection = gestoreDatabase.getConnection();) {
 				PreparedStatement statement = connection.prepareStatement(queryUpdate);
 				statement.setBytes(1, buffer);
 				statement.setInt(2, idAsta);
@@ -106,8 +105,7 @@ public class GestoreAste {
 				"WHERE Id_asta = ?;"
 			;
 
-			try {
-				Connection connection = gestoreDatabase.getConnection();
+			try (Connection connection = gestoreDatabase.getConnection();) {
 				PreparedStatement statement = connection.prepareStatement(queryControlloVincita);
 				statement.setInt(1, idAsta);
 				ResultSet resultSet = statement.executeQuery();
@@ -183,8 +181,7 @@ public class GestoreAste {
 			"WHERE Id_asta = ?;"
 		;
 		
-		try {
-			Connection connection = gestoreDatabase.getConnection();
+		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement statement = connection.prepareStatement(queryAnnullamento);
 			statement.setString(1, descrizioneAnnullamento);
 			statement.setInt(2, idAsta);
