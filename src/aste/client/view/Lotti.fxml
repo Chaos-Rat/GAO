@@ -44,7 +44,7 @@
                   </HBox>
                   <HBox alignment="TOP_CENTER" prefHeight="60.0" prefWidth="116.0">
                      <children>
-                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Username">
+                        <Text fx:id="username" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Username">
                            <font>
                               <Font name="Dubai Regular" size="13.0" />
                            </font>
@@ -113,11 +113,7 @@
                <center>
                   <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                      <content>
-                        <VBox fx:id="lottiList" prefHeight="654.0" prefWidth="951.0">
-                           <children>
-                              <HBox prefHeight="61.0" prefWidth="951.0" />
-                           </children>
-                        </VBox>
+                        <VBox fx:id="lottiList" prefHeight="654.0" prefWidth="951.0" />
                      </content>
                   </ScrollPane>
                </center>

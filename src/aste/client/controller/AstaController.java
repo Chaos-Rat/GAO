@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -78,11 +79,37 @@ public class AstaController
     @FXML
     private Spinner<LocalTime>spinnerEnd;
 
+    @FXML
+    private Text username;
+
     private Integer idLotto;
 
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+        Richiesta richiestaProfile = new Richiesta();
+        richiestaProfile.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PROFILO;
+        richiestaProfile.payload = new Object[1];
+        richiestaProfile.payload[0] = 0;
+        HelloApplication.output.writeObject(richiestaProfile);
+        Risposta rispostaProfile = (Risposta) HelloApplication.input.readObject();
+        if (rispostaProfile.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            String nome = (String) rispostaProfile.payload[0];
+            String cognome = (String) rispostaProfile.payload[1];
+            LocalDate birthdate = (LocalDate) rispostaProfile.payload[2];
+            String city = (String) rispostaProfile.payload[3];
+            Integer cap = (Integer) rispostaProfile.payload[4];
+            String address = (String) rispostaProfile.payload[5];
+            String email = (String) rispostaProfile.payload[6];
+            String iban = (String) rispostaProfile.payload[7];
+            String s1 = nome.substring(0,1).toUpperCase() + nome.substring(1);
+            String s2 = cognome.substring(0,1).toUpperCase() + cognome.substring(1);
+            username.setText(s1  + " " + s2);
+        } else if (rispostaProfile.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+        {
+            System.out.println(rispostaProfile.payload[0]);
+        }
         category.setVisible(false);
         spinnerEnd.setEditable(true);
         spinner.setEditable(true);
@@ -224,7 +251,7 @@ public class AstaController
         richiestaCrea.payload[0] = dateTime;
         richiestaCrea.payload[1] = timeduration;
         richiestaCrea.payload[2] = Float.valueOf(priceF.getText());
-        richiestaCrea.payload[3] = false;
+        richiestaCrea.payload[3] = true;
         richiestaCrea.payload[4] = idLotto;
         HelloApplication.output.writeObject(richiestaCrea);
         Risposta rispostaCrea = (Risposta) HelloApplication.input.readObject();

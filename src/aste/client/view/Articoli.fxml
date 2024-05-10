@@ -46,10 +46,17 @@
                         </Circle>
                      </children>
                   </HBox>
-                  <HBox prefHeight="60.0" prefWidth="112.0">
+                  <HBox alignment="TOP_CENTER" prefHeight="60.0" prefWidth="112.0">
                      <VBox.margin>
                         <Insets bottom="25.0" />
                      </VBox.margin>
+                     <children>
+                        <Text fx:id="username" fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Text">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Text>
+                     </children>
                   </HBox>
                   <Button fx:id="HomeB" mnemonicParsing="false" onAction="#HomeClicked" prefHeight="30.0" prefWidth="144.0" stylesheets="@CSS/button.css" text="Home" textFill="WHITE">
                      <font>

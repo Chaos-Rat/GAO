@@ -631,17 +631,15 @@ public class GestoreClient implements Runnable {
 			);
 
 			connection.commit();
-
 			rispostaUscente.tipoRisposta = TipoRisposta.OK;
 		} catch (SQLException e) {
 			if (connection != null) {
 				try {
-					// TODO: Finish
 					connection.rollback();
-					connection.setAutoCommit(true);
 				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					System.err.println("[" + Thread.currentThread().getName() +
+						"]: C'e' stato un errore nel rollback nell'effettuazione puntata. " + e1.getMessage()
+					);
 				}
 			}
 
@@ -652,13 +650,25 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		} catch (IOException e) {
-			// TODO: Implementare
+			if (connection != null) {
+				try {
+					connection.rollback();
+				} catch (SQLException e1) {
+					System.err.println("[" + Thread.currentThread().getName() +
+						"]: C'e' stato un errore nel rollback nell'effettuazione puntata. " + e1.getMessage()
+					);
+				}
+			}
+
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore interno nella diffusione della puntata. " + e.getMessage()
+			);
 		} finally {
 			try {
-				connection.close();
+				connection.setAutoCommit(true);
 			} catch (SQLException e) {
 				System.err.println("[" + Thread.currentThread().getName() +
-					"]: C'e' stato un errore nella chiusura della connessione al DB nell'effettuazione puntata. " + e.getMessage()
+					"]: C'e' stato un errore nel reset dell'autocommit nell'effettuazione della puntata. " + e.getMessage()
 				);
 			}
 		}
@@ -1822,6 +1832,12 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
+		if (idLottoInput == null || idLottoInput <= 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idLotto" };
+			return;
+		}
+
 		String controlloLotto1 = "SELECT 1\n" +
 			"FROM Aste\n" +
 			"WHERE Rif_lotto = ? AND ADDTIME(Aste.data_ora_inizio, Aste.durata) > CURRENT_TIMESTAMP;"
@@ -1936,7 +1952,7 @@ public class GestoreClient implements Runnable {
 
 	// Metodo visualizza asta 
 	private void visualizzaAsta() {
-		//TODO: Implementare
+		// TODO: Implementare
 		// conmtrollo se l'utente e conesso 
 		if (idUtente == 0) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
@@ -1962,13 +1978,21 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT DISTINCT Aste.dataOraInizio, Aste.descrizione_annullamento, Aste.durata, Aste.prezzo_attuale, Aste.Rif_lotto, Lotti.nome, Immagini.Id_immagine\n"+ 
-		"FROM Aste\n"+
-		"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n"+
-		"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n"+
-		"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n"+
-		"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n"+
-		"WHERE Id_aste = ?";
+		String queryVisualizzazione = "SELECT Aste.data_ora_inizio, Aste.durata, Aste.prezzo_inizio, " +
+			"MAX(Puntate.valore) AS prezzo_attuale, Aste.ip_multicast, Aste.descrizione_annullamento, " +
+			"Aste.durata, Aste.prezzo_attuale, Aste.Rif_lotto, Lotti.nome\n"+ 
+			"FROM Aste\n"+
+			"JOIN Puntate ON Aste.IdAsta = Puntate.Rif_asta\n" +
+			"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
+			"WHERE Aste.Id_asta = ?\n" +
+			"GROUP BY Aste.Id_asta;"
+		;
+
+		String queryImmagini = "SELECT Immagini.Id_immagine\n" +
+			"FROM Immagini\n" +
+			"JOIN Articoli ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
+			"WHERE Articoli.Rif_lotto = ?;"
+		;
 
 		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
@@ -1999,6 +2023,26 @@ public class GestoreClient implements Runnable {
 					stream.readAllBytes();
 				}
 			}
+
+			LocalDateTime dataOraInizio = resultSet.getTimestamp("data_ora_inizio").toLocalDateTime();
+			LocalTime durata;
+
+			rispostaUscente.tipoRisposta= TipoRisposta.OK;
+			
+
+			//
+			FileInputStream stream;
+
+			if (resultSet.wasNull()) {
+				stream= new FileInputStream("static_resources\\default_articolo.png");
+			} else {
+				// TODO: Fix (never)
+				stream= new FileInputStream("res\\immagini_articoli\\" + ".png");
+			}
+
+			stream.readAllBytes();
+
+			stream.close();
 
 		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
 			System.err.println("[" + Thread.currentThread().getName() +

@@ -4,6 +4,7 @@ import aste.Richiesta;
 import aste.Risposta;
 import aste.client.HelloApplication;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -28,6 +29,7 @@ import javax.swing.*;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.HashMap;
 
 public class ArticoliController
@@ -69,8 +71,34 @@ public class ArticoliController
     private Button ProfileB;
 
     @FXML
+    private Text username;
+
+    @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+        Richiesta richiestaProfile = new Richiesta();
+        richiestaProfile.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PROFILO;
+        richiestaProfile.payload = new Object[1];
+        richiestaProfile.payload[0] = 0;
+        HelloApplication.output.writeObject(richiestaProfile);
+        Risposta rispostaProfile = (Risposta) HelloApplication.input.readObject();
+        if (rispostaProfile.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            String nome = (String) rispostaProfile.payload[0];
+            String cognome = (String) rispostaProfile.payload[1];
+            LocalDate birthdate = (LocalDate) rispostaProfile.payload[2];
+            String city = (String) rispostaProfile.payload[3];
+            Integer cap = (Integer) rispostaProfile.payload[4];
+            String address = (String) rispostaProfile.payload[5];
+            String email = (String) rispostaProfile.payload[6];
+            String iban = (String) rispostaProfile.payload[7];
+            String s1 = nome.substring(0,1).toUpperCase() + nome.substring(1);
+            String s2 = cognome.substring(0,1).toUpperCase() + cognome.substring(1);
+            username.setText(s1  + " " + s2);
+        } else if (rispostaProfile.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+        {
+            System.out.println(rispostaProfile.payload[0]);
+        }
         AddCategory.setVisible(false);
         Richiesta richiest2 = new Richiesta();
         richiest2.tipoRichiesta = Richiesta.TipoRichiesta.VERIFICA_ADMIN;
@@ -129,15 +157,61 @@ public class ArticoliController
                 nomeT.setWrappingWidth(150);
                 condT.setWrappingWidth(150);
                 idT.setWrappingWidth(150);
+				Button button = new Button();
+                button.setText("Details");
+                button.setStyle(".button\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #16f70a ;\n" +
+                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "}\n" +
+                        "\n" +
+                        ".button:hover\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #1aab13 ;\n" +
+                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "}\n" +
+                        "\n" +
+                        ".button:pressed\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #096e03 ;\n" +
+                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "}");
+
+						button.setOnAction(new EventHandler<ActionEvent>()
+                {
+                    @Override
+                    public void handle(ActionEvent event)
+                    {
+                        try {
+							ArticoloDetailsController.idArticolo = id;
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/ArticoloDetails.fxml"));
+                            Parent root = loader.load();
+                            Scene scene = new Scene(root);
+                            Stage stage = new Stage();
+                            stage.setTitle("The AuctionHouse");
+                            stage.setScene(scene);
+                            stage.initModality(Modality.APPLICATION_MODAL);
+                            stage.show();
+                            Stage stage1 = (Stage) button.getScene().getWindow();
+                            stage1.close();
+                        }catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
                 VBox vbox = new VBox();
                 VBox vbox2 = new VBox();
+				VBox vbox3 = new VBox();
                 vbox2.setAlignment(Pos.CENTER);
                 vbox.setAlignment(Pos.CENTER);
+				vbox3.setAlignment(Pos.CENTER);
                 vbox.getChildren().add(item);
                 vbox2.getChildren().addAll(nomeT, condT);
+				vbox3.getChildren().addAll(button);
+				box.setSpacing(50);
                 box.setPrefWidth(940);
                 box.setAlignment(Pos.CENTER);
-                box.getChildren().addAll(vbox, vbox2);
+                box.getChildren().addAll(vbox,vbox2,vbox3);
                 articoliList.getChildren().add(box);
             }
         }

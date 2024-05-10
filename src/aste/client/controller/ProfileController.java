@@ -1,5 +1,8 @@
 package aste.client.controller;
 
+import aste.Richiesta;
+import aste.Risposta;
+import aste.client.HelloApplication;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -20,6 +23,10 @@ import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 
 public class ProfileController
@@ -198,8 +205,7 @@ public class ProfileController
         ibanEdit.setVisible(false);
     }
 
-    public void initialize()
-    {
+    public void initialize() throws IOException, ClassNotFoundException {
         Image image = new Image(getClass().getResourceAsStream("../view/Avatar.png"));
         avatar.setFill(new ImagePattern(image));
         backB.setVisible(false);
@@ -213,6 +219,37 @@ public class ProfileController
         capEdit.setVisible(false);
         addressEdit.setVisible(false);
         ibanEdit.setVisible(false);
+        Richiesta richiestaProfile = new Richiesta();
+        richiestaProfile.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PROFILO;
+        richiestaProfile.payload = new Object[1];
+        richiestaProfile.payload[0] = 0;
+        HelloApplication.output.writeObject(richiestaProfile);
+        Risposta rispostaProfile = (Risposta) HelloApplication.input.readObject();
+        if (rispostaProfile.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            String nome = (String) rispostaProfile.payload[0];
+            String cognome = (String) rispostaProfile.payload[1];
+            LocalDate birthdate = (LocalDate) rispostaProfile.payload[2];
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            String birthdateText = birthdate.format(formatter);
+            String city = (String) rispostaProfile.payload[3];
+            Integer cap = (Integer) rispostaProfile.payload[4];
+            String address = (String) rispostaProfile.payload[5];
+            String email = (String) rispostaProfile.payload[6];
+            String iban = (String) rispostaProfile.payload[7];
+            nameText.setText("Name : " + nome);
+            surnameText.setText("Surname : " + cognome);
+            dateText.setText("Date : " + birthdateText);
+            cityText.setText("City : " + city);
+            capText.setText("Cap : " + cap);
+            addressText.setText("Address : " + address);
+            emailText.setText("Email : " + email);
+            ibanText.setText("Iban : " + iban);
+        } else if (rispostaProfile.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+        {
+                System.out.println(rispostaProfile.payload[0]);
+        }
+
     }
 
     @FXML

@@ -27,7 +27,7 @@
                   </HBox>
                   <HBox alignment="TOP_CENTER" prefHeight="60.0" prefWidth="112.0">
                      <children>
-                        <Text fill="#f2efef" strokeType="OUTSIDE" strokeWidth="0.0" text="Username">
+                        <Text fx:id="username" fill="#f2efef" strokeType="OUTSIDE" strokeWidth="0.0" text="Username">
                            <HBox.margin>
                               <Insets />
                            </HBox.margin>

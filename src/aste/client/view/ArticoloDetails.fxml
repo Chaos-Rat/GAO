@@ -14,7 +14,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="749.0" prefWidth="1075.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aste.client.controller.ArticoloController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="749.0" prefWidth="1075.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aste.client.controller.ArticoloDetailsController">
    <children>
       <BorderPane layoutX="-3.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="749.0" prefWidth="1081.0">
          <top>
@@ -97,18 +97,6 @@
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <VBox prefHeight="200.0" prefWidth="100.0" />
-                        <VBox alignment="BOTTOM_RIGHT" prefHeight="200.0" prefWidth="100.0">
-                           <children>
-                              <Button fx:id="addimg" mnemonicParsing="false" onAction="#AddImage" prefHeight="25.0" prefWidth="67.0" text="Add">
-                                 <VBox.margin>
-                                    <Insets left="7.0" />
-                                 </VBox.margin>
-                              </Button>
-                           </children>
-                           <HBox.margin>
-                              <Insets left="25.0" />
-                           </HBox.margin>
-                        </VBox>
                      </children>
                   </HBox>
                   <HBox prefHeight="100.0" prefWidth="200.0">
@@ -187,16 +175,6 @@
                      <children>
                         <VBox prefHeight="100.0" prefWidth="86.0" />
                         <VBox prefHeight="100.0" prefWidth="49.0" />
-                        <VBox prefHeight="100.0" prefWidth="75.0">
-                           <children>
-                              <Button fx:id="previousB" mnemonicParsing="false" text="Previous" />
-                           </children>
-                        </VBox>
-                        <VBox prefHeight="100.0" prefWidth="75.0">
-                           <children>
-                              <Button fx:id="nextB" mnemonicParsing="false" prefHeight="25.0" prefWidth="60.0" text="Next" />
-                           </children>
-                        </VBox>
                         <VBox prefHeight="100.0" prefWidth="86.0" />
                      </children>
                   </HBox>

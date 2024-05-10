@@ -3,7 +3,9 @@ package aste.client.controller;
 import aste.Richiesta;
 import aste.Risposta;
 import aste.client.HelloApplication;
+import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -11,6 +13,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -27,6 +30,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
 public class HomeController {
@@ -71,6 +78,9 @@ public class HomeController {
     private VBox vbox;
 
     @FXML
+    private Text username;
+
+    @FXML
     void ProfileClicked(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Profile.fxml"));
         Parent root = loader.load();
@@ -94,6 +104,29 @@ public class HomeController {
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+        Richiesta richiestaProfile = new Richiesta();
+        richiestaProfile.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PROFILO;
+        richiestaProfile.payload = new Object[1];
+        richiestaProfile.payload[0] = 0;
+        HelloApplication.output.writeObject(richiestaProfile);
+        Risposta rispostaProfile = (Risposta) HelloApplication.input.readObject();
+        if (rispostaProfile.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            String nome = (String) rispostaProfile.payload[0];
+            String cognome = (String) rispostaProfile.payload[1];
+            LocalDate birthdate = (LocalDate) rispostaProfile.payload[2];
+            String city = (String) rispostaProfile.payload[3];
+            Integer cap = (Integer) rispostaProfile.payload[4];
+            String address = (String) rispostaProfile.payload[5];
+            String email = (String) rispostaProfile.payload[6];
+            String iban = (String) rispostaProfile.payload[7];
+            String s1 = nome.substring(0,1).toUpperCase() + nome.substring(1);
+            String s2 = cognome.substring(0,1).toUpperCase() + cognome.substring(1);
+            username.setText(s1  + " " + s2);
+        } else if (rispostaProfile.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+        {
+            System.out.println(rispostaProfile.payload[0]);
+        }
         category.setVisible(false);
         Richiesta richiestacat = new Richiesta();
         richiestacat.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_CATEGORIE;
@@ -139,6 +172,31 @@ public class HomeController {
                 item.setFitWidth(100);
                 item.setFitHeight(100);
                 item.setPreserveRatio(true);
+                Label timerLabel = new Label();
+                timerLabel.setVisible(false);
+				LocalDateTime endDateTime = LocalDateTime.now().plus(duration);
+                AnimationTimer timer = new AnimationTimer()
+                {
+                    @Override
+                    public void handle(long l)
+                    {
+                        Duration remaining = Duration.between(LocalDateTime.now(), endDateTime);
+                        if (remaining.isPositive()) {
+                            timerLabel.setText(format(remaining));
+                        } else {
+                            timerLabel.setText(format(Duration.ZERO));
+                            stop();
+                        }
+                    }
+                    private String format(Duration remaining) {
+                        return String.format("%02d:%02d:%02d",
+                                remaining.toHoursPart(),
+                                remaining.toMinutesPart(),
+                                remaining.toSecondsPart()
+                        );
+                    }
+                };
+                timer.start();
                 Text nomeT = new Text("LottoNome: " + Lottoname);
                 Text priceT = new Text("StartingPrice : " + price.toString());
                 nomeT.setWrappingWidth(150);
@@ -146,17 +204,63 @@ public class HomeController {
                 VBox vbox = new VBox();
                 VBox vbox2 = new VBox();
                 VBox vbox3 = new VBox();
+                VBox vbox4 = new VBox();
                 Button button = new Button();
+                button.setText("join");
+                button.setStyle(".button\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #16f70a ;\n" +
+                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "}\n" +
+                        "\n" +
+                        ".button:hover\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #1aab13 ;\n" +
+                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "}\n" +
+                        "\n" +
+                        ".button:pressed\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #096e03 ;\n" +
+                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "}");
+                button.setOnAction(new EventHandler<ActionEvent>()
+                {
+                    @Override
+                    public void handle(ActionEvent event)
+                    {
+                        try {
+                            PuntataController.idAsta = idAsta;
+							PuntataController.duration = duration;
+							PuntataController.end = endDateTime;
+							PuntataController.astaNome = Lottoname;
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Puntata.fxml"));
+                            Parent root = loader.load();
+                            Scene scene = new Scene(root);
+                            Stage stage = new Stage();
+                            stage.setTitle("The AuctionHouse");
+                            stage.setScene(scene);
+                            stage.initModality(Modality.APPLICATION_MODAL);
+                            stage.show();
+                            Stage stage1 = (Stage) button.getScene().getWindow();
+                            stage1.close();
+                        }catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
                 vbox.setAlignment(Pos.CENTER);
                 vbox2.setAlignment(Pos.CENTER);
                 vbox3.setAlignment(Pos.CENTER);
+                vbox4.setAlignment(Pos.CENTER);
                 vbox.getChildren().add(item);
                 vbox2.getChildren().addAll(nomeT,priceT);
                 vbox3.getChildren().addAll(button);
+                vbox4.getChildren().add(timerLabel);
                 box.setSpacing(50);
                 box.setPrefWidth(940);
                 box.setAlignment(Pos.CENTER);
-                box.getChildren().addAll(vbox, vbox2);
+                box.getChildren().addAll(vbox,vbox2,vbox3,vbox4);
                 asteList.getChildren().add(box);
             }
         } else if (rispostaAste.payload[0]== Risposta.TipoRisposta.ERRORE)
