@@ -59,11 +59,9 @@ public class GestoreClient implements Runnable {
 	@Override
 	public void run() {
 		String clientAddress = socket.getRemoteSocketAddress().toString();
-		System.out.println("Il client " + clientAddress + " si è disconnesso.");
+		System.out.println("Il client " + clientAddress + " si è connesso.");
 
 		try {
-			
-
 			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
 
