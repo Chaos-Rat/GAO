@@ -227,8 +227,9 @@ public class GestoreClient implements Runnable {
 		throw new UnsupportedOperationException("Unimplemented method 'visualizzaPuntate'");
 	}
 
-	// Metodo Visualizza lotto 
+	// Metodo Visualizza lotto 1.0
 	private void visualizzaLotto() {
+		// TODO: Implementare
 		// conmtrollo se l'utente e conesso 
 		if (idUtente == 0) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
@@ -236,7 +237,95 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		// TODO: Implementare
+		// Funzione per avere un'asta 
+		Integer idLottoInput;
+
+		try {
+			idLottoInput = (Integer)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+			return;
+		}
+
+		if (idLottoInput == null) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+			return;
+		}
+		//query da finire
+		String queryVisualizzazione = "SELECT Lotti.Id_Lotto, Lotti.nome" +
+			"FROM Lotti\n"+
+			"JOIN Articoli ON Articoli.Rif_utente = Utente.Rif_articolo\n" +
+			"JOIN Lotti ON Articoli.Rif_lotto = Lotti.Id_lotto\n"
+		;
+
+		String queryImmagini = "SELECT Immagini.Id_immagine\n" +
+			"FROM Immagini\n" +
+			"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n"
+		;
+
+		try (Connection connection = gestoreDatabase.getConnection();) {
+			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
+			preparedStatement.setInt(1, idLottoInput);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			// While per caricare l'array list 
+			if (!resultSet.next()) {
+				// 
+				rispostaUscente.tipoRisposta= TipoRisposta.OK;
+
+				rispostaUscente.payload[0]= resultSet.getInt("Id_lotto");
+				rispostaUscente.payload[1]= resultSet.getString("nome");
+				rispostaUscente.payload[2]= resultSet.getByte("immagini_articolo");
+
+				ArrayList <Object> lottiArticoli = new ArrayList<>();
+
+				lottiArticoli.add(resultSet.getInt("Id_articolo"));
+				lottiArticoli.add(resultSet.getInt("nome_articolo"));
+
+				rispostaUscente.payload[3]= lottiArticoli;
+
+				String nomeFile = resultSet.wasNull() ? 
+					"static_resources\\default_articolo.png" :
+					"res\\immagini_articoli\\" + ".png"
+				;
+
+				try (FileInputStream stream = new FileInputStream(nomeFile);) {
+					stream.readAllBytes();
+				}
+			}
+
+			//metti img
+			FileInputStream stream;
+
+			if (resultSet.wasNull()) {
+				stream= new FileInputStream("static_resources\\default_articolo.png");
+			} else {
+				// TODO: Fix (never)
+				stream= new FileInputStream("res\\immagini_articoli\\" + ".png");
+			}
+
+			stream.readAllBytes();
+
+			stream.close();
+
+		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di vissualizazione Lotto. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		} catch (IOException e) { // questo catch e per gli errori che potrebbe dare il caricamento del immagine del utente
+			System.err.println("[" +
+				Thread.currentThread().getName() +
+				"]: C'e' stato un errore nell'apertura/scrittura/chiusura delle immagini del lotto. "
+				+ e.getMessage()
+			);
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
 	}
 
 	// Metodo visualizza lotti 
@@ -475,9 +564,105 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
 	}
-
+	//Metodo visualizza articolo 1.0
 	private void visualizzaArticolo() {
-		
+		// TODO: Implementare
+		// conmtrollo se l'utente e conesso 
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
+
+		// Funzione per avere un'asta 
+		Integer idArticoloInput;
+
+		try {
+			idArticoloInput = (Integer)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+			return;
+		}
+
+		if (idArticoloInput == null) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+			return;
+		}
+		//query
+		String queryVisualizzazione = "SELECT Articoli.nome, Articoli.condizione, Articoli.descrizione, " +
+			"Lotti.Id_lotto, Utenti.Id_utente, " +
+			"Utente.email\n"+ 
+			"FROM Articoli\n"+
+			"JOIN Utenti ON Articoli.Rif_utente = Utente.Rif_articolo\n" +
+			"JOIN Lotti ON Articoli.Rif_lotto = Lotti.Id_lotto\n"
+		;
+
+		String queryImmagini = "SELECT Immagini.Id_immagine\n" +
+			"FROM Immagini\n" +
+			"JOIN Articoli ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
+			"WHERE Articoli.Rif_lotto = ?;"
+		;
+
+		try (Connection connection = gestoreDatabase.getConnection();) {
+			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
+			preparedStatement.setInt(1, idArticoloInput);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			// While per caricare l'array list 
+			if (!resultSet.next()) {
+				// 
+				rispostaUscente.tipoRisposta= TipoRisposta.OK;
+
+				rispostaUscente.payload[0]= resultSet.getString("nome");
+				rispostaUscente.payload[1]= resultSet.getString("condizione");
+				rispostaUscente.payload[2]= resultSet.getString("descrizione");
+				rispostaUscente.payload[3]= resultSet.getInt("Id_lotto");
+				rispostaUscente.payload[4]= resultSet.getByte("immagini_articolo");
+				rispostaUscente.payload[5]= resultSet.getInt("Id_utente");
+				rispostaUscente.payload[6]= resultSet.getString("email");
+
+				String nomeFile = resultSet.wasNull() ? 
+					"static_resources\\default_articolo.png" :
+					"res\\immagini_articoli\\" + ".png"
+				;
+
+				try (FileInputStream stream = new FileInputStream(nomeFile);) {
+					stream.readAllBytes();
+				}
+			}
+
+			//metti img
+			FileInputStream stream;
+
+			if (resultSet.wasNull()) {
+				stream= new FileInputStream("static_resources\\default_articolo.png");
+			} else {
+				// TODO: Fix (never)
+				stream= new FileInputStream("res\\immagini_articoli\\" + ".png");
+			}
+
+			stream.readAllBytes();
+
+			stream.close();
+
+		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di vissualizazione articolo. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		} catch (IOException e) { // questo catch e per gli errori che potrebbe dare il caricamento del immagine del utente
+			System.err.println("[" +
+				Thread.currentThread().getName() +
+				"]: C'e' stato un errore nell'apertura/scrittura/chiusura delle immagini dell'articolo. "
+				+ e.getMessage()
+			);
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
 	}
 
 	private void modificaLotto() {
