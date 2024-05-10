@@ -227,7 +227,7 @@ public class GestoreClient implements Runnable {
 		throw new UnsupportedOperationException("Unimplemented method 'visualizzaPuntate'");
 	}
 
-	// Metodo Visualizza lotto 
+	// Metodo Visualizza lotto 1.0
 	private void visualizzaLotto() {
 		// TODO: Implementare
 		// conmtrollo se l'utente e conesso 
