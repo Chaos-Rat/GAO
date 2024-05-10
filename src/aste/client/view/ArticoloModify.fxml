@@ -14,7 +14,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="749.0" prefWidth="1075.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aste.client.controller.ArticoloDetailsController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="749.0" prefWidth="1075.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aste.client.controller.ArticoloModifyController">
    <children>
       <BorderPane layoutX="-3.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="749.0" prefWidth="1081.0">
          <top>
@@ -130,7 +130,7 @@
                                  <children>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Descrizione:" />
                                     <TextField fx:id="desF" prefHeight="25.0" prefWidth="231.0" promptText="Please enter a description" />
-                                    <Button fx:id="createB" mnemonicParsing="false" onAction="#CreateClicked" text="Create">
+                                    <Button fx:id="createB" mnemonicParsing="false" onAction="#CreateClicked" text="Confirm">
                                        <HBox.margin>
                                           <Insets left="80.0" />
                                        </HBox.margin>

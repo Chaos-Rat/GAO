@@ -2,8 +2,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -111,7 +109,14 @@
                               <HBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="662.0">
                                  <children>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Nome:" />
-                                    <TextField fx:id="nomeF" prefHeight="25.0" prefWidth="260.0" promptText="Please enter a name" />
+                                    <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0">
+                                       <HBox.margin>
+                                          <Insets left="25.0" />
+                                       </HBox.margin>
+                                       <children>
+                                          <Text fx:id="nomeText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="100.13671875" />
+                                       </children>
+                                    </VBox>
                                  </children>
                                  <VBox.margin>
                                     <Insets left="40.0" />
@@ -120,7 +125,14 @@
                               <HBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="662.0">
                                  <children>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Condizione:" />
-                                    <TextField fx:id="conF" prefHeight="25.0" prefWidth="232.0" promptText="Please enter the condition of your item" />
+                                    <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0">
+                                       <HBox.margin>
+                                          <Insets left="25.0" />
+                                       </HBox.margin>
+                                       <children>
+                                          <Text fx:id="condText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="102.13671875" />
+                                       </children>
+                                    </VBox>
                                  </children>
                                  <VBox.margin>
                                     <Insets left="40.0" />
@@ -129,10 +141,17 @@
                               <HBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="662.0">
                                  <children>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Descrizione:" />
-                                    <TextField fx:id="desF" prefHeight="25.0" prefWidth="231.0" promptText="Please enter a description" />
-                                    <Button fx:id="createB" mnemonicParsing="false" onAction="#CreateClicked" text="Create">
+                                    <VBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="92.0">
                                        <HBox.margin>
-                                          <Insets left="80.0" />
+                                          <Insets left="25.0" />
+                                       </HBox.margin>
+                                       <children>
+                                          <Text fx:id="descText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="92.13671875" />
+                                       </children>
+                                    </VBox>
+                                    <Button fx:id="modifyB" mnemonicParsing="false" onAction="#ModifyClicked" text="Modify">
+                                       <HBox.margin>
+                                          <Insets left="250.0" />
                                        </HBox.margin>
                                     </Button>
                                  </children>
@@ -143,7 +162,14 @@
                               <HBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="662.0">
                                  <children>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Lotto:" />
-                                    <TextField fx:id="lottoF" prefHeight="25.0" prefWidth="264.0" promptText="Please enter the lot number" />
+                                    <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0">
+                                       <HBox.margin>
+                                          <Insets left="25.0" />
+                                       </HBox.margin>
+                                       <children>
+                                          <Text fx:id="lottoText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="99.13671875" />
+                                       </children>
+                                    </VBox>
                                  </children>
                                  <VBox.margin>
                                     <Insets left="40.0" />
@@ -151,8 +177,15 @@
                               </HBox>
                               <HBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="662.0">
                                  <children>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Categoria:" />
-                                    <ComboBox fx:id="category" prefHeight="25.0" prefWidth="251.0" promptText="Please choose a category" />
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="UserID:" />
+                                    <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0">
+                                       <HBox.margin>
+                                          <Insets left="25.0" />
+                                       </HBox.margin>
+                                       <children>
+                                          <Text fx:id="useridText" fill="#2600ff" onMouseClicked="#idClicked" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="100.13671875" />
+                                       </children>
+                                    </VBox>
                                  </children>
                                  <VBox.margin>
                                     <Insets left="40.0" />
@@ -160,8 +193,15 @@
                               </HBox>
                               <HBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="662.0">
                                  <children>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Quantità:" />
-                                    <TextField fx:id="quantita" prefHeight="25.0" prefWidth="258.0" promptText="Please enter a quantity" />
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Email:" />
+                                    <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0">
+                                       <HBox.margin>
+                                          <Insets left="25.0" />
+                                       </HBox.margin>
+                                       <children>
+                                          <Text fx:id="emailText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="99.13671875" />
+                                       </children>
+                                    </VBox>
                                  </children>
                                  <VBox.margin>
                                     <Insets left="40.0" />
@@ -171,7 +211,7 @@
                         </VBox>
                      </children>
                   </HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <VBox prefHeight="100.0" prefWidth="86.0" />
                         <VBox prefHeight="100.0" prefWidth="49.0" />
