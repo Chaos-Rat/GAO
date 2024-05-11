@@ -2354,29 +2354,33 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		// controllo se la categoria presa esiste 
-		String queryControlloCategoria = "SELECT Id_categoria\n" +
-			"FROM Categorie\n" + 
-			"WHERE Id_categoria = ?;"
-		;
+		boolean categoriaSpecificata = idCategoriaInput == 0;
 
-		try (Connection connection = gestoreDatabase.getConnection();) {
-			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloCategoria);
-			preparedStatement.setInt(1, idCategoriaInput);
-			ResultSet resultSet = preparedStatement.executeQuery();
+		if (categoriaSpecificata) {
+			// controllo se la categoria presa esiste 
+			String queryControlloCategoria = "SELECT Id_categoria\n" +
+				"FROM Categorie\n" + 
+				"WHERE Id_categoria = ?;"
+			;
 
-			if (!resultSet.next()) {
+			try (Connection connection = gestoreDatabase.getConnection();) {
+				PreparedStatement preparedStatement = connection.prepareStatement(queryControlloCategoria);
+				preparedStatement.setInt(1, idCategoriaInput);
+				ResultSet resultSet = preparedStatement.executeQuery();
+
+				if (!resultSet.next()) {
+					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+					rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria" };
+					return;
+				}
+			} catch (SQLException e) {
+				System.err.println("[" + Thread.currentThread().getName() +
+					"]: C'e' stato un errore nella query di controllo dell'idCategoria nella creazione dell'articolo. " + e.getMessage()
+				);
+
 				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria" };
-				return;
+				rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 			}
-		} catch (SQLException e) {
-			System.err.println("[" + Thread.currentThread().getName() +
-				"]: C'e' stato un errore nella query di controllo dell'idCategoria nella creazione dell'articolo. " + e.getMessage()
-			);
-
-			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
 
 		Boolean assegnabiliInput;
@@ -2395,28 +2399,39 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		// Impostazione della query finale 
-		String queryVisualizzazione = assegnabiliInput ? ("SELECT Articoli.Id_articolo, Articoli.nome, " +
+		String queryVisualizzazione = "SELECT Articoli.Id_articolo, Articoli.nome, " +
 			"Articoli.condizione, Immagini.Id_immagine\n" + 
 			"FROM Articoli\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
-			"WHERE Articoli.Rif_lotto = 1 AND Articoli.Rif_utente = ? AND " +
-			"Articoli.Rif_categoria = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1\n" +
-			"LIMIT ? OFFSET ?;"
-		) : ("SELECT Articoli.Id_articolo, Articoli.nome, Articoli.condizione, Immagini.Id_immagine\n" + 
-			"FROM Articoli\n" +
-			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
-			"WHERE Articoli.Rif_utente = ? AND Articoli.Rif_categoria = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1\n" +
-			"LIMIT ? OFFSET ?;"
-		);
+			"WHERE Articoli.Rif_utente = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1 AND "
+		;
+
+		if (assegnabiliInput) {
+			queryVisualizzazione += "Articoli.Rif_lotto = 1";
+
+			if (categoriaSpecificata) {
+				queryVisualizzazione += " AND Articoli.Rif_categoria = ?";
+			}
+
+			queryVisualizzazione += "\n";
+		}
+
+		queryVisualizzazione += "LIMIT ? OFFSET ?;";
 
 		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
 			preparedStatement.setInt(1, idUtente);
-			preparedStatement.setInt(2, idCategoriaInput);
-			preparedStatement.setString(3, "%"+ stringaRicerca+ "%");
-			preparedStatement.setInt(4, numeroArticoli);
-			preparedStatement.setInt(5, ((numeroPagina-1)*numeroArticoli));
+			preparedStatement.setString(2, "%"+ stringaRicerca+ "%");
+			
+			if (categoriaSpecificata) {
+				preparedStatement.setInt(3, idCategoriaInput);
+				preparedStatement.setInt(4, numeroArticoli);
+				preparedStatement.setInt(5, ((numeroPagina-1)*numeroArticoli));
+			} else {
+				preparedStatement.setInt(3, numeroArticoli);
+				preparedStatement.setInt(4, ((numeroPagina-1)*numeroArticoli));
+			}
+			
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			// array list per gli oggetti del articolo 
