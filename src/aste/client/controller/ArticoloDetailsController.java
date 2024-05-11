@@ -85,35 +85,35 @@ public class ArticoloDetailsController {
 
 	@FXML
 	public void initialize() throws IOException, ClassNotFoundException {
-		System.out.println(idArticolo);
-        useridText.setUnderline(true);
-        Richiesta richiestaArticolo = new Richiesta();
-        richiestaArticolo.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_ARTICOLO;
-        richiestaArticolo.payload = new Object[1];
-        richiestaArticolo.payload[0] = idArticolo;
-        HelloApplication.output.writeObject(richiestaArticolo);
-        Risposta rispostaArticolo = (Risposta) HelloApplication.input.readObject();
-        if (rispostaArticolo.tipoRisposta == Risposta.TipoRisposta.OK)
-        {
-            nomeText.setText((String) rispostaArticolo.payload[0]);
-            condText.setText((String) rispostaArticolo.payload[1]);
-            descText.setText((String) rispostaArticolo.payload[2]);
-            lottoText.setText((String) rispostaArticolo.payload[3]);
-            FileOutputStream out = new FileOutputStream("cache/Articolo.png");
-            out.write((byte[]) rispostaArticolo.payload[4]);
-            out.close();
-            FileInputStream in = new FileInputStream("cache/Articolo.png");
-            Image img = new Image(in);
-            articolo.setImage(img);
-            in.close();
-            useridText.setText((String) rispostaArticolo.payload[5]);
-            emailText.setText((String) rispostaArticolo.payload[6]);
-
-        } else if (rispostaArticolo.tipoRisposta == Risposta.TipoRisposta.ERRORE)
-        {
-            System.out.println(rispostaArticolo.payload[0]);
-            System.out.println(rispostaArticolo.payload[1]);
-        }
+//		System.out.println(idArticolo);
+//        useridText.setUnderline(true);
+//        Richiesta richiestaArticolo = new Richiesta();
+//        richiestaArticolo.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_ARTICOLO;
+//        richiestaArticolo.payload = new Object[1];
+//        richiestaArticolo.payload[0] = idArticolo;
+//        HelloApplication.output.writeObject(richiestaArticolo);
+//        Risposta rispostaArticolo = (Risposta) HelloApplication.input.readObject();
+//        if (rispostaArticolo.tipoRisposta == Risposta.TipoRisposta.OK)
+//        {
+//            nomeText.setText((String) rispostaArticolo.payload[0]);
+//            condText.setText((String) rispostaArticolo.payload[1]);
+//            descText.setText((String) rispostaArticolo.payload[2]);
+//            lottoText.setText((String) rispostaArticolo.payload[3]);
+//            FileOutputStream out = new FileOutputStream("cache/Articolo.png");
+//            out.write((byte[]) rispostaArticolo.payload[4]);
+//            out.close();
+//            FileInputStream in = new FileInputStream("cache/Articolo.png");
+//            Image img = new Image(in);
+//            articolo.setImage(img);
+//            in.close();
+//            useridText.setText((String) rispostaArticolo.payload[5]);
+//            emailText.setText((String) rispostaArticolo.payload[6]);
+//
+//        } else if (rispostaArticolo.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+//        {
+//            System.out.println(rispostaArticolo.payload[0]);
+//            System.out.println(rispostaArticolo.payload[1]);
+//        }
     }
     @FXML
     void ArticoliClicked(ActionEvent event) throws IOException 

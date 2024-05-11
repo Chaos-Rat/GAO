@@ -27,6 +27,7 @@ import jdk.jfr.Category;
 
 import javax.swing.*;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -129,98 +130,96 @@ public class ArticoliController
         richiestaArticoli.payload[0] = 10;
         richiestaArticoli.payload[1] = 1;
         richiestaArticoli.payload[2] = "";
-        richiestaArticoli.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
+        richiestaArticoli.payload[3] = 0 ;
 		richiestaArticoli.payload[4] = false;
         HelloApplication.output.writeObject(richiestaArticoli);
         Risposta rispostaArticoli = new Risposta();
         rispostaArticoli = (Risposta) HelloApplication.input.readObject();
         if (rispostaArticoli.tipoRisposta == Risposta.TipoRisposta.OK) {
-            for (int i = 0; i < rispostaArticoli.payload.length / 4; i++) {
-                HBox box = new HBox();
-                FileOutputStream out = new FileOutputStream("cache/Articolo.png");
-                out.write((byte[]) rispostaArticoli.payload[i * 4 + 3]);
-                out.close();
-                FileInputStream in = new FileInputStream("cache/Articolo.png");
-                Image img = new Image(in);
-                in.close();
-                ImageView item = new ImageView();
-                item.setImage(img);
-                item.setFitWidth(100);
-                item.setFitHeight(100);
-                item.setPreserveRatio(true);
-                String nome = (String) rispostaArticoli.payload[i * 4 + 1];
-                String cond = (String) rispostaArticoli.payload[i * 4 + 2];
-                Text nomeT = new Text("Nome: " + nome);
-                Text condT = new Text("Condition: " + cond);
-                Integer id = (Integer) rispostaArticoli.payload[i * 4 + 0];
-                Text idT = new Text("Id: +" + id.toString());
-                nomeT.setWrappingWidth(150);
-                condT.setWrappingWidth(150);
-                idT.setWrappingWidth(150);
-				Button button = new Button();
-                button.setText("Details");
-                button.setStyle(".button\n" +
-                        "{\n" +
-                        "    -fx-background-color :  #16f70a ;\n" +
-                        "    -fx-background-radius: 15,15,15,15;\n" +
-                        "}\n" +
-                        "\n" +
-                        ".button:hover\n" +
-                        "{\n" +
-                        "    -fx-background-color :  #1aab13 ;\n" +
-                        "    -fx-background-radius: 15,15,15,15;\n" +
-                        "}\n" +
-                        "\n" +
-                        ".button:pressed\n" +
-                        "{\n" +
-                        "    -fx-background-color :  #096e03 ;\n" +
-                        "    -fx-background-radius: 15,15,15,15;\n" +
-                        "}");
 
-						button.setOnAction(new EventHandler<ActionEvent>()
-                {
-                    @Override
-                    public void handle(ActionEvent event)
-                    {
-                        try {
-							ArticoloDetailsController.idArticolo = id;
-                            FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/ArticoloDetails.fxml"));
-                            Parent root = loader.load();
-                            Scene scene = new Scene(root);
-                            Stage stage = new Stage();
-                            stage.setTitle("The AuctionHouse");
-                            stage.setScene(scene);
-                            stage.initModality(Modality.APPLICATION_MODAL);
-                            stage.show();
-                            Stage stage1 = (Stage) button.getScene().getWindow();
-                            stage1.close();
-                        }catch (IOException e) {
-                            throw new RuntimeException(e);
+                for (int i = 0; i < rispostaArticoli.payload.length / 4; i++) {
+                    HBox box = new HBox();
+                    FileOutputStream out = new FileOutputStream("cache/Articolo.png");
+                    out.write((byte[]) rispostaArticoli.payload[i * 4 + 3]);
+                    out.close();
+                    FileInputStream in = new FileInputStream("cache/Articolo.png");
+                    Image img = new Image(in);
+                    in.close();
+                    ImageView item = new ImageView();
+                    item.setImage(img);
+                    item.setFitWidth(100);
+                    item.setFitHeight(100);
+                    item.setPreserveRatio(true);
+                    String nome = (String) rispostaArticoli.payload[i * 4 + 1];
+                    String cond = (String) rispostaArticoli.payload[i * 4 + 2];
+                    Text nomeT = new Text("Nome: " + nome);
+                    Text condT = new Text("Condition: " + cond);
+                    Integer id = (Integer) rispostaArticoli.payload[i * 4 + 0];
+                    Text idT = new Text("Id: +" + id.toString());
+                    nomeT.setWrappingWidth(150);
+                    condT.setWrappingWidth(150);
+                    idT.setWrappingWidth(150);
+                    Button button = new Button();
+                    button.setText("Details");
+                    button.setStyle(".button\n" +
+                            "{\n" +
+                            "    -fx-background-color :  #16f70a ;\n" +
+                            "    -fx-background-radius: 15,15,15,15;\n" +
+                            "}\n" +
+                            "\n" +
+                            ".button:hover\n" +
+                            "{\n" +
+                            "    -fx-background-color :  #1aab13 ;\n" +
+                            "    -fx-background-radius: 15,15,15,15;\n" +
+                            "}\n" +
+                            "\n" +
+                            ".button:pressed\n" +
+                            "{\n" +
+                            "    -fx-background-color :  #096e03 ;\n" +
+                            "    -fx-background-radius: 15,15,15,15;\n" +
+                            "}");
+
+                    button.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                            try {
+                                ArticoloDetailsController.idArticolo = id;
+                                FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/ArticoloDetails.fxml"));
+                                Parent root = loader.load();
+                                Scene scene = new Scene(root);
+                                Stage stage = new Stage();
+                                stage.setTitle("The AuctionHouse");
+                                stage.setScene(scene);
+                                stage.initModality(Modality.APPLICATION_MODAL);
+                                stage.show();
+                                Stage stage1 = (Stage) button.getScene().getWindow();
+                                stage1.close();
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                         }
-                    }
-                });
-                VBox vbox = new VBox();
-                VBox vbox2 = new VBox();
-				VBox vbox3 = new VBox();
-                vbox2.setAlignment(Pos.CENTER);
-                vbox.setAlignment(Pos.CENTER);
-				vbox3.setAlignment(Pos.CENTER);
-                vbox.getChildren().add(item);
-                vbox2.getChildren().addAll(nomeT, condT);
-				vbox3.getChildren().addAll(button);
-				box.setSpacing(50);
-                box.setPrefWidth(940);
-                box.setAlignment(Pos.CENTER);
-                box.getChildren().addAll(vbox,vbox2,vbox3);
-                articoliList.getChildren().add(box);
-            }
+                    });
+                    VBox vbox = new VBox();
+                    VBox vbox2 = new VBox();
+                    VBox vbox3 = new VBox();
+                    vbox2.setAlignment(Pos.CENTER);
+                    vbox.setAlignment(Pos.CENTER);
+                    vbox3.setAlignment(Pos.CENTER);
+                    vbox.getChildren().add(item);
+                    vbox2.getChildren().addAll(nomeT, condT);
+                    vbox3.getChildren().addAll(button);
+                    box.setSpacing(50);
+                    box.setPrefWidth(940);
+                    box.setAlignment(Pos.CENTER);
+                    box.getChildren().addAll(vbox, vbox2, vbox3);
+                    articoliList.getChildren().add(box);
+                }
         }
         else if (rispostaArticoli.payload[0] == Risposta.TipoRisposta.ERRORE)
         {
             System.out.println(rispostaArticoli.payload[0]);
             System.out.println(rispostaArticoli.payload[1]);
         }
-
         confirmB.setVisible(false);
         categoryF.setVisible(false);
         Richiesta richiesta = new Richiesta();
@@ -247,8 +246,124 @@ public class ArticoliController
     }
 
     @FXML
-    void CategorySelected(ActionEvent event)
+    void CategorySelected(ActionEvent event) throws IOException, ClassNotFoundException
     {
+        articoliList.getChildren().clear();
+        Richiesta richiestacat = new Richiesta();
+        richiestacat.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_CATEGORIE;
+        HelloApplication.output.writeObject(richiestacat);
+        Risposta rispostacat = (Risposta) HelloApplication.input.readObject();
+        HashMap<String, Integer> catmap = new HashMap<String, Integer>();
+        if (rispostacat.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            for (int i = 0 ; i < rispostacat.payload.length/2 ; i++)
+            {
+                catmap.put((String) rispostacat.payload[i*2+1], (Integer) rispostacat.payload[i*2]);
+            }
+            catmap.put("Tutte le categorie",0);
+            category.getSelectionModel().getSelectedItem();
+        }
+        Richiesta richiestaArticoli = new Richiesta();
+        richiestaArticoli.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_ARTICOLI;
+        richiestaArticoli.payload = new Object[5];
+        richiestaArticoli.payload[0] = 10;
+        richiestaArticoli.payload[1] = 1;
+        richiestaArticoli.payload[2] = "";
+        if(category.getSelectionModel().isSelected(0))
+        {
+            richiestaArticoli.payload[3] =0;
+        }else {
+            richiestaArticoli.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
+        }
+        richiestaArticoli.payload[4] = false;
+        HelloApplication.output.writeObject(richiestaArticoli);
+        Risposta rispostaArticoli = new Risposta();
+        rispostaArticoli = (Risposta) HelloApplication.input.readObject();
+        if (rispostaArticoli.tipoRisposta == Risposta.TipoRisposta.OK) {
+
+            for (int i = 0; i < rispostaArticoli.payload.length / 4; i++) {
+                HBox box = new HBox();
+                FileOutputStream out = new FileOutputStream("cache/Articolo.png");
+                out.write((byte[]) rispostaArticoli.payload[i * 4 + 3]);
+                out.close();
+                FileInputStream in = new FileInputStream("cache/Articolo.png");
+                Image img = new Image(in);
+                in.close();
+                ImageView item = new ImageView();
+                item.setImage(img);
+                item.setFitWidth(100);
+                item.setFitHeight(100);
+                item.setPreserveRatio(true);
+                String nome = (String) rispostaArticoli.payload[i * 4 + 1];
+                String cond = (String) rispostaArticoli.payload[i * 4 + 2];
+                Text nomeT = new Text("Nome: " + nome);
+                Text condT = new Text("Condition: " + cond);
+                Integer id = (Integer) rispostaArticoli.payload[i * 4 + 0];
+                Text idT = new Text("Id: +" + id.toString());
+                nomeT.setWrappingWidth(150);
+                condT.setWrappingWidth(150);
+                idT.setWrappingWidth(150);
+                Button button = new Button();
+                button.setText("Details");
+                button.setStyle(".button\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #16f70a ;\n" +
+                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "}\n" +
+                        "\n" +
+                        ".button:hover\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #1aab13 ;\n" +
+                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "}\n" +
+                        "\n" +
+                        ".button:pressed\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #096e03 ;\n" +
+                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "}");
+
+                button.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        try {
+                            ArticoloDetailsController.idArticolo = id;
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/ArticoloDetails.fxml"));
+                            Parent root = loader.load();
+                            Scene scene = new Scene(root);
+                            Stage stage = new Stage();
+                            stage.setTitle("The AuctionHouse");
+                            stage.setScene(scene);
+                            stage.initModality(Modality.APPLICATION_MODAL);
+                            stage.show();
+                            Stage stage1 = (Stage) button.getScene().getWindow();
+                            stage1.close();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
+                VBox vbox = new VBox();
+                VBox vbox2 = new VBox();
+                VBox vbox3 = new VBox();
+                vbox2.setAlignment(Pos.CENTER);
+                vbox.setAlignment(Pos.CENTER);
+                vbox3.setAlignment(Pos.CENTER);
+                vbox.getChildren().add(item);
+                vbox2.getChildren().addAll(nomeT, condT);
+                vbox3.getChildren().addAll(button);
+                box.setSpacing(50);
+                box.setPrefWidth(940);
+                box.setAlignment(Pos.CENTER);
+                box.getChildren().addAll(vbox, vbox2, vbox3);
+                articoliList.getChildren().add(box);
+            }
+        }
+        else if (rispostaArticoli.payload[0] == Risposta.TipoRisposta.ERRORE)
+        {
+            System.out.println(rispostaArticoli.payload[0]);
+            System.out.println(rispostaArticoli.payload[1]);
+        }
 
     }
     @FXML
