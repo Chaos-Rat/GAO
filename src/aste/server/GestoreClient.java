@@ -676,7 +676,7 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void effettuaPuntata() {
-		// controllo se l'utente e' conesso 
+		// Controlla se l'utente e' connesso 
 		if (idUtente == 0) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
@@ -710,8 +710,7 @@ public class GestoreClient implements Runnable {
 				"FROM Aste\n" +
 				"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
 				"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n" +
-				"JOIN Utenti ON Articoli.Rif_utente = Utenti.Id_utente\n" +
-				"WHERE Aste.Id_asta = A.Id_asta AND Utenti.Id_utente = ?\n" +
+				"WHERE Aste.Id_asta = A.Id_asta AND Articoli.Rif_utente = ?\n" +
 			");"
 		;
 
@@ -759,16 +758,33 @@ public class GestoreClient implements Runnable {
 			"WHERE Rif_asta = ?;"
 		;
 
+		String queryControlloPrezzoInizio = "SELECT prezzo_inizio\n" +
+			"FROM Aste\n" +
+			"WHERE Id_asta = ?;"
+		;
+
 		try (Connection connection = gestoreDatabase.getConnection();){
 			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloValore);
 			preparedStatement.setInt(1, idAstaInput);
 			ResultSet resultSet = preparedStatement.executeQuery();
-			resultSet.next();
 
-			if (valoreInput <= resultSet.getFloat("prezzo_attuale")) {
-				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-				rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
-				return;
+			if (resultSet.next()) {
+				if (valoreInput <= resultSet.getFloat("prezzo_attuale")) {
+					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+					rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+					return;
+				}
+			} else {
+				preparedStatement = connection.prepareStatement(queryControlloPrezzoInizio);
+				preparedStatement.setInt(1, idAstaInput);
+				resultSet = preparedStatement.executeQuery();
+				resultSet.next();
+
+				if (valoreInput <= resultSet.getFloat("prezzo_inizio")) {
+					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+					rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+					return;
+				}
 			}
 		} catch (SQLException e) {
 			System.err.println("[" + Thread.currentThread().getName() +
@@ -2163,9 +2179,9 @@ public class GestoreClient implements Runnable {
 		// Impostazione della query finale 
 		String queryVisualizzazione = "SELECT Aste.data_ora_inizio, Aste.durata, Aste.prezzo_inizio, " +
 			"MAX(Puntate.valore) AS prezzo_attuale, Aste.ip_multicast, Aste.descrizione_annullamento, " +
-			"Aste.durata, Aste.prezzo_attuale, Lotti.Id_lotto, Lotti.nome\n"+ 
+			"Aste.durata, Lotti.Id_lotto, Lotti.nome\n"+ 
 			"FROM Aste\n"+
-			"JOIN Puntate ON Aste.IdAsta = Puntate.Rif_asta\n" +
+			"LEFT JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
 			"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
 			"WHERE Aste.Id_asta = ?\n" +
 			"GROUP BY Aste.Id_asta;"
