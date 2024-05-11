@@ -99,7 +99,7 @@
                   </HBox>
                   <HBox prefHeight="380.0" prefWidth="960.0">
                      <children>
-                        <ImageView fx:id="articolo" fitHeight="360.0" fitWidth="295.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="astaPicture" fitHeight="360.0" fitWidth="295.0" pickOnBounds="true" preserveRatio="true">
                            <HBox.margin>
                               <Insets left="50.0" />
                            </HBox.margin>
@@ -114,7 +114,7 @@
                                           <Insets left="25.0" />
                                        </HBox.margin>
                                        <children>
-                                          <Text fx:id="nomelottoText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="100.13671875" />
+                                          <Text fx:id="nomelottoText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="205.13671875" />
                                        </children>
                                     </VBox>
                                  </children>
@@ -130,7 +130,7 @@
                                           <Insets left="25.0" />
                                        </HBox.margin>
                                        <children>
-                                          <Text fx:id="prezzoInizioText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="102.13671875" />
+                                          <Text fx:id="prezzoInizioText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="251.13671875" />
                                        </children>
                                     </VBox>
                                  </children>
@@ -146,7 +146,7 @@
                                           <Insets left="25.0" />
                                        </HBox.margin>
                                        <children>
-                                          <Text fx:id="prezzoAttualeText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="102.13671875" />
+                                          <Text fx:id="prezzoAttualeText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="253.13671875" />
                                        </children>
                                     </VBox>
                                  </children>
@@ -162,10 +162,10 @@
                                           <Insets left="25.0" />
                                        </HBox.margin>
                                        <children>
-                                          <Text fx:id="ipMultiText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="92.13671875" />
+                                          <Text fx:id="ipMultiText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="151.13671875" />
                                        </children>
                                     </VBox>
-                                    <Button fx:id="modifyB" mnemonicParsing="false" onAction="#ModifyClicked" text="Modify">
+                                    <Button fx:id="modifyB" mnemonicParsing="false" onAction="#ModifyClicked" text="Participate">
                                        <HBox.margin>
                                           <Insets left="250.0" />
                                        </HBox.margin>
@@ -178,7 +178,7 @@
                               <HBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="662.0">
                                  <children>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="UserID:" />
-                                    <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0">
+                                    <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="235.0">
                                        <HBox.margin>
                                           <Insets left="25.0" />
                                        </HBox.margin>
@@ -194,12 +194,12 @@
                               <HBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="662.0">
                                  <children>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Email:" />
-                                    <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0">
+                                    <VBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="262.0">
                                        <HBox.margin>
                                           <Insets left="25.0" />
                                        </HBox.margin>
                                        <children>
-                                          <Text fx:id="emailText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="99.13671875" />
+                                          <Text fx:id="emailText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="265.13671875" />
                                        </children>
                                     </VBox>
                                  </children>

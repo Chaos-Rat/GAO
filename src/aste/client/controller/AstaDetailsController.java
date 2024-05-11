@@ -1,28 +1,34 @@
 package aste.client.controller;
-
 import aste.Richiesta;
 import aste.Risposta;
 import aste.client.HelloApplication;
+import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
-public class AstaDetailsController {
-
+public class AstaDetailsController
+{
+    
     @FXML
     private Button ArticoloB;
 
@@ -42,7 +48,7 @@ public class AstaDetailsController {
     private Button ProfileB;
 
     @FXML
-    private ImageView articolo;
+    private ImageView astaPicture;
 
     @FXML
     private Circle avatar;
@@ -89,12 +95,35 @@ public class AstaDetailsController {
             Duration duration = (Duration)rispostaAsta.payload[1];
             Float sp = (Float)rispostaAsta.payload[2];
             Float hb = (Float)rispostaAsta.payload[3];
-            InetAddress ipaddress = (InetAddress)rispostaAsta.payload[4];
+            if (rispostaAsta.payload[4] != null)
+            {
+                InetAddress ipaddress = (InetAddress) rispostaAsta.payload[4];
+                ipMultiText.setText(ipaddress.toString());
+            }else
+            {
+                ipMultiText.setText("null");
+            }
             String desc = (String)rispostaAsta.payload[5];
             Integer idLotto = (Integer)rispostaAsta.payload[6];
             String nomeLotto = (String)rispostaAsta.payload[7];
             Integer idUser = (Integer)rispostaAsta.payload[8];
             String email = (String)rispostaAsta.payload[9];
+            Image [] image = new Image[((byte[][])rispostaAsta.payload[10]).length];
+            for (int i = 0; i < image.length; i++)
+            {
+                FileOutputStream out = new FileOutputStream("cache/Articolo.png");
+                out.write(((byte[][]) rispostaAsta.payload[10])[i]);
+                out.close();
+                FileInputStream in = new FileInputStream("cache/Articolo.png");
+                image[i]= new Image(in);
+                in.close();
+            }
+            astaPicture.setImage(image[0]);
+            nomelottoText.setText(nomeLotto);
+            prezzoInizioText.setText(sp.toString());
+            prezzoAttualeText.setText(hb.toString());
+            useridText.setText(idUser.toString());
+            emailText.setText(email);
         }
         else if (rispostaAsta.tipoRisposta == Risposta.TipoRisposta.ERRORE)
         {
