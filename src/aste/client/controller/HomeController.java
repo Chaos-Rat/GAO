@@ -206,35 +206,34 @@ public class HomeController {
                 VBox vbox3 = new VBox();
                 VBox vbox4 = new VBox();
                 Button button = new Button();
-                button.setText("join");
+                button.setText("Details");
+                button.setId("#button");
                 button.setStyle(".button\n" +
                         "{\n" +
-                        "    -fx-background-color :  #16f70a ;\n" +
-                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "    -fx-background-color :  #6F5CC2 ;\n" +
+                        "    -fx-background-radius: 10,10,10,10;\n" +
                         "}\n" +
                         "\n" +
                         ".button:hover\n" +
                         "{\n" +
-                        "    -fx-background-color :  #1aab13 ;\n" +
-                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "    -fx-background-color :  #947cfc ;\n" +
+                        "    -fx-background-radius: 10,10,10,10;\n" +
                         "}\n" +
                         "\n" +
                         ".button:pressed\n" +
                         "{\n" +
-                        "    -fx-background-color :  #096e03 ;\n" +
-                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "    -fx-background-color :  #6254a1 ;\n" +
+                        "    -fx-background-radius: 10,10,10,10;\n" +
                         "}");
+//                button.setStyle("-fx-background-color : #16f70a ;");
                 button.setOnAction(new EventHandler<ActionEvent>()
                 {
                     @Override
                     public void handle(ActionEvent event)
                     {
                         try {
-                            PuntataController.idAsta = idAsta;
-							PuntataController.duration = duration;
-							PuntataController.end = endDateTime;
-							PuntataController.astaNome = Lottoname;
-                            FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Puntata.fxml"));
+                            AstaDetailsController.idAsta = idAsta;
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/AstaDetails.fxml"));
                             Parent root = loader.load();
                             Scene scene = new Scene(root);
                             Stage stage = new Stage();
