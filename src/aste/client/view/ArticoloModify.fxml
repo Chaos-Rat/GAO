@@ -130,7 +130,7 @@
                                  <children>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Descrizione:" />
                                     <TextField fx:id="desF" prefHeight="25.0" prefWidth="231.0" promptText="Please enter a description" />
-                                    <Button fx:id="createB" mnemonicParsing="false" onAction="#CreateClicked" text="Confirm">
+                                    <Button fx:id="createB" mnemonicParsing="false" onAction="#ConfirmClicked" text="Confirm">
                                        <HBox.margin>
                                           <Insets left="80.0" />
                                        </HBox.margin>

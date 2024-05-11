@@ -272,7 +272,8 @@ public class ArticoliController
         if(category.getSelectionModel().isSelected(0))
         {
             richiestaArticoli.payload[3] =0;
-        }else {
+        }else
+        {
             richiestaArticoli.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
         }
         richiestaArticoli.payload[4] = false;

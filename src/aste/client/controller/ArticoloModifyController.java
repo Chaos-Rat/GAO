@@ -70,7 +70,7 @@ public class ArticoloModifyController {
     }
 
     @FXML
-    void CreateClicked(ActionEvent event) {
+    void ConfirmClicked(ActionEvent event) {
 
     }
 
