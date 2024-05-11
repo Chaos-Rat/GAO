@@ -231,8 +231,8 @@ public class AstaController
             System.out.println(rispostaLotti.payload[0]);
             System.out.println(rispostaLotti.payload[1]);
         }
-
     }
+
     @FXML
     void CreateClicked(ActionEvent event) throws IOException, ClassNotFoundException
     {

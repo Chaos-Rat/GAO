@@ -365,7 +365,6 @@ public class ArticoliController
             System.out.println(rispostaArticoli.payload[0]);
             System.out.println(rispostaArticoli.payload[1]);
         }
-
     }
     @FXML
     void AddClicked(ActionEvent event) throws IOException {
