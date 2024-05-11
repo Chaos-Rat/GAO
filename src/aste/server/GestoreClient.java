@@ -830,6 +830,7 @@ public class GestoreClient implements Runnable {
 			);
 
 			connection.commit();
+
 			rispostaUscente.tipoRisposta = TipoRisposta.OK;
 		} catch (SQLException e) {
 			if (connection != null) {
@@ -868,6 +869,14 @@ public class GestoreClient implements Runnable {
 			} catch (SQLException e) {
 				System.err.println("[" + Thread.currentThread().getName() +
 					"]: C'e' stato un errore nel reset dell'autocommit nell'effettuazione della puntata. " + e.getMessage()
+				);
+			}
+
+			try {
+				connection.close();
+			} catch (SQLException e) {
+				System.err.println("[" + Thread.currentThread().getName() +
+					"]: C'e' stato un errore nella chiusura della connessione col DB in effettua puntata. " + e.getMessage()
 				);
 			}
 		}
@@ -1888,7 +1897,9 @@ public class GestoreClient implements Runnable {
 			"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
 			"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n"+
-			"WHERE Articoli.Rif_categoria = ? AND Lotti.nome LIKE ? AND Immagini.principale = 1\n" +
+			"WHERE (CURRENT_TIMESTAMP > Aste.data_ora_inizio) AND " +
+			"(CURRENT_TIMESTAMP < ADDTIME(Aste.data_ora_inizio, Aste.durata)) AND " + 
+			"Articoli.Rif_categoria = ? AND Lotti.nome LIKE ? AND Immagini.principale = 1\n" +
 			"GROUP BY Aste.Id_asta\n" +
 			"LIMIT ? OFFSET ?;"
 		;
@@ -2370,7 +2381,7 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		boolean categoriaSpecificata = idCategoriaInput == 0;
+		boolean categoriaSpecificata = idCategoriaInput != 0;
 
 		if (categoriaSpecificata) {
 			// controllo se la categoria presa esiste 
@@ -2419,20 +2430,18 @@ public class GestoreClient implements Runnable {
 			"Articoli.condizione, Immagini.Id_immagine\n" + 
 			"FROM Articoli\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
-			"WHERE Articoli.Rif_utente = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1 AND "
+			"WHERE Articoli.Rif_utente = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1"
 		;
 
-		if (assegnabiliInput) {
-			queryVisualizzazione += "Articoli.Rif_lotto = 1";
-
-			if (categoriaSpecificata) {
-				queryVisualizzazione += " AND Articoli.Rif_categoria = ?";
-			}
-
-			queryVisualizzazione += "\n";
+		if (categoriaSpecificata) {
+			queryVisualizzazione += " AND Articoli.Rif_categoria = ?";
 		}
 
-		queryVisualizzazione += "LIMIT ? OFFSET ?;";
+		if (assegnabiliInput) {
+			queryVisualizzazione += " AND Articoli.Rif_lotto = 1";
+		}
+
+		queryVisualizzazione += "\nLIMIT ? OFFSET ?;";
 
 		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
