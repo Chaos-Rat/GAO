@@ -41,7 +41,7 @@ public class GestoreDatabase {
 		}
 	}
 
-	public GestoreDatabase(Opzioni opzioni) {
+	public GestoreDatabase(Opzioni opzioni) throws RuntimeException {
 		this.opzioni = opzioni;
 
 		if (opzioni.pool)
@@ -54,6 +54,12 @@ public class GestoreDatabase {
 			dataSource.setMinIdle(opzioni.minIdle);
 			dataSource.setMaxIdle(opzioni.maxIdle);
 			dataSource.setMaxOpenPreparedStatements(opzioni.maxOpenPreparedStatements);
+		}
+
+		try (Connection test = getConnection();) {
+			test.isValid(0);
+		} catch (SQLException e) {
+			throw new RuntimeException("Impossibile connettersi al database: " + e.getMessage());
 		}
 	}
 

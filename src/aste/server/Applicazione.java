@@ -5,7 +5,11 @@ public class Applicazione {
 	private GestoreConnessioni gestoreConnessioni;
 	private GestoreDatabase gestoreDatabase;
 
-	public Applicazione(int threadPoolAste, int porta, int threadPoolConnessioni, GestoreDatabase.Opzioni opzioniDatabase) {
+	public Applicazione(int threadPoolAste,
+		int porta,
+		int threadPoolConnessioni,
+		GestoreDatabase.Opzioni opzioniDatabase
+	) throws RuntimeException {
 		gestoreDatabase = new GestoreDatabase(opzioniDatabase);
 		gestoreAste = new GestoreAste(threadPoolAste, gestoreDatabase);
 		gestoreConnessioni = new GestoreConnessioni(threadPoolConnessioni, porta, gestoreDatabase, gestoreAste);
@@ -30,8 +34,12 @@ public class Applicazione {
 			100
 		);
 
-		Applicazione applicazione = new Applicazione(4, 3000, 4, opzioniDB);
-		applicazione.avvia();
-		applicazione.finalizza();
+		try {
+			Applicazione applicazione = new Applicazione(4, 3000, 4, opzioniDB);
+			applicazione.avvia();
+			applicazione.finalizza();
+		} catch (RuntimeException e) {
+			System.err.println(e.getMessage());
+		}
 	}
 }
