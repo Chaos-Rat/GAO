@@ -2012,6 +2012,12 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
+		if (durataInput.isNegative() || durataInput.isZero()) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "durata" };
+			return;
+		}
+
 		Float prezzoInizioInput;
 
 		try {
