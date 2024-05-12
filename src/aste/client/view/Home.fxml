@@ -107,7 +107,7 @@
                <top>
                   <HBox alignment="CENTER_RIGHT" prefHeight="35.0" prefWidth="955.0" BorderPane.alignment="CENTER">
                      <children>
-                        <ComboBox fx:id="category" prefWidth="150.0">
+                        <ComboBox fx:id="category" onAction="#CategorySelected" prefWidth="150.0">
                            <HBox.margin>
                               <Insets right="150.0" />
                            </HBox.margin>

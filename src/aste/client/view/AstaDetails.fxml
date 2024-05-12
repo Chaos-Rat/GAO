@@ -165,7 +165,7 @@
                                           <Text fx:id="ipMultiText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="151.13671875" />
                                        </children>
                                     </VBox>
-                                    <Button fx:id="modifyB" mnemonicParsing="false" onAction="#ModifyClicked" text="Participate">
+                                    <Button fx:id="participateB" mnemonicParsing="false" onAction="#ParticipateClicked" text="Participate">
                                        <HBox.margin>
                                           <Insets left="250.0" />
                                        </HBox.margin>

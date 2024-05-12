@@ -60,7 +60,7 @@ public class AstaDetailsController
     private Text ipMultiText;
 
     @FXML
-    private Button modifyB;
+    private Button participateB;
 
     @FXML
     private Text nomelottoText;
@@ -79,6 +79,12 @@ public class AstaDetailsController
 
     public static Integer idAsta;
 
+    private InetAddress ipaddress;
+
+    private LocalDateTime time;
+
+    private Duration duration;
+
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
@@ -91,13 +97,13 @@ public class AstaDetailsController
         Risposta rispostaAsta = (Risposta) HelloApplication.input.readObject();
         if (rispostaAsta.tipoRisposta == Risposta.TipoRisposta.OK)
         {
-            LocalDateTime time = (LocalDateTime)rispostaAsta.payload[0];
-            Duration duration = (Duration)rispostaAsta.payload[1];
+            time = (LocalDateTime)rispostaAsta.payload[0];
+            duration = (Duration)rispostaAsta.payload[1];
             Float sp = (Float)rispostaAsta.payload[2];
             Float hb = (Float)rispostaAsta.payload[3];
             if (rispostaAsta.payload[4] != null)
             {
-                InetAddress ipaddress = (InetAddress) rispostaAsta.payload[4];
+                ipaddress = (InetAddress) rispostaAsta.payload[4];
                 ipMultiText.setText(ipaddress.toString());
             }else
             {
@@ -131,23 +137,52 @@ public class AstaDetailsController
         }
     }
     @FXML
-    void ArticoliClicked(ActionEvent event) {
-
+    void ArticoliClicked(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Articoli.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setTitle("The AuctionHouse");
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+        Stage stage1 = (Stage) AsteB.getScene().getWindow();
+        stage1.close();
     }
 
     @FXML
-    void AsteClicked(ActionEvent event) {
-
+    void AsteClicked(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Aste.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setTitle("The AuctionHouse");
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+        Stage stage1 = (Stage) AsteB.getScene().getWindow();
+        stage1.close();
     }
 
     @FXML
-    void HomeClicked(ActionEvent event) {
-
+    void HomeClicked(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Profile.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setTitle("The AuctionHouse");
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+        Stage stage1 = (Stage) ProfileB.getScene().getWindow();
+        stage1.close();
     }
 
     @FXML
-    void LogoutClicked(ActionEvent event) {
-
+    void LogoutClicked(ActionEvent event)
+    {
+        Stage stage = (Stage) LogoutB.getScene().getWindow();
+        stage.close();
     }
 
     @FXML
@@ -165,17 +200,40 @@ public class AstaDetailsController
     }
 
     @FXML
-    void ModifyClicked(ActionEvent event) {
-
+    void ParticipateClicked(ActionEvent event) throws IOException {
+        PuntataController.idAsta = idAsta;
+        PuntataController.astaNome = nomelottoText.getText();
+        PuntataController.duration = duration;
+        PuntataController.end = time;
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Puntata.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setTitle("The AuctionHouse");
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+        Stage stage1 = (Stage) participateB.getScene().getWindow();
+        stage1.close();
     }
 
     @FXML
-    void ProfileClicked(ActionEvent event) {
-
+    void ProfileClicked(ActionEvent event) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Profile.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setTitle("The AuctionHouse");
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+        Stage stage1 = (Stage) ProfileB.getScene().getWindow();
+        stage1.close();
     }
 
     @FXML
-    void idClicked(MouseEvent event) {
+    void idClicked(MouseEvent event)
+    {
 
     }
 

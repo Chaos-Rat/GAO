@@ -135,7 +135,7 @@ public class LottoController
                 catmap.put((String) rispostacat.payload[i*2+1], (Integer) rispostacat.payload[i*2]);
             }
             catmap.put("Tutte le categorie",0);
-            category.getSelectionModel().select("Altre categorie");
+            category.getSelectionModel().select("Tutte le categorie");
             category.getItems().addAll(catmap.keySet());
         }else if (rispostaProfile.payload[0] == Risposta.TipoErrore.CAMPI_INVALIDI)
         {
@@ -275,6 +275,7 @@ public class LottoController
                         return;
                     }
                     articoliSelezionati.put(id, false);
+                    System.out.println(articoliSelezionati);
                 });
                 vbox2.setAlignment(Pos.CENTER);
                 vbox.setAlignment(Pos.CENTER);

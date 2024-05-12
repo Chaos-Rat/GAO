@@ -121,7 +121,7 @@ public class ArticoliController
                 catmap.put((String) rispostacat.payload[i*2+1], (Integer) rispostacat.payload[i*2]);
             }
             catmap.put("Tutte le categorie",0);
-            category.getSelectionModel().select("Altre categorie");
+            category.getSelectionModel().select("Tutte le categorie");
             category.getItems().addAll(catmap.keySet());
         }
         Richiesta richiestaArticoli = new Richiesta();

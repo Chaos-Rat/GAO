@@ -7,6 +7,7 @@ import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -140,26 +141,29 @@ public class PuntataController {
 //					Integer idUser = (Integer) rispostaPuntate.payload[i / 5 + 3];
 //					String Username = (String)rispostaPuntate.payload[i / 5 + 4];
 //					}
-					
 //				}
+//                else if (rispostaPuntate.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+//                 {
+//                    System.out.println(rispostaPuntate.payload[0]);
+//                 }
     }
 
     @FXML
     void SendClicked(ActionEvent event) throws IOException, ClassNotFoundException {
-//        Richiesta richiestaPunatata = new Richiesta();
-//        richiestaPunatata.tipoRichiesta = Richiesta.TipoRichiesta.EFFETTUA_PUNTATA;
-//        richiestaPunatata.payload = new Object[2];
-//        richiestaPunatata.payload[0] = idAsta;
-//        richiestaPunatata.payload[1] = Float.parseFloat(puntataF.getText());
-//        HelloApplication.output.writeObject(richiestaPunatata);
-//        Risposta rispostaPuntata = (Risposta)HelloApplication.input.readObject();
-//        if (rispostaPuntata.tipoRisposta == Risposta.TipoRisposta.OK)
-//        {
-//            System.out.println("Hai puntato " + puntataF.getText());
-//        }else if (rispostaPuntata.tipoRisposta == Risposta.TipoRisposta.ERRORE)
-//        {
-//            System.out.println(rispostaPuntata.payload[0]);
-//        }
+        Richiesta richiestaPunatata = new Richiesta();
+        richiestaPunatata.tipoRichiesta = Richiesta.TipoRichiesta.EFFETTUA_PUNTATA;
+        richiestaPunatata.payload = new Object[2];
+        richiestaPunatata.payload[0] = idAsta;
+        richiestaPunatata.payload[1] = Float.parseFloat(puntataF.getText());
+        HelloApplication.output.writeObject(richiestaPunatata);
+        Risposta rispostaPuntata = (Risposta)HelloApplication.input.readObject();
+        if (rispostaPuntata.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            System.out.println("Hai puntato " + puntataF.getText());
+        }else if (rispostaPuntata.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+        {
+            System.out.println(rispostaPuntata.payload[0]);
+        }
 
 		Text text = new Text(puntataF.getText() + "\n");
 		text.setStyle("-fx-font: 24 arial;");
