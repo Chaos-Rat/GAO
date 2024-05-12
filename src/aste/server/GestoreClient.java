@@ -223,8 +223,86 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void visualizzaPuntate() {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'visualizzaPuntate'");
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
+
+		Integer idAstaInput;
+
+		try {
+			idAstaInput = (Integer)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+			return;
+		}
+
+		if (idAstaInput == null) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+			return;
+		}
+
+		String queryControlloAsta = "SELECT 1\n" +
+			"FROM Aste\n" +
+			"WHERE Id_asta = ?;"
+		;
+
+		try (Connection connection = gestoreDatabase.getConnection();) {
+			PreparedStatement statement = connection.prepareStatement(queryControlloAsta);
+			statement.setInt(1, idAstaInput);
+			ResultSet resultSet = statement.executeQuery();
+
+			if (!resultSet.next()) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+				return;
+			}
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di controllo sull'idAsta nella visualizzazione puntata. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+			return;
+		}
+
+		String queryVisualizzazione = "SELECT Puntate.Id_puntata, Puntate.data_ora_effettuazione, " +
+			"Puntate.valore, Puntate.Rif_utente, Utenti.Email\n" +
+			"FROM Puntate\n" +
+			"JOIN Utenti ON Puntate.Rif_utente = Utenti.Id_utente\n" +
+			"WHERE Rif_asta = ?;"
+		;
+
+		try (Connection connection = gestoreDatabase.getConnection();) {
+			PreparedStatement statement = connection.prepareStatement(queryVisualizzazione);
+			statement.setInt(1, idAstaInput);
+			ResultSet result = statement.executeQuery();
+
+			ArrayList<Object> puntate = new ArrayList<>();
+
+			while (result.next()) {
+				puntate.add(result.getInt("Id_puntate"));
+				puntate.add(result.getTimestamp("data_ora_effettuazione").toLocalDateTime());
+				puntate.add(result.getFloat("valore"));
+				puntate.add(result.getInt("Rif_utente"));
+				puntate.add(result.getString("Email"));
+			}
+
+			rispostaUscente.tipoRisposta = TipoRisposta.OK;
+			rispostaUscente.payload = puntate.toArray();
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di visualizzazione puntate. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+			return;
+		}
 	}
 
 	// Metodo Visualizza lotto 1.0
@@ -253,7 +331,8 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
 			return;
 		}
-		//query da finire
+
+		// query da finire
 		String queryVisualizzazione = "SELECT Lotti.Id_Lotto, Lotti.nome" +
 			"FROM Lotti\n"+
 			"JOIN Articoli ON Articoli.Rif_utente = Utente.Rif_articolo\n" +
@@ -2168,8 +2247,7 @@ public class GestoreClient implements Runnable {
 
 	// Metodo visualizza asta 
 	private void visualizzaAsta() {
-		// TODO: Implementare
-		// conmtrollo se l'utente e conesso 
+		// controllo se l'utente e' connesso 
 		if (idUtente == 0) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
