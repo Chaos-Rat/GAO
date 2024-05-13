@@ -531,31 +531,27 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale
-		String queryVisualizzazione = "SELECT Lotti.Id_lotto, Lotti.nome, Immagini.Id_immagine\n" + 
-			"FROM Lotti";
-			
-		if (assegnabili) {
-			queryVisualizzazione += " AS L";
-		}
+		String queryVisualizzazione = "SELECT L.Id_lotto, L.nome, Immagini.Id_immagine\n" + 
+			"FROM Lotti AS L";
 		
 		queryVisualizzazione += "\n" +
-			"JOIN Articoli ON Articoli.Rif_lotto = Lotti.Id_lotto\n" +
+			"JOIN Articoli ON Articoli.Rif_lotto = L.Id_lotto\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
 			"WHERE Articoli.Rif_utente = ? AND\n"
 		;
 
-		queryVisualizzazione += "Lotti.nome LIKE ? AND\n" + 
+		queryVisualizzazione += "L.nome LIKE ? AND\n" + 
 			"Immagini.principale = 1 AND\n" +
-			"Lotti.Id_lotto != 1"
+			"L.Id_lotto != 1"
 		;
 
 		if (assegnabili) {
 			queryVisualizzazione += " AND\n" +
-				"(NOT EXIST (\n" +
+				"(NOT EXISTS (\n" +
 					"SELECT 1\n" +
 					"FROM Aste\n" +
 					"WHERE Rif_lotto = L.Id_lotto AND ADDTIME(data_ora_inizio, durata) > CURRENT_TIMESTAMP\n" +
-				") OR NOT EXIST(\n" +
+				") OR NOT EXISTS (\n" +
 					"SELECT 1\n" +
 					"FROM Aste\n" +
 					"JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
@@ -571,7 +567,7 @@ public class GestoreClient implements Runnable {
 		}
 
 		queryVisualizzazione +=	"\n" +
-			"GROUP BY Lotti.Id_lotto\n" +
+			"GROUP BY L.Id_lotto\n" +
 			"LIMIT ? OFFSET ?;"
 		;
 
