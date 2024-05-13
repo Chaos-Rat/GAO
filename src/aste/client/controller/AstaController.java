@@ -235,6 +235,7 @@ public class AstaController
     @FXML
     void CategorySelected(ActionEvent event) throws IOException, ClassNotFoundException {
         lottiList.getChildren().clear();
+        ToggleGroup group = new ToggleGroup();
         Richiesta richiestacat = new Richiesta();
         richiestacat.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_CATEGORIE;
         HelloApplication.output.writeObject(richiestacat);
@@ -262,6 +263,7 @@ public class AstaController
         if (rispostaLotti.tipoRisposta == Risposta.TipoRisposta.OK)
         {
             for (int i = 0; i < rispostaLotti.payload.length / 3; i++) {
+                RadioButton check = new RadioButton();
                 HBox box = new HBox();
                 FileOutputStream out = new FileOutputStream("cache/Articolo.png");
                 out.write((byte[]) rispostaLotti.payload[i * 3 + 2]);
@@ -282,18 +284,29 @@ public class AstaController
                 idT.setWrappingWidth(150);
                 VBox vbox = new VBox();
                 VBox vbox2 = new VBox();
+                VBox vbox3 = new VBox();
+                box.setSpacing(50);
+                check.setToggleGroup(group);
+                check.setOnAction(event2 ->
+                {
+                    if(check.isSelected())
+                    {
+                        idLotto = id;
+                        System.out.println(idLotto);
+                    }
+                });
                 vbox2.setAlignment(Pos.CENTER);
                 vbox.setAlignment(Pos.CENTER);
                 vbox.getChildren().add(item);
+                vbox3.setAlignment(Pos.CENTER);
                 vbox2.getChildren().addAll(nomeT);
-                box.setSpacing(50);
+                vbox3.getChildren().addAll(check);
                 box.setPrefWidth(940);
                 box.setAlignment(Pos.CENTER);
-                box.getChildren().addAll(vbox, vbox2);
+                box.getChildren().addAll(vbox, vbox2,vbox3);
                 lottiList.getChildren().add(box);
             }
-        }
-        else if (rispostaLotti.payload[0] == Risposta.TipoRisposta.ERRORE)
+        }else if (rispostaLotti.payload[0] == Risposta.TipoRisposta.ERRORE)
         {
             System.out.println(rispostaLotti.payload[0]);
             System.out.println(rispostaLotti.payload[1]);
