@@ -176,7 +176,7 @@ public class AstaController
         richiestaLotti.payload[1] = 1;
         richiestaLotti.payload[2] = "";
         richiestaLotti.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
-        richiestaLotti.payload[4] = false;
+        richiestaLotti.payload[4] = true;
         HelloApplication.output.writeObject(richiestaLotti);
         Risposta rispostaLotti = (Risposta) HelloApplication.input.readObject();
         ToggleGroup group = new ToggleGroup();

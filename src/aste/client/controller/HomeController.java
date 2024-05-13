@@ -318,8 +318,7 @@ public class HomeController {
         }
         richiestaArticoli.payload[4] = false;
         HelloApplication.output.writeObject(richiestaArticoli);
-        Risposta rispostaArticoli = new Risposta();
-        rispostaArticoli = (Risposta) HelloApplication.input.readObject();
+        Risposta rispostaArticoli =(Risposta) HelloApplication.input.readObject();
         if (rispostaArticoli.tipoRisposta == Risposta.TipoRisposta.OK) {
             for (int i = 0; i < rispostaArticoli.payload.length / 4; i++)
             {
