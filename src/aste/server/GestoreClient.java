@@ -531,50 +531,65 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale
-		String queryVisualizzazione = assegnabili ? ("SELECT Lotti.Id_lotto, Lotti.nome, Immagini.Id_immagine\n" + 
-			"FROM Lotti AS L\n" +
+		String queryVisualizzazione = "SELECT Lotti.Id_lotto, Lotti.nome, Immagini.Id_immagine\n" + 
+			"FROM Lotti";
+			
+		if (assegnabili) {
+			queryVisualizzazione += " AS L";
+		}
+		
+		queryVisualizzazione += "\n" +
 			"JOIN Articoli ON Articoli.Rif_lotto = Lotti.Id_lotto\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
-			"WHERE Articoli.Rif_utente = ? AND\n" +
-			"Articoli.Rif_categoria = ? AND\n" +
-			"Lotti.nome LIKE ? AND\n" + 
-			"Immagini.principale = 1 AND\n" +
-			"AND Lotti.Id_lotto != 1\n" +
-			"(NOT EXIST (\n" +
-				"SELECT 1\n" +
-				"FROM Aste\n" +
-				"WHERE Rif_lotto = L.Id_lotto AND ADDTIME(data_ora_inizio, durata) > CURRENT_TIMESTAMP\n" +
-			") OR NOT EXIST(\n" +
-				"SELECT 1\n" +
-				"FROM Aste\n" +
-				"JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
-				"WHERE Rif_lotto = L.Id_lotto\n" +
-			"))\n" +
-			"GROUP BY Lotti.Id_lotto\n" +
-			"LIMIT ? OFFSET ?;"
-		) : ("SELECT Lotti.Id_lotto, Lotti.nome, Immagini.Id_immagine\n" + 
-			"FROM Lotti\n" +
-			"JOIN Articoli ON Articoli.Rif_lotto = Lotti.Id_lotto\n" +
-			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
-			"WHERE Articoli.Rif_utente = ? AND Articoli.Rif_categoria = ? AND Lotti.nome LIKE ? AND Immagini.principale = 1\n" +
-			"AND Lotti.Id_lotto != 1\n" +
-			"GROUP BY Lotti.Id_lotto\n" +
-			"LIMIT ? OFFSET ?;"
-		);
+			"WHERE Articoli.Rif_utente = ? AND\n"
+		;
 
-		// "SELECT Articoli.Id_articolo, Articoli.nome, " +
-		// 	"Articoli.condizione, Immagini.Id_immagine\n" + 
-		// 	"FROM Articoli\n" +
-		// 	"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
-		// 	"WHERE Articoli.Rif_utente = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1"
+		queryVisualizzazione += "Lotti.nome LIKE ? AND\n" + 
+			"Immagini.principale = 1 AND\n" +
+			"AND Lotti.Id_lotto != 1"
+		;
+
+		if (assegnabili) {
+			queryVisualizzazione += " AND\n" +
+				"(NOT EXIST (\n" +
+					"SELECT 1\n" +
+					"FROM Aste\n" +
+					"WHERE Rif_lotto = L.Id_lotto AND ADDTIME(data_ora_inizio, durata) > CURRENT_TIMESTAMP\n" +
+				") OR NOT EXIST(\n" +
+					"SELECT 1\n" +
+					"FROM Aste\n" +
+					"JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
+					"WHERE Rif_lotto = L.Id_lotto\n" +
+				"))"
+			;
+		}
+
+		if (categoriaSpecificata) {
+			queryVisualizzazione += " AND\n" +
+				"Articoli.Rif_categoria = ?"
+			;
+		}
+
+		queryVisualizzazione +=	"\n" +
+			"GROUP BY Lotti.Id_lotto\n" +
+			"LIMIT ? OFFSET ?;"
+		;
 
 		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
 			preparedStatement.setInt(1, idUtente);
-			preparedStatement.setInt(2, idCategoriaInput);
-			preparedStatement.setString(3, "%"+ stringaRicerca+ "%");
-			preparedStatement.setInt(4, numeroLotti);
-			preparedStatement.setInt(5, ((numeroPagina-1) * numeroLotti));
+			preparedStatement.setString(2, "%"+ stringaRicerca+ "%");
+			
+			if (categoriaSpecificata) {
+				preparedStatement.setInt(3, idCategoriaInput);
+				preparedStatement.setInt(4, numeroLotti);
+				preparedStatement.setInt(5, ((numeroPagina-1) * numeroLotti));
+			} else {
+				preparedStatement.setInt(3, numeroLotti);
+				preparedStatement.setInt(4, ((numeroPagina-1) * numeroLotti));
+			}
+
+			
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			// array list per gli oggetti dei lotti 
