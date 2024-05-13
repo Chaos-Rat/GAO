@@ -484,30 +484,34 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		// controllo se la categoria presa esiste 
-		String queryControlloCategoria = "SELECT Id_categoria\n" +
-			"FROM Categorie\n" + 
-			"WHERE Id_categoria = ?;"
-		;
+		boolean categoriaSpecificata = idCategoriaInput != 0;
 
-		try (Connection connection = gestoreDatabase.getConnection();) {
-			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloCategoria);
-			preparedStatement.setInt(1, idCategoriaInput);
-			ResultSet resultSet = preparedStatement.executeQuery();
+		if (categoriaSpecificata) {
+			// controllo se la categoria presa esiste 
+			String queryControlloCategoria = "SELECT Id_categoria\n" +
+				"FROM Categorie\n" + 
+				"WHERE Id_categoria = ?;"
+			;
 
-			if (!resultSet.next()) {
+			try (Connection connection = gestoreDatabase.getConnection();) {
+				PreparedStatement preparedStatement = connection.prepareStatement(queryControlloCategoria);
+				preparedStatement.setInt(1, idCategoriaInput);
+				ResultSet resultSet = preparedStatement.executeQuery();
+
+				if (!resultSet.next()) {
+					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+					rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria" };
+					return;
+				}
+			} catch (SQLException e) {
+				System.err.println("[" + Thread.currentThread().getName() +
+					"]: C'e' stato un errore nella query di controllo dell'idCategoria nella visualizzazione dei lotti. " + e.getMessage()
+				);
+
 				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria" };
+				rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 				return;
 			}
-		} catch (SQLException e) {
-			System.err.println("[" + Thread.currentThread().getName() +
-				"]: C'e' stato un errore nella query di controllo dell'idCategoria nella visualizzazione dei lotti. " + e.getMessage()
-			);
-
-			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
-			return;
 		}
 
 		Boolean assegnabili;
@@ -557,6 +561,12 @@ public class GestoreClient implements Runnable {
 			"GROUP BY Lotti.Id_lotto\n" +
 			"LIMIT ? OFFSET ?;"
 		);
+
+		"SELECT Articoli.Id_articolo, Articoli.nome, " +
+			"Articoli.condizione, Immagini.Id_immagine\n" + 
+			"FROM Articoli\n" +
+			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
+			"WHERE Articoli.Rif_utente = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1"
 
 		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
@@ -796,8 +806,7 @@ public class GestoreClient implements Runnable {
 		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloAsta);
 			preparedStatement.setInt(1, idAstaInput);
-			preparedStatement.setInt(2, idAstaInput);
-			preparedStatement.setInt(3, idUtente);
+			preparedStatement.setInt(2, idUtente);
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			if (!resultSet.next()) {
@@ -2486,11 +2495,12 @@ public class GestoreClient implements Runnable {
 				}
 			} catch (SQLException e) {
 				System.err.println("[" + Thread.currentThread().getName() +
-					"]: C'e' stato un errore nella query di controllo dell'idCategoria nella creazione dell'articolo. " + e.getMessage()
+					"]: C'e' stato un errore nella query di controllo dell'idCategoria nella visualizzazione degli articoli. " + e.getMessage()
 				);
 
 				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 				rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+				return;
 			}
 		}
 
