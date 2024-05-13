@@ -546,7 +546,7 @@ public class GestoreClient implements Runnable {
 
 		queryVisualizzazione += "Lotti.nome LIKE ? AND\n" + 
 			"Immagini.principale = 1 AND\n" +
-			"AND Lotti.Id_lotto != 1"
+			"Lotti.Id_lotto != 1"
 		;
 
 		if (assegnabili) {
@@ -618,7 +618,7 @@ public class GestoreClient implements Runnable {
 
 		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
 			System.err.println("[" + Thread.currentThread().getName() +
-				"]: C'e' stato un errore nella query di vissualizzazione lotti. " + e.getMessage()
+				"]: C'e' stato un errore nella query di visualizzazione lotti. " + e.getMessage()
 			);
 
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
