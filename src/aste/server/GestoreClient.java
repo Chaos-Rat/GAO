@@ -562,11 +562,11 @@ public class GestoreClient implements Runnable {
 			"LIMIT ? OFFSET ?;"
 		);
 
-		"SELECT Articoli.Id_articolo, Articoli.nome, " +
-			"Articoli.condizione, Immagini.Id_immagine\n" + 
-			"FROM Articoli\n" +
-			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
-			"WHERE Articoli.Rif_utente = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1"
+		// "SELECT Articoli.Id_articolo, Articoli.nome, " +
+		// 	"Articoli.condizione, Immagini.Id_immagine\n" + 
+		// 	"FROM Articoli\n" +
+		// 	"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
+		// 	"WHERE Articoli.Rif_utente = ? AND Articoli.nome LIKE ? AND Immagini.principale = 1"
 
 		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
