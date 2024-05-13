@@ -269,13 +269,7 @@ public class ArticoliController
         richiestaArticoli.payload[0] = 10;
         richiestaArticoli.payload[1] = 1;
         richiestaArticoli.payload[2] = "";
-        if(category.getSelectionModel().isSelected(0))
-        {
-            richiestaArticoli.payload[3] =0;
-        }else
-        {
-            richiestaArticoli.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
-        }
+        richiestaArticoli.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
         richiestaArticoli.payload[4] = false;
         HelloApplication.output.writeObject(richiestaArticoli);
         Risposta rispostaArticoli = new Risposta();

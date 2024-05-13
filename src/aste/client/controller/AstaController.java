@@ -166,7 +166,7 @@ public class AstaController
                 catmap.put((String) rispostacat.payload[i*2+1], (Integer) rispostacat.payload[i*2]);
             }
             catmap.put("Tutte le categorie",0);
-            category.getSelectionModel().select("Weapons");
+            category.getSelectionModel().select("Tutte lle categorie");
             category.getItems().addAll(catmap.keySet());
         }
         Richiesta richiestaLotti = new Richiesta();
@@ -255,16 +255,10 @@ public class AstaController
         richiestaLotti.payload[0] = 10;
         richiestaLotti.payload[1] = 1;
         richiestaLotti.payload[2] = "";
-        if(category.getSelectionModel().isSelected(0))
-        {
-            richiestaLotti.payload[3] =0;
-        }else
-        {
-            richiestaLotti.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
-        }
-        richiestaLotti.payload[4] = false;
+        richiestaLotti.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
+        richiestaLotti.payload[4] = true;
         HelloApplication.output.writeObject(richiestaLotti);
-        Risposta rispostaLotti = new Risposta();
+        Risposta rispostaLotti = (Risposta) HelloApplication.input.readObject();
         if (rispostaLotti.tipoRisposta == Risposta.TipoRisposta.OK)
         {
             for (int i = 0; i < rispostaLotti.payload.length / 3; i++) {
