@@ -88,6 +88,7 @@ public class AstaDetailsController
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+        useridText.setUnderline(true);
         System.out.println(idAsta);
         Richiesta richiestaAsta = new Richiesta();
         richiestaAsta.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_ASTA;
@@ -232,9 +233,19 @@ public class AstaDetailsController
     }
 
     @FXML
-    void idClicked(MouseEvent event)
+    void idClicked(MouseEvent event) throws IOException, ClassNotFoundException
     {
-
+        OtherUserProfileController.idUser = Integer.parseInt(useridText.getText());
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/OtherUserProfile.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setTitle("The AuctionHouse");
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+        Stage stage1 = (Stage) useridText.getScene().getWindow();
+        stage1.close();
     }
 
 }

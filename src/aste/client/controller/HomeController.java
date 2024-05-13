@@ -136,7 +136,7 @@ public class HomeController {
                 catmap.put((String) rispostacat.payload[i*2+1], (Integer) rispostacat.payload[i*2]);
             }
             catmap.put("Tutte le categorie",0);
-            category.getSelectionModel().select("Weapon");
+            category.getSelectionModel().select("Weapons");
             category.getItems().addAll(catmap.keySet());
         }
         Richiesta richiestaAste = new Richiesta();
