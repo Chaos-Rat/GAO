@@ -1967,29 +1967,34 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		// controllo se la categoria presa esiste 
-		String queryControlloCategoria = "SELECT Id_categoria\n" +
-			"FROM Categorie\n" + 
-			"WHERE Id_categoria = ?;"
-		;
+		boolean categoriaSpecificata = idCategoriaInput != 0;
 
-		try (Connection connection = gestoreDatabase.getConnection();) {
-			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloCategoria);
-			preparedStatement.setInt(1, idCategoriaInput);
-			ResultSet resultSet = preparedStatement.executeQuery();
+		if (categoriaSpecificata) {
+			// controllo se la categoria presa esiste 
+			String queryControlloCategoria = "SELECT Id_categoria\n" +
+				"FROM Categorie\n" + 
+				"WHERE Id_categoria = ?;"
+			;
 
-			if (!resultSet.next()) {
+			try (Connection connection = gestoreDatabase.getConnection();) {
+				PreparedStatement preparedStatement = connection.prepareStatement(queryControlloCategoria);
+				preparedStatement.setInt(1, idCategoriaInput);
+				ResultSet resultSet = preparedStatement.executeQuery();
+
+				if (!resultSet.next()) {
+					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+					rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria" };
+					return;
+				}
+			} catch (SQLException e) {
+				System.err.println("[" + Thread.currentThread().getName() +
+					"]: C'e' stato un errore nella query di controllo dell'idCategoria nella visualizzazione delle aste. " + e.getMessage()
+				);
+
 				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idCategoria" };
+				rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 				return;
 			}
-		} catch (SQLException e) {
-			System.err.println("[" + Thread.currentThread().getName() +
-				"]: C'e' stato un errore nella query di controllo dell'idCategoria nella visualizzazione delle aste. " + e.getMessage()
-			);
-
-			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
 
 		// Impostazione della query finale 
@@ -2000,19 +2005,33 @@ public class GestoreClient implements Runnable {
 			"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
 			"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n"+
-			"WHERE (CURRENT_TIMESTAMP > Aste.data_ora_inizio) AND " +
-			"(CURRENT_TIMESTAMP < ADDTIME(Aste.data_ora_inizio, Aste.durata)) AND " + 
-			"Articoli.Rif_categoria = ? AND Lotti.nome LIKE ? AND Immagini.principale = 1\n" +
+			"WHERE (CURRENT_TIMESTAMP > Aste.data_ora_inizio) AND\n" +
+			"(CURRENT_TIMESTAMP < ADDTIME(Aste.data_ora_inizio, Aste.durata)) AND\n"
+		;
+
+		if (categoriaSpecificata) {
+			queryVisualizzazione += "Articoli.Rif_categoria = ? AND\n";
+		}
+
+		queryVisualizzazione += "Lotti.nome LIKE ?\n" +
+			"AND Immagini.principale = 1\n" +
 			"GROUP BY Aste.Id_asta\n" +
 			"LIMIT ? OFFSET ?;"
 		;
 
 		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
-			preparedStatement.setInt(1, idCategoriaInput);
-			preparedStatement.setString(2, "%"+ stringaRicerca+ "%");
-			preparedStatement.setInt(3, numeroAste);
-			preparedStatement.setInt(4, ((numeroPagina-1)*numeroAste));
+			if (categoriaSpecificata) {
+				preparedStatement.setInt(1, idCategoriaInput);
+				preparedStatement.setString(2, "%"+ stringaRicerca+ "%");
+				preparedStatement.setInt(3, numeroAste);
+				preparedStatement.setInt(4, ((numeroPagina-1)*numeroAste));
+			} else {
+				preparedStatement.setString(1, "%"+ stringaRicerca+ "%");
+				preparedStatement.setInt(2, numeroAste);
+				preparedStatement.setInt(3, ((numeroPagina-1)*numeroAste));
+			}
+			
 			ResultSet resultSet = preparedStatement.executeQuery();
 
 			// array list per gli oggetti delle aste 
@@ -2054,7 +2073,7 @@ public class GestoreClient implements Runnable {
 		} catch (IOException e) { // questo catch e per gli errori che potrebbe dare il caricamento del immagine del utente
 			System.err.println("[" +
 				Thread.currentThread().getName() +
-				"]: C'e' stato un errore nell'apertura/lettura/chiusura delle immagini delle aste. "
+				"]: C'e' stato un errore nell'apertura/lettura/chiusura delle immagini nella visualizzazione aste. "
 				+ e.getMessage()
 			);
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
