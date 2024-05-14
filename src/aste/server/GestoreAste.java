@@ -54,7 +54,7 @@ public class GestoreAste {
 		mappaFuturi = new Hashtable<>();
 		executorScheduler = Executors.newScheduledThreadPool(threadPoolAste);
 
-		for (int i = 0; i < 256; ++i) {
+		for (int i = 1; i < 255; ++i) {
 			indirizziLiberi.add((byte)i);
 		}
     }
@@ -196,23 +196,16 @@ public class GestoreAste {
 		InetAddress indirizzoServer,
 		Offerta offerta
 	) throws IOException {
-		MulticastSocket socket = null;
-		
-		try {
+		try (MulticastSocket socket = new MulticastSocket();) {
 			InetSocketAddress indirizzoSocket = new InetSocketAddress(indirizzoMulticast, 3000);
 			NetworkInterface interfaccia = NetworkInterface.getByInetAddress(indirizzoServer);
 			
-			socket = new MulticastSocket();
 			socket.joinGroup(indirizzoSocket, interfaccia);
 
 			byte[] datiOfferta = Offerta.toByteArray(offerta);
 			
 			DatagramPacket pacchetto = new DatagramPacket(datiOfferta, datiOfferta.length, indirizzoSocket);
 			socket.send(pacchetto);
-		} finally {
-			if (socket != null) {
-				socket.close();
-			}
 		}
     }
 }

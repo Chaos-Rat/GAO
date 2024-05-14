@@ -805,7 +805,7 @@ public class GestoreClient implements Runnable {
 			"WHERE Id_asta = ? AND " +
 			"(CURRENT_TIMESTAMP > data_ora_inizio) AND " +
 			"(CURRENT_TIMESTAMP < ADDTIME(data_ora_inizio, durata)) AND " +
-			"NOT EXIST (\n" +
+			"NOT EXISTS (\n" +
 				"SELECT 1\n" +
 				"FROM Aste\n" +
 				"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
@@ -907,19 +907,32 @@ public class GestoreClient implements Runnable {
 		Connection connection = null;
 
 		try {
+			String queryDataOra = "SELECT data_ora_effettuazione\n" +
+				"FROM Puntate\n" +
+				"WHERE Id_puntata = ?;"
+			;
+
 			connection = gestoreDatabase.getConnection();
 			connection.setAutoCommit(false);
-			PreparedStatement statement = connection.prepareStatement(queryPuntata, new String[]{ "data_ora_effettuazione" });
+			PreparedStatement statement = connection.prepareStatement(queryPuntata, new String[]{ "Id_puntata" });
 			statement.setFloat(1, valoreInput);
 			statement.setInt(2, idAstaInput);
 			statement.setInt(3, idUtente);
 			statement.executeUpdate();
 			ResultSet resultSet = statement.getGeneratedKeys();
-			LocalDateTime dataOraEffettuazione = resultSet.getTimestamp(1).toLocalDateTime();
+			resultSet.next();
+			int idPuntata = resultSet.getInt(1);
+
+			statement = connection.prepareStatement(queryDataOra);
+			statement.setInt(1, idPuntata);
+			resultSet = statement.executeQuery();
+			resultSet.next();
+			LocalDateTime dataOraEffettuazione = resultSet.getTimestamp("data_ora_effettuazione").toLocalDateTime();
 
 			statement = connection.prepareStatement(queryAsta);
 			statement.setInt(1, idAstaInput);
 			resultSet = statement.executeQuery();
+			resultSet.next();
 			InetAddress indirizzoMulticast = InetAddress.getByAddress(resultSet.getBytes("ip_multicast"));
 
 			gestoreAste.effettuaPuntata(idAstaInput,
@@ -929,7 +942,6 @@ public class GestoreClient implements Runnable {
 			);
 
 			connection.commit();
-
 			rispostaUscente.tipoRisposta = TipoRisposta.OK;
 		} catch (SQLException e) {
 			if (connection != null) {
