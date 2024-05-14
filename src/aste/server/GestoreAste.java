@@ -54,7 +54,7 @@ public class GestoreAste {
 		mappaFuturi = new Hashtable<>();
 		executorScheduler = Executors.newScheduledThreadPool(threadPoolAste);
 
-		for (int i = 0; i < 256; ++i) {
+		for (int i = 1; i < 255; ++i) {
 			indirizziLiberi.add((byte)i);
 		}
     }
@@ -73,12 +73,12 @@ public class GestoreAste {
 			buffer[3] = indirizziLiberi.remove(indirizziLiberi.size() - 1);
 
 			// Aggiornando DB
-			String queryUpdate = "UPDATE Aste\n" +
-				"SET ip_multicast = ?\n" +
-				"WHERE Id_asta = ?;"
-			;
-
 			try (Connection connection = gestoreDatabase.getConnection();) {
+				String queryUpdate = "UPDATE Aste\n" +
+					"SET ip_multicast = ?\n" +
+					"WHERE Id_asta = ?;"
+				;
+
 				PreparedStatement statement = connection.prepareStatement(queryUpdate);
 				statement.setBytes(1, buffer);
 				statement.setInt(2, idAsta);
@@ -89,23 +89,13 @@ public class GestoreAste {
 		};
 
 		Runnable taskDistruzione = () -> {
-			String queryControlloVincita = "SELECT Aste.ip_multicast\n" +
-				"FROM Aste\n" +
-				"JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
-				"WHERE Id_asta = ?;"
-			;
-			
-			String queryControlloAutomatica = "SELECT asta_automatica, durata\n" +
-				"FROM Aste\n" +
-				"WHERE Id_asta = ?;"
-			;
-
-			String queryAggiornamento = "UPDATE Aste\n" +
-				"SET data_ora_inizio = CURRENT_TIMESTAMP\n" +
-				"WHERE Id_asta = ?;"
-			;
-
 			try (Connection connection = gestoreDatabase.getConnection();) {
+				String queryControlloVincita = "SELECT Aste.ip_multicast\n" +
+					"FROM Aste\n" +
+					"JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
+					"WHERE Id_asta = ?;"
+				;
+
 				PreparedStatement statement = connection.prepareStatement(queryControlloVincita);
 				statement.setInt(1, idAsta);
 				ResultSet resultSet = statement.executeQuery();
@@ -117,6 +107,11 @@ public class GestoreAste {
 					liberaIndirizzo(idAsta, indirizzoLibero);
 					return;
 				}
+
+				String queryControlloAutomatica = "SELECT asta_automatica, durata\n" +
+					"FROM Aste\n" +
+					"WHERE Id_asta = ?;"
+				;
 
 				statement = connection.prepareStatement(queryControlloAutomatica);
 				statement.setInt(1, idAsta);
@@ -136,6 +131,11 @@ public class GestoreAste {
 					);
 					return;
 				}
+
+				String queryAggiornamento = "UPDATE Aste\n" +
+					"SET data_ora_inizio = CURRENT_TIMESTAMP\n" +
+					"WHERE Id_asta = ?;"
+				;
 				
 				statement = connection.prepareStatement(queryAggiornamento);
 				statement.setInt(1, idAsta);
@@ -171,24 +171,11 @@ public class GestoreAste {
 		
     }
 
-    public synchronized void annullaAsta(int idAsta, String descrizioneAnnullamento) {
-		// if (!mappaFuturi.get(idAsta).(false)) {
-		// 	// TODO: libera indirizzo
-		// }
-		
-		String queryAnnullamento = "UPDATE Aste\n" +
-			"SET descrizione_annullamento = ?\n" +
-			"WHERE Id_asta = ?;"
-		;
-		
-		try (Connection connection = gestoreDatabase.getConnection();) {
-			PreparedStatement statement = connection.prepareStatement(queryAnnullamento);
-			statement.setString(1, descrizioneAnnullamento);
-			statement.setInt(2, idAsta);
-			statement.executeUpdate();
-		} catch (SQLException e) {
-			throw new Error("[" + Thread.currentThread().getName() + "]: " + e.getMessage());
-		}
+    public synchronized void annullaAsta(int idAsta, byte indirizzoLibero) {
+		AstaFutura astaFutura = mappaFuturi.get(idAsta);
+		astaFutura.futuraCreazione.cancel(false);
+		astaFutura.futuraDistruzione.cancel(false);
+		liberaIndirizzo(idAsta, indirizzoLibero);
     }
 
     public synchronized void effettuaPuntata(int idAsta,
@@ -196,23 +183,16 @@ public class GestoreAste {
 		InetAddress indirizzoServer,
 		Offerta offerta
 	) throws IOException {
-		MulticastSocket socket = null;
-		
-		try {
+		try (MulticastSocket socket = new MulticastSocket();) {
 			InetSocketAddress indirizzoSocket = new InetSocketAddress(indirizzoMulticast, 3000);
 			NetworkInterface interfaccia = NetworkInterface.getByInetAddress(indirizzoServer);
 			
-			socket = new MulticastSocket();
 			socket.joinGroup(indirizzoSocket, interfaccia);
 
 			byte[] datiOfferta = Offerta.toByteArray(offerta);
 			
 			DatagramPacket pacchetto = new DatagramPacket(datiOfferta, datiOfferta.length, indirizzoSocket);
 			socket.send(pacchetto);
-		} finally {
-			if (socket != null) {
-				socket.close();
-			}
 		}
     }
 }

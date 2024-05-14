@@ -37,7 +37,7 @@ import aste.Risposta.TipoErrore;
 import aste.Risposta.TipoRisposta;
 
 public class GestoreClient implements Runnable {
-	private Socket socket;
+	private final Socket socket;
 	private GestoreDatabase gestoreDatabase;
 	private	GestoreAste gestoreAste;
 	private int idUtente;
@@ -61,7 +61,7 @@ public class GestoreClient implements Runnable {
 		String clientAddress = socket.getRemoteSocketAddress().toString();
 		System.out.println("Il client " + clientAddress + " si è connesso.");
 
-		try {
+		try (socket;){
 			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
 
@@ -87,15 +87,6 @@ public class GestoreClient implements Runnable {
 			);
 		} finally {
 			System.out.println("Disconnessione dal client " + clientAddress + ".");
-
-			try {
-				socket.close();
-			} catch (IOException e) {
-				System.err.println("[" + Thread.currentThread().getName() +
-					"]: Impossibile chiudere Socket: " + e.getMessage() +
-					"."
-				);
-			}
 		}
 	}
 
@@ -551,7 +542,7 @@ public class GestoreClient implements Runnable {
 					"SELECT 1\n" +
 					"FROM Aste\n" +
 					"WHERE Rif_lotto = L.Id_lotto AND ADDTIME(data_ora_inizio, durata) > CURRENT_TIMESTAMP\n" +
-				") OR NOT EXISTS (\n" +
+				") AND NOT EXISTS (\n" +
 					"SELECT 1\n" +
 					"FROM Aste\n" +
 					"JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
@@ -802,16 +793,18 @@ public class GestoreClient implements Runnable {
 
 		String queryControlloAsta = "SELECT 1\n" +
 			"FROM Aste AS A\n" +
-			"WHERE Id_asta = ? AND " +
-			"(CURRENT_TIMESTAMP > data_ora_inizio) AND " +
-			"(CURRENT_TIMESTAMP < ADDTIME(data_ora_inizio, durata)) AND " +
-			"NOT EXIST (\n" +
-				"SELECT 1\n" +
-				"FROM Aste\n" +
-				"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
-				"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n" +
-				"WHERE Aste.Id_asta = A.Id_asta AND Articoli.Rif_utente = ?\n" +
-			");"
+			"WHERE Id_asta = ? AND\n" +
+				"(CURRENT_TIMESTAMP > data_ora_inizio) AND\n" +
+				"(CURRENT_TIMESTAMP < ADDTIME(data_ora_inizio, durata)) AND\n" +
+				"descrizione_annullamento IS NULL\n" +
+				"NOT EXISTS (\n" +
+					"SELECT 1\n" +
+					"FROM Aste\n" +
+					"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
+					"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n" +
+					"WHERE Aste.Id_asta = A.Id_asta AND Articoli.Rif_utente = ?\n" +
+				")\n" +
+			";"
 		;
 
 		try (Connection connection = gestoreDatabase.getConnection();) {
@@ -907,19 +900,32 @@ public class GestoreClient implements Runnable {
 		Connection connection = null;
 
 		try {
+			String queryDataOra = "SELECT data_ora_effettuazione\n" +
+				"FROM Puntate\n" +
+				"WHERE Id_puntata = ?;"
+			;
+
 			connection = gestoreDatabase.getConnection();
 			connection.setAutoCommit(false);
-			PreparedStatement statement = connection.prepareStatement(queryPuntata, new String[]{ "data_ora_effettuazione" });
+			PreparedStatement statement = connection.prepareStatement(queryPuntata, new String[]{ "Id_puntata" });
 			statement.setFloat(1, valoreInput);
 			statement.setInt(2, idAstaInput);
 			statement.setInt(3, idUtente);
 			statement.executeUpdate();
 			ResultSet resultSet = statement.getGeneratedKeys();
-			LocalDateTime dataOraEffettuazione = resultSet.getTimestamp(1).toLocalDateTime();
+			resultSet.next();
+			int idPuntata = resultSet.getInt(1);
+
+			statement = connection.prepareStatement(queryDataOra);
+			statement.setInt(1, idPuntata);
+			resultSet = statement.executeQuery();
+			resultSet.next();
+			LocalDateTime dataOraEffettuazione = resultSet.getTimestamp("data_ora_effettuazione").toLocalDateTime();
 
 			statement = connection.prepareStatement(queryAsta);
 			statement.setInt(1, idAstaInput);
 			resultSet = statement.executeQuery();
+			resultSet.next();
 			InetAddress indirizzoMulticast = InetAddress.getByAddress(resultSet.getBytes("ip_multicast"));
 
 			gestoreAste.effettuaPuntata(idAstaInput,
@@ -929,7 +935,6 @@ public class GestoreClient implements Runnable {
 			);
 
 			connection.commit();
-
 			rispostaUscente.tipoRisposta = TipoRisposta.OK;
 		} catch (SQLException e) {
 			if (connection != null) {
