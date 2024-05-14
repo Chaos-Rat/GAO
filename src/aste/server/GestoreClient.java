@@ -37,7 +37,7 @@ import aste.Risposta.TipoErrore;
 import aste.Risposta.TipoRisposta;
 
 public class GestoreClient implements Runnable {
-	private Socket socket;
+	private final Socket socket;
 	private GestoreDatabase gestoreDatabase;
 	private	GestoreAste gestoreAste;
 	private int idUtente;
@@ -61,7 +61,7 @@ public class GestoreClient implements Runnable {
 		String clientAddress = socket.getRemoteSocketAddress().toString();
 		System.out.println("Il client " + clientAddress + " si è connesso.");
 
-		try {
+		try (socket;){
 			ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
 			ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
 
@@ -87,15 +87,6 @@ public class GestoreClient implements Runnable {
 			);
 		} finally {
 			System.out.println("Disconnessione dal client " + clientAddress + ".");
-
-			try {
-				socket.close();
-			} catch (IOException e) {
-				System.err.println("[" + Thread.currentThread().getName() +
-					"]: Impossibile chiudere Socket: " + e.getMessage() +
-					"."
-				);
-			}
 		}
 	}
 
@@ -802,16 +793,18 @@ public class GestoreClient implements Runnable {
 
 		String queryControlloAsta = "SELECT 1\n" +
 			"FROM Aste AS A\n" +
-			"WHERE Id_asta = ? AND " +
-			"(CURRENT_TIMESTAMP > data_ora_inizio) AND " +
-			"(CURRENT_TIMESTAMP < ADDTIME(data_ora_inizio, durata)) AND " +
-			"NOT EXISTS (\n" +
-				"SELECT 1\n" +
-				"FROM Aste\n" +
-				"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
-				"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n" +
-				"WHERE Aste.Id_asta = A.Id_asta AND Articoli.Rif_utente = ?\n" +
-			");"
+			"WHERE Id_asta = ? AND\n" +
+				"(CURRENT_TIMESTAMP > data_ora_inizio) AND\n" +
+				"(CURRENT_TIMESTAMP < ADDTIME(data_ora_inizio, durata)) AND\n" +
+				"descrizione_annullamento IS NULL\n" +
+				"NOT EXISTS (\n" +
+					"SELECT 1\n" +
+					"FROM Aste\n" +
+					"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
+					"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n" +
+					"WHERE Aste.Id_asta = A.Id_asta AND Articoli.Rif_utente = ?\n" +
+				")\n" +
+			";"
 		;
 
 		try (Connection connection = gestoreDatabase.getConnection();) {
