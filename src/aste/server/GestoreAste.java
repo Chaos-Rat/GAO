@@ -10,12 +10,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -29,6 +31,7 @@ public class GestoreAste {
     private ScheduledExecutorService executorScheduler;
 
 	private static class AstaFutura {
+		@SuppressWarnings("unused")
 		public Runnable taskCreazione;
 		public Runnable taskDistruzione;
 		public ScheduledFuture<?> futuraCreazione;
@@ -57,7 +60,31 @@ public class GestoreAste {
 		for (int i = 1; i < 255; ++i) {
 			indirizziLiberi.add((byte)i);
 		}
+
+		inizializza();
     }
+
+	private void inizializza() {
+		try (Connection connection = gestoreDatabase.getConnection();) {
+			String queryVisualizzazione = "SELECT Id_asta, data_ora_inizio, durata\n" +
+				"FROM Aste\n" +
+				"WHERE ADDTIME(data_ora_inizio, durata) > CURRENT_TIMESTAMP;"
+			;
+
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(queryVisualizzazione);
+
+			while (resultSet.next()) {
+				int idAsta = resultSet.getInt("Id_asta");
+				LocalDateTime dataOraInizio = resultSet.getTimestamp("data_ora_inizio").toLocalDateTime();
+				Duration durata = Duration.between(LocalTime.of(0, 0), resultSet.getTime("durata").toLocalTime());
+				
+				creaAsta(idAsta, dataOraInizio, durata);
+			}
+		} catch (SQLException e) {
+			throw new Error("[" + Thread.currentThread().getName() + "]: " + e.getMessage());
+		}
+	}
 
     public synchronized void creaAsta(int idAsta,
 		LocalDateTime dataOraInizio,
@@ -122,7 +149,7 @@ public class GestoreAste {
 					return;
 				}
 
-				if (resultSet.getInt("asta_automatica") == 1) {
+				if (resultSet.getBoolean("asta_automatica")) {
 					AstaFutura astaFutura = mappaFuturi.get(idAsta);
 					LocalTime durataDatabase = resultSet.getTime("durata").toLocalTime();
 					astaFutura.futuraDistruzione = executorScheduler.schedule(astaFutura.taskDistruzione,
