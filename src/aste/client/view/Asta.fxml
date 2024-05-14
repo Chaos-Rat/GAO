@@ -117,7 +117,7 @@
                                        <VBox.margin>
                                           <Insets bottom="10.0" />
                                        </VBox.margin></Text>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Ends at :">
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Duration: ">
                                        <VBox.margin>
                                           <Insets bottom="2.0" />
                                        </VBox.margin>
