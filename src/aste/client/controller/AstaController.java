@@ -336,6 +336,7 @@ public class AstaController
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         LocalDateTime dateTime = LocalDateTime.parse(datetimestr,formatter);
         Duration end = spinnerEnd.getValue();
+        System.out.println(end.toString());
         System.out.println((String) dateTime.format(formatter));
         Richiesta richiestaCrea = new Richiesta();
         richiestaCrea.tipoRichiesta = Richiesta.TipoRichiesta.CREA_ASTA;
