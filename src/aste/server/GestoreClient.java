@@ -551,7 +551,7 @@ public class GestoreClient implements Runnable {
 					"SELECT 1\n" +
 					"FROM Aste\n" +
 					"WHERE Rif_lotto = L.Id_lotto AND ADDTIME(data_ora_inizio, durata) > CURRENT_TIMESTAMP\n" +
-				") OR NOT EXISTS (\n" +
+				") AND NOT EXISTS (\n" +
 					"SELECT 1\n" +
 					"FROM Aste\n" +
 					"JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
