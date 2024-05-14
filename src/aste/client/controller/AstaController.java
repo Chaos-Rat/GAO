@@ -19,6 +19,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,10 +32,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class AstaController
 {
@@ -78,10 +76,12 @@ public class AstaController
     private TextField priceF;
 
     @FXML
-    private Spinner<LocalTime>spinnerEnd;
+    private Spinner<Duration>spinnerEnd;
 
     @FXML
     private Text username;
+
+
 
     private Integer idLotto;
 
@@ -113,26 +113,39 @@ public class AstaController
         }
         spinnerEnd.setEditable(true);
         spinner.setEditable(true);
-        SpinnerValueFactory<LocalTime> factory = new SpinnerValueFactory<LocalTime>() {
+        SpinnerValueFactory<Duration> valueFactory = new SpinnerValueFactory<Duration>() {
             {
-                setValue(defaultValue());
+                setConverter(new StringConverter<Duration>() {
+                    @Override
+                    public String toString(Duration duration) {
+                        long hours = duration.toHours();
+                        long minutes = duration.toMinutes() % 60;
+                        return String.format("%02d:%02d", hours, minutes);
+                    }
+
+                    @Override
+                    public Duration fromString(String string) {
+                        String[] parts = string.split(":");
+                        long hours = Long.parseLong(parts[0]);
+                        long minutes = Long.parseLong(parts[1]);
+                        return Duration.ofHours(hours).plusMinutes(minutes);
+                    }
+                });
+                setValue(Duration.ZERO);
             }
 
-            private LocalTime defaultValue() {
-                return LocalTime.now().truncatedTo(ChronoUnit.MINUTES);
-            }
             @Override
             public void decrement(int steps) {
-                LocalTime value = getValue();
-                setValue(value == null ? defaultValue() : value.minusMinutes(steps));
+                setValue(getValue().minusMinutes(steps));
             }
+
             @Override
             public void increment(int steps) {
-                LocalTime value = getValue();
-                setValue(value == null ? defaultValue() : value.plusMinutes(steps));
+                setValue(getValue().plusMinutes(steps));
             }
         };
-        SpinnerValueFactory<LocalTime> factory2 = new SpinnerValueFactory<LocalTime>() {
+
+        SpinnerValueFactory<LocalTime> factory = new SpinnerValueFactory<LocalTime>() {
             {
                 setValue(defaultValue());
             }
@@ -144,15 +157,15 @@ public class AstaController
             @Override
             public void decrement(int steps) {
                 LocalTime value = getValue();
-                setValue(value == null ? defaultValue() : value.minusMinutes(steps));
+                setValue(value == null ? defaultValue() : value.minusMinutes(1));
             }
             @Override
             public void increment(int steps) {
                 LocalTime value = getValue();
-                setValue(value == null ? defaultValue() : value.plusMinutes(steps));
+                setValue(value == null ? defaultValue() : value.plusMinutes(1));
             }
         };
-        spinnerEnd.setValueFactory(factory2);
+        spinnerEnd.setValueFactory(valueFactory);
         spinner.setValueFactory(factory);
         Richiesta richiestacat = new Richiesta();
         richiestacat.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_CATEGORIE;
@@ -322,14 +335,13 @@ public class AstaController
         String datetimestr = (startDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))+" "+time.format(DateTimeFormatter.ofPattern("HH:mm")));
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm");
         LocalDateTime dateTime = LocalDateTime.parse(datetimestr,formatter);
-        LocalTime end = spinnerEnd.getValue();
-        Duration timeduration = Duration.between(time,end);
+        Duration end = spinnerEnd.getValue();
         System.out.println((String) dateTime.format(formatter));
         Richiesta richiestaCrea = new Richiesta();
         richiestaCrea.tipoRichiesta = Richiesta.TipoRichiesta.CREA_ASTA;
         richiestaCrea.payload = new Object[5];
         richiestaCrea.payload[0] = dateTime;
-        richiestaCrea.payload[1] = timeduration;
+        richiestaCrea.payload[1] = end;
         richiestaCrea.payload[2] = Float.valueOf(priceF.getText());
         richiestaCrea.payload[3] = true;
         richiestaCrea.payload[4] = idLotto;
