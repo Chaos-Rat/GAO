@@ -299,8 +299,7 @@ public class GestoreClient implements Runnable {
 
 	// Metodo Visualizza lotto 1.0
 	private void visualizzaLotto() {
-		// TODO: Implementare
-		// conmtrollo se l'utente e conesso 
+		// controllo se l'utente e conesso 
 		if (idUtente == 0) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
@@ -351,6 +350,7 @@ public class GestoreClient implements Runnable {
 				return;
 			}
 
+			rispostaUscente.tipoRisposta = TipoRisposta.OK;
 			rispostaUscente.payload = new Object[]{ idLottoInput,
 				resultSet.getString("nome"),
 				null,
@@ -362,44 +362,36 @@ public class GestoreClient implements Runnable {
 			resultSet = preparedStatement.executeQuery();
 
 			ArrayList<Object> articoli = new ArrayList<>();
+			ArrayList<byte[]> immaginiArticoli = new ArrayList<>();
 			
 			while (resultSet.next()) {
-				articoli.add(resultSet.getInt("Id_articolo"));
+				int idArticolo = resultSet.getInt("Id_articolo");
+				articoli.add(idArticolo);
 				articoli.add(resultSet.getString("nome"));
 
 				PreparedStatement preparedStatement2 = connection.prepareStatement(queryImmagini);
+				preparedStatement2.setInt(1, idArticolo);
+				ResultSet resultSet2 = preparedStatement2.executeQuery();
+
+				while (resultSet2.next()) {
+					int idImmagine = resultSet2.getInt("Id_immagine");
+
+					String nomeFile = "res\\immagini_articoli\\" + idImmagine + ".png";
+
+					try (FileInputStream stream = new FileInputStream(nomeFile);) {
+						immaginiArticoli.add(stream.readAllBytes());
+					}
+				}
 			}
 
+			if (immaginiArticoli.isEmpty()) {
+				try (FileInputStream stream = new FileInputStream("static_resources\\default_articolo.png");) {
+					immaginiArticoli.add(stream.readAllBytes());
+				}
+			}
+
+			rispostaUscente.payload[2] = (byte[][])immaginiArticoli.toArray();
 			rispostaUscente.payload[3] = articoli.toArray();
-
-			preparedStatement = connection.prepareStatement(queryArticoli);
-			preparedStatement.setInt(1, idLottoInput);
-			resultSet = preparedStatement.executeQuery();
-
-			String nomeFile = resultSet.wasNull() ? 
-				"static_resources\\default_articolo.png" :
-				"res\\immagini_articoli\\" + ".png"
-			;
-
-			try (FileInputStream stream = new FileInputStream(nomeFile);) {
-				stream.readAllBytes();
-			}
-			
-
-			//metti img
-			FileInputStream stream;
-
-			if (resultSet.wasNull()) {
-				stream= new FileInputStream("static_resources\\default_articolo.png");
-			} else {
-				// TODO: Fix (never)
-				stream= new FileInputStream("res\\immagini_articoli\\" + ".png");
-			}
-
-			stream.readAllBytes();
-
-			stream.close();
-
 		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
 			System.err.println("[" + Thread.currentThread().getName() +
 				"]: C'e' stato un errore nella query di vissualizazione Lotto. " + e.getMessage()
