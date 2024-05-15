@@ -67,7 +67,7 @@ public class PuntataController {
 
     public static  Integer idAsta;
 
-	public static LocalDateTime end ;
+	public static LocalDateTime start ;
 
 	public static Duration duration;
 
@@ -101,13 +101,15 @@ public class PuntataController {
         }
         System.out.println(idAsta);
 		astaName.setText("Asta :" + astaNome);
-				LocalDateTime endDateTime = LocalDateTime.now().plus(duration);
+                Duration timestamp = Duration.between(start,LocalDateTime.now());
+                duration = duration.minus(timestamp);
+                LocalDateTime dateTime = LocalDateTime.now().plus(duration);
                 AnimationTimer timer = new AnimationTimer()
                 {
                     @Override
                     public void handle(long l)
                     {
-                        Duration remaining = Duration.between(LocalDateTime.now(), endDateTime);
+                        Duration remaining = Duration.between(LocalDateTime.now(),dateTime) ;
                         if (remaining.isPositive()) {
                             timerLabel.setText("Time Remaning: " + format(remaining));
                         } else {

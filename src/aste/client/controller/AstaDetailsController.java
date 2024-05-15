@@ -205,7 +205,7 @@ public class AstaDetailsController
         PuntataController.idAsta = idAsta;
         PuntataController.astaNome = nomelottoText.getText();
         PuntataController.duration = duration;
-        PuntataController.end = time;
+        PuntataController.start = time;
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Puntata.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
