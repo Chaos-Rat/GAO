@@ -14,7 +14,6 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
-<?import javafx.scene.text.TextFlow?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="749.0" prefWidth="1075.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aste.client.controller.PuntataController">
    <children>
@@ -129,7 +128,7 @@
                <center>
                   <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="BOTTOM_CENTER">
                      <content>
-                        <TextFlow fx:id="chatBox" prefHeight="547.0" prefWidth="958.0" />
+                        <VBox fx:id="chatBox" prefHeight="548.0" prefWidth="951.0" />
                      </content>
                   </ScrollPane>
                </center>

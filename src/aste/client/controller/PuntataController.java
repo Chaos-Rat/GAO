@@ -1,5 +1,6 @@
 package aste.client.controller;
 
+import aste.Offerta;
 import aste.Richiesta;
 import aste.Risposta;
 import aste.client.HelloApplication;
@@ -13,6 +14,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
@@ -20,12 +22,13 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.net.*;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-public class PuntataController {
-
+public class PuntataController
+{
     @FXML
     private Button ArticoloB;
 
@@ -60,10 +63,10 @@ public class PuntataController {
     private Button sendB;
 
 	@FXML
-	private TextFlow chatBox;
+	private VBox chatBox;
 
     @FXML
-    private  Text username;
+    private Text username;
 
     public static  Integer idAsta;
 
@@ -72,6 +75,46 @@ public class PuntataController {
 	public static Duration duration;
 
 	public static String astaNome;
+
+    public static InetAddress ipAddress;
+
+    private static class ChatClient extends Thread
+    {
+        private final MulticastSocket socket;
+        private PuntataController puntataController;
+
+        public ChatClient(PuntataController puntataController, InetAddress ipMulticast) throws IOException {
+            InetSocketAddress indirizzoSocket = new InetSocketAddress(ipMulticast, 3000);
+            NetworkInterface interfaccia = NetworkInterface.getByInetAddress(HelloApplication.getLocalAddress());
+
+            socket = new MulticastSocket();
+            socket.setSoTimeout(10 * 1000);
+            socket.joinGroup(indirizzoSocket, interfaccia);
+        }
+
+        @Override
+        public void run() {
+            try (socket;) {
+                byte[] datiOfferta = new byte[Offerta.MAX_SERIALIZED_SIZE];
+                DatagramPacket pacchetto = new DatagramPacket(datiOfferta, datiOfferta.length);
+
+                while (!isInterrupted()) {
+                    try {
+                        socket.receive(pacchetto);
+                        Offerta offerta = Offerta.fromByteArray(datiOfferta);
+                        // TODO You should stuff here, you've got your offer
+                        puntataController.ChatLog(offerta);
+                    } catch (SocketTimeoutException e) {
+                        continue;
+                    } catch (ClassNotFoundException | ClassCastException e) {
+                        System.err.println("C'è stato un errore nella conversione della puntata ricevuta: " + e.getMessage());
+                    }
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
 
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
@@ -150,6 +193,10 @@ public class PuntataController {
 //                 }
     }
 
+    void ChatLog (Offerta offerta)
+    {
+
+    }
     @FXML
     void SendClicked(ActionEvent event) throws IOException, ClassNotFoundException {
         Richiesta richiestaPunatata = new Richiesta();
@@ -166,10 +213,6 @@ public class PuntataController {
         {
             System.out.println(rispostaPuntata.payload[0]);
         }
-
-		Text text = new Text(puntataF.getText() + "\n");
-		text.setStyle("-fx-font: 24 arial;");
-		chatBox.getChildren().addAll(text);
     }
 
     @FXML

@@ -8,8 +8,8 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 
 public class HelloApplication extends Application
@@ -40,6 +40,10 @@ public class HelloApplication extends Application
         stage.setTitle("The AuctionHouse");
         stage.setScene(scene);
         stage.show();
+    }
+
+    public static InetAddress getLocalAddress() {
+        return socket.getLocalAddress();
     }
 
     public static void main(String[] args)

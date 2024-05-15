@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
@@ -84,6 +85,8 @@ public class AstaDetailsController
     private LocalDateTime time;
 
     private Duration duration;
+
+    private  InetAddress groupAddress;
 
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
@@ -206,6 +209,9 @@ public class AstaDetailsController
         PuntataController.astaNome = nomelottoText.getText();
         PuntataController.duration = duration;
         PuntataController.start = time;
+        String ip = ipMultiText.getText().substring(1);
+        groupAddress = InetAddress.getByName(ip);
+        PuntataController.ipAddress = InetAddress.getByName(ip);
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Puntata.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
