@@ -23,6 +23,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.zone.ZoneOffsetTransitionRule.TimeDefinition;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
@@ -313,58 +314,77 @@ public class GestoreClient implements Runnable {
 			idLottoInput = (Integer)richiestaEntrante.payload[0];
 		} catch (ClassCastException e) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idLotto"};
 			return;
 		}
 
-		if (idLottoInput == null) {
+		if (idLottoInput == null || idLottoInput > 1) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idLotto"};
 			return;
 		}
-
-		// query da finire
-		String queryVisualizzazione = "SELECT Lotti.Id_Lotto, Lotti.nome" +
-			"FROM Lotti\n"+
-			"JOIN Articoli ON Articoli.Rif_utente = Utente.Rif_articolo\n" +
-			"JOIN Lotti ON Articoli.Rif_lotto = Lotti.Id_lotto\n"
-		;
-
-		String queryImmagini = "SELECT Immagini.Id_immagine\n" +
-			"FROM Immagini\n" +
-			"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n"
-		;
 
 		try (Connection connection = gestoreDatabase.getConnection();) {
-			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
+			String queryLotto = "SELECT nome\n" +
+				"FROM Lotti\n" +
+				"WHERE Id_lotto = ?;"
+			;
+
+			String queryArticoli = "SELECT Id_articolo, nome\n" +
+				"FROM Articoli\n" +
+				"WHERE Rif_lotto = ?;"
+			;
+
+			String queryImmagini = "SELECT Id_immagine\n" +
+				"FROM Immagini\n" +
+				"WHERE Rif_articolo = ?;\n"
+			;
+
+			PreparedStatement preparedStatement = connection.prepareStatement(queryLotto);
 			preparedStatement.setInt(1, idLottoInput);
 			ResultSet resultSet = preparedStatement.executeQuery();
 
-			// While per caricare l'array list 
+			// Non esiste lotto con id dato
 			if (!resultSet.next()) {
-				// 
-				rispostaUscente.tipoRisposta= TipoRisposta.OK;
-
-				rispostaUscente.payload[0]= resultSet.getInt("Id_lotto");
-				rispostaUscente.payload[1]= resultSet.getString("nome");
-				rispostaUscente.payload[2]= resultSet.getByte("immagini_articolo");
-
-				ArrayList <Object> lottiArticoli = new ArrayList<>();
-
-				lottiArticoli.add(resultSet.getInt("Id_articolo"));
-				lottiArticoli.add(resultSet.getInt("nome_articolo"));
-
-				rispostaUscente.payload[3]= lottiArticoli;
-
-				String nomeFile = resultSet.wasNull() ? 
-					"static_resources\\default_articolo.png" :
-					"res\\immagini_articoli\\" + ".png"
-				;
-
-				try (FileInputStream stream = new FileInputStream(nomeFile);) {
-					stream.readAllBytes();
-				}
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idLotto" };
+				return;
 			}
+
+			rispostaUscente.payload = new Object[]{ idLottoInput,
+				resultSet.getString("nome"),
+				null,
+				null,	
+			};
+
+			preparedStatement = connection.prepareStatement(queryArticoli);
+			preparedStatement.setInt(1, idLottoInput);
+			resultSet = preparedStatement.executeQuery();
+
+			ArrayList<Object> articoli = new ArrayList<>();
+			
+			while (resultSet.next()) {
+				articoli.add(resultSet.getInt("Id_articolo"));
+				articoli.add(resultSet.getString("nome"));
+
+				PreparedStatement preparedStatement2 = connection.prepareStatement(queryImmagini);
+			}
+
+			rispostaUscente.payload[3] = articoli.toArray();
+
+			preparedStatement = connection.prepareStatement(queryArticoli);
+			preparedStatement.setInt(1, idLottoInput);
+			resultSet = preparedStatement.executeQuery();
+
+			String nomeFile = resultSet.wasNull() ? 
+				"static_resources\\default_articolo.png" :
+				"res\\immagini_articoli\\" + ".png"
+			;
+
+			try (FileInputStream stream = new FileInputStream(nomeFile);) {
+				stream.readAllBytes();
+			}
+			
 
 			//metti img
 			FileInputStream stream;
@@ -796,7 +816,7 @@ public class GestoreClient implements Runnable {
 			"WHERE Id_asta = ? AND\n" +
 				"(CURRENT_TIMESTAMP > data_ora_inizio) AND\n" +
 				"(CURRENT_TIMESTAMP < DATE_ADD(data_ora_inizio, INTERVAL durata MINUTE)) AND\n" +
-				"descrizione_annullamento IS NULL\n" +
+				"descrizione_annullamento IS NULL AND\n" +
 				"NOT EXISTS (\n" +
 					"SELECT 1\n" +
 					"FROM Aste\n" +
