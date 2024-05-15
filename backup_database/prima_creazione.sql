@@ -34,7 +34,7 @@ CREATE TABLE Aste (
 	Id_asta INT NOT NULL AUTO_INCREMENT,
 	prezzo_inizio DECIMAL(10, 2) NOT NULL,
 	data_ora_inizio DATETIME NOT NULL,
-	durata TIME NOT NULL,
+	durata BIGINT NOT NULL,
 	asta_automatica BOOLEAN NOT NULL,
     ip_multicast BINARY(4),
 	descrizione_annullamento VARCHAR(255),

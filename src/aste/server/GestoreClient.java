@@ -541,7 +541,7 @@ public class GestoreClient implements Runnable {
 				"(NOT EXISTS (\n" +
 					"SELECT 1\n" +
 					"FROM Aste\n" +
-					"WHERE Rif_lotto = L.Id_lotto AND ADDTIME(data_ora_inizio, durata) > CURRENT_TIMESTAMP\n" +
+					"WHERE Rif_lotto = L.Id_lotto AND DATE_ADD(data_ora_inizio, INTERVAL durata MINUTE) > CURRENT_TIMESTAMP\n" +
 				") AND NOT EXISTS (\n" +
 					"SELECT 1\n" +
 					"FROM Aste\n" +
@@ -795,7 +795,7 @@ public class GestoreClient implements Runnable {
 			"FROM Aste AS A\n" +
 			"WHERE Id_asta = ? AND\n" +
 				"(CURRENT_TIMESTAMP > data_ora_inizio) AND\n" +
-				"(CURRENT_TIMESTAMP < ADDTIME(data_ora_inizio, durata)) AND\n" +
+				"(CURRENT_TIMESTAMP < DATE_ADD(data_ora_inizio, INTERVAL durata MINUTE)) AND\n" +
 				"descrizione_annullamento IS NULL\n" +
 				"NOT EXISTS (\n" +
 					"SELECT 1\n" +
@@ -2007,7 +2007,7 @@ public class GestoreClient implements Runnable {
 			"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n"+
 			"WHERE (CURRENT_TIMESTAMP > Aste.data_ora_inizio) AND\n" +
-			"(CURRENT_TIMESTAMP < ADDTIME(Aste.data_ora_inizio, Aste.durata)) AND\n"
+			"(CURRENT_TIMESTAMP < DATE_ADD(Aste.data_ora_inizio, INTERVAL Aste.durata MINUTE)) AND\n"
 		;
 
 		if (categoriaSpecificata) {
@@ -2041,7 +2041,7 @@ public class GestoreClient implements Runnable {
 			// While per caricare l'array list 
 			while (resultSet.next()) {
 				aste.add(resultSet.getInt("Id_asta"));
-				aste.add(Duration.between(LocalTime.of(0, 0), resultSet.getTime("durata").toLocalTime()));
+				aste.add(Duration.ofMinutes(resultSet.getLong("durata")));
 				
 				float prezzo_attuale = resultSet.getFloat("prezzo_attuale");
 				aste.add(prezzo_attuale == 0 ? resultSet.getFloat("prezzo_inizio") : prezzo_attuale);
@@ -2179,7 +2179,7 @@ public class GestoreClient implements Runnable {
 
 		String controlloLotto1 = "SELECT 1\n" +
 			"FROM Aste\n" +
-			"WHERE Rif_lotto = ? AND ADDTIME(Aste.data_ora_inizio, Aste.durata) > CURRENT_TIMESTAMP;"
+			"WHERE Rif_lotto = ? AND DATE_ADD(Aste.data_ora_inizio, INTERVAL Aste.durata MINUTE) > CURRENT_TIMESTAMP;"
 		;
 
 		String controlloLotto2 = "SELECT 1\n" +
@@ -2230,14 +2230,15 @@ public class GestoreClient implements Runnable {
 			PreparedStatement statement = connection.prepareStatement(queryCreazione, new String[]{ "Id_asta" });
 			statement.setFloat(1, prezzoInizioInput);
 			statement.setTimestamp(2, Timestamp.valueOf(dataOraInizioInput));
-			statement.setTime(3, Time.valueOf(LocalTime.of(0, 0).plus(durataInput)));
+			long durata = durataInput.toMinutes();
+			statement.setLong(3, durata);
 			statement.setInt(4, astaAutomaticaInput ? 1 : 0);
 			statement.setInt(5, idLottoInput);
 			statement.executeUpdate();
 			ResultSet resultSet = statement.getGeneratedKeys();
 			resultSet.next();
 
-			gestoreAste.creaAsta(resultSet.getInt(1), dataOraInizioInput, durataInput);
+			gestoreAste.creaAsta(resultSet.getInt(1), dataOraInizioInput, durata);
 			connection.commit();
 			
 			rispostaUscente.tipoRisposta = TipoRisposta.OK;
@@ -2356,9 +2357,7 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.tipoRisposta = TipoRisposta.OK;
 			rispostaUscente.payload = new Object[] {
 				resultSet.getTimestamp("data_ora_inizio").toLocalDateTime(),
-				Duration.between(LocalTime.of(0, 0),
-					resultSet.getTime("durata").toLocalTime()
-				),
+				Duration.ofMinutes(resultSet.getLong("durata")),
 				resultSet.getFloat("prezzo_inizio"),
 				resultSet.getFloat("prezzo_attuale"),
 				indirizzo != null ? InetAddress.getByAddress(indirizzo) : null,

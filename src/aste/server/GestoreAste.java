@@ -17,7 +17,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.concurrent.Executors;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -68,7 +67,7 @@ public class GestoreAste {
 		try (Connection connection = gestoreDatabase.getConnection();) {
 			String queryVisualizzazione = "SELECT Id_asta, data_ora_inizio, durata\n" +
 				"FROM Aste\n" +
-				"WHERE ADDTIME(data_ora_inizio, durata) > CURRENT_TIMESTAMP;"
+				"WHERE DATE_ADD(data_ora_inizio, INTERVAL durata MINUTE) > CURRENT_TIMESTAMP;"
 			;
 
 			Statement statement = connection.createStatement();
@@ -77,7 +76,7 @@ public class GestoreAste {
 			while (resultSet.next()) {
 				int idAsta = resultSet.getInt("Id_asta");
 				LocalDateTime dataOraInizio = resultSet.getTimestamp("data_ora_inizio").toLocalDateTime();
-				Duration durata = Duration.between(LocalTime.of(0, 0), resultSet.getTime("durata").toLocalTime());
+				long durata = resultSet.getLong("durata");
 				
 				creaAsta(idAsta, dataOraInizio, durata);
 			}
@@ -88,7 +87,7 @@ public class GestoreAste {
 
     public synchronized void creaAsta(int idAsta,
 		LocalDateTime dataOraInizio,
-		Duration durata
+		long durataMinuti
 	) throws IllegalStateException {
 		if (indirizziLiberi.size() == 0) {
 			throw new IllegalStateException("Impossibile creare una nuova asta, limite raggiunto.");
@@ -151,9 +150,9 @@ public class GestoreAste {
 
 				if (resultSet.getBoolean("asta_automatica")) {
 					AstaFutura astaFutura = mappaFuturi.get(idAsta);
-					LocalTime durataDatabase = resultSet.getTime("durata").toLocalTime();
+					long durata =  resultSet.getLong("durata");
 					astaFutura.futuraDistruzione = executorScheduler.schedule(astaFutura.taskDistruzione,
-						Duration.between(LocalTime.of(0, 0), durataDatabase).toMinutes(),
+						durata,
 						TimeUnit.MINUTES
 					);
 					return;
@@ -182,7 +181,7 @@ public class GestoreAste {
 					TimeUnit.MINUTES
 				),
 				executorScheduler.schedule(taskDistruzione,
-					Duration.between(LocalDateTime.now(), dataOraInizio.plus(durata).plusMinutes(1)).toMinutes(),
+					Duration.between(LocalDateTime.now(), dataOraInizio.plusMinutes(durataMinuti)).toMinutes(),
 					TimeUnit.MINUTES
 				)
 			)
