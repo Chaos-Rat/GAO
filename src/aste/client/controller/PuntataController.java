@@ -17,6 +17,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -92,6 +93,8 @@ public class PuntataController
 
     public static InetAddress ipAddress;
 
+    private static ChatClient handlerPuntate;
+
     private static class ChatClient extends Thread
     {
         private final MulticastSocket socket;
@@ -116,7 +119,6 @@ public class PuntataController
                     try {
                         socket.receive(pacchetto);
                         Offerta offerta = Offerta.fromByteArray(datiOfferta);
-                        // TODO You should stuff here, you've got your offer
                         puntataController.ChatLog(offerta);
                     } catch (SocketTimeoutException e) {
                         continue;
@@ -159,70 +161,71 @@ public class PuntataController
         }
         System.out.println(idAsta);
 		astaName.setText("Asta :" + astaNome);
-                Duration timestamp = Duration.between(start,LocalDateTime.now());
-                duration = duration.minus(timestamp);
-                LocalDateTime dateTime = LocalDateTime.now().plus(duration);
-                AnimationTimer timer = new AnimationTimer()
-                {
-                    @Override
-                    public void handle(long l)
-                    {
-                        Duration remaining = Duration.between(LocalDateTime.now(),dateTime) ;
-                        if (remaining.isPositive()) {
-                            timerLabel.setText("Time Remaning: " + format(remaining));
-                        } else {
-                            timerLabel.setText("Time Remaning: " + format(Duration.ZERO));
-                            stop();
-                        }
-                    }
-                    private String format(Duration remaining) {
-                        return String.format("%01d days, %02d:%02d:%02d",
-								remaining.toDays(),
-                                remaining.toHoursPart(),
-                                remaining.toMinutesPart(),
-                                remaining.toSecondsPart()
-                        );
-                    }
-                };
-                timer.start();
-				Richiesta richiestaPuntate = new Richiesta();
-				richiestaPuntate.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PUNTATE;
-				richiestaPuntate.payload = new Object[1];
-				richiestaPuntate.payload[0] = idAsta;
-				HelloApplication.output.writeObject(richiestaPuntate);
-				Risposta rispostaPuntate = (Risposta) HelloApplication.input.readObject();
-
-				if(rispostaPuntate.tipoRisposta == Risposta.TipoRisposta.OK)
-				{
-					for (int i = 0; i < rispostaPuntate.payload.length/5; i++) 
-					{
-					idPuntata = (Integer) rispostaPuntate.payload[i / 5 + 0];
-					valore = (Float)rispostaPuntate.payload[i / 5 + 1];
-					messageDateTime = (LocalDateTime) rispostaPuntate.payload[i / 5 + 2];
-					idUser = (Integer) rispostaPuntate.payload[i / 5 + 3];
-					Username = (String)rispostaPuntate.payload[i / 5 + 4];
-					HBox hbox = new HBox();
-					hbox.setAlignment(Pos.CENTER_LEFT);
-					hbox.setPadding(new Insets(5,5,5,10));
-					Text email = new Text();
-					email.setText(messageDateTime.toString() + "\n" +"Username \n" + String.valueOf(idUser));
-					TextFlow textFlow = new TextFlow();
-					textFlow.setStyle("-fx-background-color: rgb(233,233,235)" + "-fx-background-radius: 20px");
-					textFlow.setPadding(new Insets(5,5,5,10));
-					chatBox.getChildren().add(textFlow);
-					}
-				}
-                else if (rispostaPuntate.tipoRisposta == Risposta.TipoRisposta.ERRORE)
-                 {
-                    System.out.println(rispostaPuntate.payload[0]);
-                 }
+        Duration timestamp = Duration.between(start,LocalDateTime.now());
+        duration = duration.minus(timestamp);
+        LocalDateTime dateTime = LocalDateTime.now().plus(duration);
+        AnimationTimer timer = new AnimationTimer()
+        {
+            @Override
+            public void handle(long l)
+            {
+                Duration remaining = Duration.between(LocalDateTime.now(),dateTime) ;
+                if (remaining.isPositive()) {
+                    timerLabel.setText("Time Remaning: " + format(remaining));
+                } else {
+                    timerLabel.setText("Time Remaning: " + format(Duration.ZERO));
+                    stop();
+                }
+            }
+            private String format(Duration remaining) {
+                return String.format("%01d days, %02d:%02d:%02d",
+                        remaining.toDays(),
+                        remaining.toHoursPart(),
+                        remaining.toMinutesPart(),
+                        remaining.toSecondsPart()
+                );
+            }
+        };
+        timer.start();
+//				Richiesta richiestaPuntate = new Richiesta();
+//				richiestaPuntate.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PUNTATE;
+//				richiestaPuntate.payload = new Object[1];
+//				richiestaPuntate.payload[0] = idAsta;
+//				HelloApplication.output.writeObject(richiestaPuntate);
+//				Risposta rispostaPuntate = (Risposta) HelloApplication.input.readObject();
+//
+//				if(rispostaPuntate.tipoRisposta == Risposta.TipoRisposta.OK)
+//				{
+//					for (int i = 0; i < rispostaPuntate.payload.length/5; i++)
+//					{
+//					idPuntata = (Integer) rispostaPuntate.payload[i / 5 + 0];
+//					valore = (Float) rispostaPuntate.payload[i / 5 + 1];
+//					messageDateTime = (LocalDateTime) rispostaPuntate.payload[i / 5 + 2];
+//					idUser = (Integer) rispostaPuntate.payload[i / 5 + 3];
+//					Username = (String)rispostaPuntate.payload[i / 5 + 4];
+//					HBox hbox = new HBox();
+//					hbox.setAlignment(Pos.CENTER_LEFT);
+//					hbox.setPadding(new Insets(5,5,5,10));
+//					Text email = new Text();
+//					email.setText(messageDateTime.toString() + "\n" +"Username \n" + String.valueOf(idUser));
+//					TextFlow textFlow = new TextFlow();
+//					textFlow.setStyle("-fx-background-color: rgb(233,233,235)" + "-fx-background-radius: 20px");
+//					textFlow.setPadding(new Insets(5,5,5,10));
+//					chatBox.getChildren().add(textFlow);
+//					}
+//				}
+//                else if (rispostaPuntate.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+//                 {
+//                    System.out.println(rispostaPuntate.payload[0]);
+//                 }
+        handlerPuntate = new ChatClient(this, ipAddress);
+        handlerPuntate.start();
     }
 
     void ChatLog (Offerta offerta) throws ClassNotFoundException, IOException
     {
-
 		HBox hbox = new HBox();
-		hbox.setAlignment(Pos.CENTER_LEFT);
+		hbox.setAlignment(Pos.CENTER);
 		hbox.setPadding(new Insets(5,5,5,10));
 		Text puntataRicevuta = new Text();
 		Richiesta richiestaUser = new Richiesta();
@@ -233,21 +236,23 @@ public class PuntataController
 		String cognome;
 		String email;
 		Risposta rispostaUser = (Risposta) HelloApplication.input.readObject();
-		if (rispostaUser.tipoRisposta == Risposta.TipoRisposta.OK) 
-		{
-			nome = (String)rispostaUser.payload[0];
-			cognome = (String)rispostaUser.payload[1];
-			email = (String)rispostaUser.payload[2];
-			puntataRicevuta.setText(offerta.dataOra.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n" + offerta.idUtente + " " + nome + " " + cognome +" \n" + String.valueOf(offerta.valore));
-			TextFlow textFlow = new TextFlow(puntataRicevuta);
-			textFlow.setStyle("-fx-background-color: rgb(233,233,235)" + "-fx-background-radius: 20px");
-			textFlow.setPadding(new Insets(5,5,5,10));
-			chatBox.getChildren().add(textFlow);
-		}
-		else if (rispostaUser.tipoRisposta == Risposta.TipoRisposta.ERRORE)
-		{
-			System.out.println(rispostaUser.payload[0]);	
-		}
+
+        if (rispostaUser.tipoRisposta == Risposta.TipoRisposta.ERRORE) {
+            System.out.println(rispostaUser.payload[0]);
+            return;
+        }
+
+        nome = (String)rispostaUser.payload[0];
+        cognome = (String)rispostaUser.payload[1];
+        email = (String)rispostaUser.payload[2];
+
+        puntataRicevuta.setText(offerta.dataOra.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n" + offerta.idUtente + " " + nome + " " + cognome +" \n" + String.valueOf(offerta.valore));
+        TextFlow textFlow = new TextFlow(puntataRicevuta);
+        textFlow.setStyle("-fx-background-color: rgb(233,233,235)" + "-fx-background-radius: 20px");
+        textFlow.setPadding(new Insets(5,5,5,10));
+        textFlow.setPrefWidth(200);
+        hbox.getChildren().add(textFlow);
+        chatBox.getChildren().add(hbox);
     }
     @FXML
     void SendClicked(ActionEvent event) throws IOException, ClassNotFoundException {
@@ -267,12 +272,13 @@ public class PuntataController
 			Text puntata = new Text();
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 			puntata.setText(LocalDateTime.now().format(formatter) + "\n" +"Username \n" + puntataF.getText()+ "$");
-			puntata.setTextAlignment(TextAlignment.RIGHT);
+            puntata.setFill(Color.color(0.934,0.945,0.996));
 			TextFlow textFlow = new TextFlow(puntata);
 			textFlow.setStyle("-fx-background-color: rgb(15,125,242);" + 
-			" -fx-background-radius: 20px;" + 
+			" -fx-background-radius: 20px;" +
 			"-fx-color: rgb(239,242,255)");
-			textFlow.setPadding(new Insets(5,5,5,10));
+			textFlow.setPadding(new Insets(5, 5,5,10));
+            textFlow.setPrefWidth(200);
 			hbox.getChildren().add(textFlow);
 			chatBox.getChildren().add(hbox);
         }else if (rispostaPuntata.tipoRisposta == Risposta.TipoRisposta.ERRORE)
@@ -284,6 +290,7 @@ public class PuntataController
     @FXML
     void ArticoliClicked(ActionEvent event) throws IOException
     {
+        handlerPuntate.interrupt();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Articoli.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
@@ -298,6 +305,7 @@ public class PuntataController
 
     @FXML
     void AsteClicked(ActionEvent event) throws IOException {
+        handlerPuntate.interrupt();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Aste.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
@@ -312,6 +320,7 @@ public class PuntataController
 
     @FXML
     void HomeClicked(ActionEvent event) throws IOException {
+        handlerPuntate.interrupt();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Home.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
@@ -327,6 +336,7 @@ public class PuntataController
     @FXML
     void LogoutClicked(ActionEvent event)
     {
+        handlerPuntate.interrupt();
         Stage stage = (Stage) LogoutB.getScene().getWindow();
         stage.close();
     }
@@ -334,6 +344,7 @@ public class PuntataController
     @FXML
     void LottiClicked(ActionEvent event) throws IOException
     {
+        handlerPuntate.interrupt();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Lotti.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
@@ -349,6 +360,7 @@ public class PuntataController
     @FXML
     void ProfileClicked(ActionEvent event) throws IOException
     {
+        handlerPuntate.interrupt();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Profile.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);

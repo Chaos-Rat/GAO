@@ -118,7 +118,7 @@
                               <Insets left="50.0" />
                            </HBox.margin>
                         </ImageView>
-                        <VBox prefHeight="360.0" prefWidth="662.0">
+                        <VBox alignment="CENTER" prefHeight="360.0" prefWidth="662.0">
                            <children>
                               <HBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="662.0">
                                  <children>
@@ -147,15 +147,6 @@
                                           <Insets left="80.0" />
                                        </HBox.margin>
                                     </Button>
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets left="40.0" />
-                                 </VBox.margin>
-                              </HBox>
-                              <HBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="662.0">
-                                 <children>
-                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Lotto:" />
-                                    <TextField fx:id="lottoF" prefHeight="25.0" prefWidth="264.0" promptText="Please enter the lot number" />
                                  </children>
                                  <VBox.margin>
                                     <Insets left="40.0" />

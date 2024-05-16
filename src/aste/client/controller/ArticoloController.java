@@ -164,7 +164,7 @@ public class ArticoloController
         richiesta.payload[0] = nomeF.getText();
         richiesta.payload[1] = conF.getText();
         richiesta.payload[2] = desF.getText();
-        richiesta.payload[3] = Integer.parseInt(lottoF.getText());
+        richiesta.payload[3] = 1;
         richiesta.payload[4] = new byte[selectedFiles.size()][];
         for (int i = 0 ; i<selectedFiles.size();i++)
         {
