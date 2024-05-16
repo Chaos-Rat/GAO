@@ -128,7 +128,7 @@
                <center>
                   <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="BOTTOM_CENTER">
                      <content>
-                        <VBox fx:id="chatBox" prefHeight="548.0" prefWidth="951.0" />
+                        <VBox fx:id="chatBox" alignment="TOP_RIGHT" prefHeight="548.0" prefWidth="951.0" />
                      </content>
                   </ScrollPane>
                </center>

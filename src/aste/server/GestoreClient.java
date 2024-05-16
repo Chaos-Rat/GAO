@@ -277,7 +277,7 @@ public class GestoreClient implements Runnable {
 			ArrayList<Object> puntate = new ArrayList<>();
 
 			while (result.next()) {
-				puntate.add(result.getInt("Id_puntate"));
+				puntate.add(result.getInt("Id_puntata"));
 				puntate.add(result.getTimestamp("data_ora_effettuazione").toLocalDateTime());
 				puntate.add(result.getFloat("valore"));
 				puntate.add(result.getInt("Rif_utente"));
@@ -2442,12 +2442,57 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void annullaAsta() {
-		// Implementazione dell'annullamento di un'asta
+		// controllo se l'utente e' connesso 
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
+
+		// Funzione per avere un'asta 
+		Integer idAstaInput;
+
+		try {
+			idAstaInput = (Integer)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+			return;
+		}
+
+		if (idAstaInput == null || idAstaInput <= 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+			return;
+		}
+
+		if (!admin) {
+			try (Connection connection = gestoreDatabase.getConnection();) {
+				String queryControlloAsta = "SELECT 1\n" +
+					"FROM Aste\n" +
+					"WHERE Id_asta = ? AND Rif_utente = ?;"
+				;
+	
+				PreparedStatement statement = connection.prepareStatement(queryControlloAsta);
+				statement.setInt(1, idAstaInput);
+				statement.setInt(2, idUtente);
+				ResultSet resultSet = statement.executeQuery();
+
+				if (!resultSet.next()) {
+					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+					rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+					return;
+				}
+	
+			} catch (SQLException e) {
+
+			}
+		}
 	}
 
 	// Metodo visualliza articoli 
 	private void visualizzaArticoli() {
-		// conmtrollo se l'utente e conesso 
+		// controllo se l'utente e conesso 
 		if (idUtente == 0) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };

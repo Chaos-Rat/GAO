@@ -8,15 +8,18 @@ import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -26,6 +29,7 @@ import java.net.*;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class PuntataController
 {
@@ -68,9 +72,19 @@ public class PuntataController
     @FXML
     private Text username;
 
+	private Integer idPuntata;
+
+	private float valore;
+
+	private  Integer idUser;
+
+	private String Username;
+
+	private LocalDateTime messageDateTime;
+
     public static  Integer idAsta;
 
-	public static LocalDateTime start ;
+	public static LocalDateTime start;
 
 	public static Duration duration;
 
@@ -119,6 +133,7 @@ public class PuntataController
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+		chatBox.setSpacing(8);
         Richiesta richiestaProfilen = new Richiesta();
         richiestaProfilen.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PROFILO;
         richiestaProfilen.payload = new Object[1];
@@ -170,32 +185,69 @@ public class PuntataController
                     }
                 };
                 timer.start();
-//				Richiesta richiestaPuntate = new Richiesta();
-//				richiestaPuntate.payload = new Object[1];
-//				richiestaPuntate.payload[0] = idAsta;
-//				HelloApplication.output.writeObject(richiestaPuntate);
-//				Risposta rispostaPuntate = (Risposta) HelloApplication.input.readObject();
-//
-//				if(rispostaPuntate.tipoRisposta == Risposta.TipoRisposta.OK)
-//				{
-//					for (int i = 0; i < rispostaPuntate.payload.length/5; i++) 
-//					{
-//					Integer idPuntata = (Integer) rispostaPuntate.payload[i / 5 + 0];
-//					float valore = (Float)rispostaPuntate.payload[i / 5 + 1];
-//					LocalDateTime messageDateTime = (LocalDateTime) rispostaPuntate.payload[i / 5 + 2];
-//					Integer idUser = (Integer) rispostaPuntate.payload[i / 5 + 3];
-//					String Username = (String)rispostaPuntate.payload[i / 5 + 4];
-//					}
-//				}
-//                else if (rispostaPuntate.tipoRisposta == Risposta.TipoRisposta.ERRORE)
-//                 {
-//                    System.out.println(rispostaPuntate.payload[0]);
-//                 }
+				Richiesta richiestaPuntate = new Richiesta();
+				richiestaPuntate.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PUNTATE;
+				richiestaPuntate.payload = new Object[1];
+				richiestaPuntate.payload[0] = idAsta;
+				HelloApplication.output.writeObject(richiestaPuntate);
+				Risposta rispostaPuntate = (Risposta) HelloApplication.input.readObject();
+
+				if(rispostaPuntate.tipoRisposta == Risposta.TipoRisposta.OK)
+				{
+					for (int i = 0; i < rispostaPuntate.payload.length/5; i++) 
+					{
+					idPuntata = (Integer) rispostaPuntate.payload[i / 5 + 0];
+					valore = (Float)rispostaPuntate.payload[i / 5 + 1];
+					messageDateTime = (LocalDateTime) rispostaPuntate.payload[i / 5 + 2];
+					idUser = (Integer) rispostaPuntate.payload[i / 5 + 3];
+					Username = (String)rispostaPuntate.payload[i / 5 + 4];
+					HBox hbox = new HBox();
+					hbox.setAlignment(Pos.CENTER_LEFT);
+					hbox.setPadding(new Insets(5,5,5,10));
+					Text email = new Text();
+					email.setText(messageDateTime.toString() + "\n" +"Username \n" + String.valueOf(idUser));
+					TextFlow textFlow = new TextFlow();
+					textFlow.setStyle("-fx-background-color: rgb(233,233,235)" + "-fx-background-radius: 20px");
+					textFlow.setPadding(new Insets(5,5,5,10));
+					chatBox.getChildren().add(textFlow);
+					}
+				}
+                else if (rispostaPuntate.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+                 {
+                    System.out.println(rispostaPuntate.payload[0]);
+                 }
     }
 
-    void ChatLog (Offerta offerta)
+    void ChatLog (Offerta offerta) throws ClassNotFoundException, IOException
     {
 
+		HBox hbox = new HBox();
+		hbox.setAlignment(Pos.CENTER_LEFT);
+		hbox.setPadding(new Insets(5,5,5,10));
+		Text puntataRicevuta = new Text();
+		Richiesta richiestaUser = new Richiesta();
+		richiestaUser.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PROFILO;
+		richiestaUser.payload[0] = offerta.idUtente;
+		HelloApplication.output.writeObject(richiestaUser);
+		String nome;
+		String cognome;
+		String email;
+		Risposta rispostaUser = (Risposta) HelloApplication.input.readObject();
+		if (rispostaUser.tipoRisposta == Risposta.TipoRisposta.OK) 
+		{
+			nome = (String)rispostaUser.payload[0];
+			cognome = (String)rispostaUser.payload[1];
+			email = (String)rispostaUser.payload[2];
+			puntataRicevuta.setText(offerta.dataOra.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n" + offerta.idUtente + " " + nome + " " + cognome +" \n" + String.valueOf(offerta.valore));
+			TextFlow textFlow = new TextFlow(puntataRicevuta);
+			textFlow.setStyle("-fx-background-color: rgb(233,233,235)" + "-fx-background-radius: 20px");
+			textFlow.setPadding(new Insets(5,5,5,10));
+			chatBox.getChildren().add(textFlow);
+		}
+		else if (rispostaUser.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+		{
+			System.out.println(rispostaUser.payload[0]);	
+		}
     }
     @FXML
     void SendClicked(ActionEvent event) throws IOException, ClassNotFoundException {
@@ -209,6 +261,20 @@ public class PuntataController
         if (rispostaPuntata.tipoRisposta == Risposta.TipoRisposta.OK)
         {
             System.out.println("Hai puntato " + puntataF.getText());
+			HBox hbox = new HBox();
+			hbox.setAlignment(Pos.CENTER_RIGHT);
+			hbox.setPadding(new Insets(5,5,5,10));
+			Text puntata = new Text();
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+			puntata.setText(LocalDateTime.now().format(formatter) + "\n" +"Username \n" + puntataF.getText()+ "$");
+			puntata.setTextAlignment(TextAlignment.RIGHT);
+			TextFlow textFlow = new TextFlow(puntata);
+			textFlow.setStyle("-fx-background-color: rgb(15,125,242);" + 
+			" -fx-background-radius: 20px;" + 
+			"-fx-color: rgb(239,242,255)");
+			textFlow.setPadding(new Insets(5,5,5,10));
+			hbox.getChildren().add(textFlow);
+			chatBox.getChildren().add(hbox);
         }else if (rispostaPuntata.tipoRisposta == Risposta.TipoRisposta.ERRORE)
         {
             System.out.println(rispostaPuntata.payload[0]);
