@@ -317,7 +317,7 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		if (idLottoInput == null || idLottoInput > 1) {
+		if (idLottoInput == null || idLottoInput <= 1) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idLotto"};
 			return;
@@ -669,8 +669,7 @@ public class GestoreClient implements Runnable {
 	}
 	//Metodo visualizza articolo 1.0
 	private void visualizzaArticolo() {
-		// TODO: Implementare
-		// conmtrollo se l'utente e conesso 
+		// controllo se l'utente e conesso 
 		if (idUtente == 0) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
@@ -684,72 +683,74 @@ public class GestoreClient implements Runnable {
 			idArticoloInput = (Integer)richiestaEntrante.payload[0];
 		} catch (ClassCastException e) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idArticolo"};
 			return;
 		}
 
-		if (idArticoloInput == null) {
+		if (idArticoloInput == null || idArticoloInput <= 0) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
-			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idArticolo"};
 			return;
 		}
-		//query
-		String queryVisualizzazione = "SELECT Articoli.nome, Articoli.condizione, Articoli.descrizione, " +
-			"Lotti.Id_lotto, Utenti.Id_utente, " +
-			"Utente.email\n"+ 
-			"FROM Articoli\n"+
-			"JOIN Utenti ON Articoli.Rif_utente = Utente.Rif_articolo\n" +
-			"JOIN Lotti ON Articoli.Rif_lotto = Lotti.Id_lotto\n"
-		;
-
-		String queryImmagini = "SELECT Immagini.Id_immagine\n" +
-			"FROM Immagini\n" +
-			"JOIN Articoli ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
-			"WHERE Articoli.Rif_lotto = ?;"
-		;
 
 		try (Connection connection = gestoreDatabase.getConnection();) {
-			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
+			String queryArticolo = "SELECT Articoli.nome, Articoli.condizione, Articoli.descrizione,\n" +
+					"Articoli.Rif_lotto, Articoli.Rif_utente, Utenti.email\n" +
+				"FROM Articoli\n" +
+				"JOIN Utenti ON Articoli.Rif_utente = Utenti.Id_utente\n" +
+				"WHERE Id_articolo = ?;"
+			;
+
+			String queryImmagini = "SELECT Id_immagine\n" +
+				"FROM Immagini\n" +
+				"WHERE Rif_articolo = ?;\n"
+			;
+
+			PreparedStatement preparedStatement = connection.prepareStatement(queryArticolo);
 			preparedStatement.setInt(1, idArticoloInput);
 			ResultSet resultSet = preparedStatement.executeQuery();
 
-			// While per caricare l'array list 
+			// Non esiste lotto con id dato
 			if (!resultSet.next()) {
-				// 
-				rispostaUscente.tipoRisposta= TipoRisposta.OK;
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idArticolo" };
+				return;
+			}
 
-				rispostaUscente.payload[0]= resultSet.getString("nome");
-				rispostaUscente.payload[1]= resultSet.getString("condizione");
-				rispostaUscente.payload[2]= resultSet.getString("descrizione");
-				rispostaUscente.payload[3]= resultSet.getInt("Id_lotto");
-				rispostaUscente.payload[4]= resultSet.getByte("immagini_articolo");
-				rispostaUscente.payload[5]= resultSet.getInt("Id_utente");
-				rispostaUscente.payload[6]= resultSet.getString("email");
+			rispostaUscente.tipoRisposta = TipoRisposta.OK;
+			rispostaUscente.payload = new Object[]{ idArticoloInput,
+				resultSet.getString("nome"),
+				resultSet.getString("condizione"),
+				resultSet.getString("descrizione"),
+				resultSet.getInt("Rif_lotto"),
+				null,
+				resultSet.getInt("Rif_utente"),
+				resultSet.getString("email")	
+			};
 
-				String nomeFile = resultSet.wasNull() ? 
-					"static_resources\\default_articolo.png" :
-					"res\\immagini_articoli\\" + ".png"
-				;
+			preparedStatement = connection.prepareStatement(queryImmagini);
+			preparedStatement.setInt(1, idArticoloInput);
+			resultSet = preparedStatement.executeQuery();
+
+			ArrayList<byte[]> immaginiArticoli = new ArrayList<>();
+			
+			while (resultSet.next()) {
+				int idImmagine = resultSet.getInt("Id_immagine");
+
+				String nomeFile = "res\\immagini_articoli\\" + idImmagine + ".png";
 
 				try (FileInputStream stream = new FileInputStream(nomeFile);) {
-					stream.readAllBytes();
+					immaginiArticoli.add(stream.readAllBytes());
 				}
 			}
 
-			//metti img
-			FileInputStream stream;
-
-			if (resultSet.wasNull()) {
-				stream= new FileInputStream("static_resources\\default_articolo.png");
-			} else {
-				// TODO: Fix (never)
-				stream= new FileInputStream("res\\immagini_articoli\\" + ".png");
+			if (immaginiArticoli.isEmpty()) {
+				try (FileInputStream stream = new FileInputStream("static_resources\\default_articolo.png");) {
+					immaginiArticoli.add(stream.readAllBytes());
+				}
 			}
 
-			stream.readAllBytes();
-
-			stream.close();
-
+			rispostaUscente.payload[5] = (byte[][])immaginiArticoli.toArray();
 		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
 			System.err.println("[" + Thread.currentThread().getName() +
 				"]: C'e' stato un errore nella query di vissualizazione articolo. " + e.getMessage()
@@ -763,6 +764,7 @@ public class GestoreClient implements Runnable {
 				"]: C'e' stato un errore nell'apertura/scrittura/chiusura delle immagini dell'articolo. "
 				+ e.getMessage()
 			);
+
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
