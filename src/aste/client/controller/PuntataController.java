@@ -101,12 +101,9 @@ public class PuntataController
         private PuntataController puntataController;
 
         public ChatClient(PuntataController puntataController, InetAddress ipMulticast) throws IOException {
-            InetSocketAddress indirizzoSocket = new InetSocketAddress(ipMulticast, 3000);
-            NetworkInterface interfaccia = NetworkInterface.getByInetAddress(HelloApplication.getLocalAddress());
-
-            socket = new MulticastSocket();
+            socket = new MulticastSocket(3000);
             socket.setSoTimeout(10 * 1000);
-            socket.joinGroup(indirizzoSocket, interfaccia);
+            socket.joinGroup(ipMulticast);
         }
 
         @Override

@@ -209,11 +209,10 @@ public class GestoreAste {
 		InetAddress indirizzoServer,
 		Offerta offerta
 	) throws IOException {
-		try (MulticastSocket socket = new MulticastSocket();) {
+		try (MulticastSocket socket = new MulticastSocket(3000);) {
 			InetSocketAddress indirizzoSocket = new InetSocketAddress(indirizzoMulticast, 3000);
-			NetworkInterface interfaccia = NetworkInterface.getByInetAddress(indirizzoServer);
 			
-			socket.joinGroup(indirizzoSocket, interfaccia);
+			socket.joinGroup(indirizzoMulticast);
 
 			byte[] datiOfferta = Offerta.toByteArray(offerta);
 			
