@@ -28,7 +28,7 @@ echo ""
 tar -xf temp.zip
 
 echo Apache Commons Logging...
-powershell -c "Invoke-WebRequest -Uri 'https://dlcdn.apache.org//commons/logging/binaries/commons-logging-1.3.1-bin.zip' -OutFile 'temp.zip'"
+powershell -c "Invoke-WebRequest -Uri 'https://dlcdn.apache.org//commons/logging/binaries/commons-logging-1.3.2-bin.zip' -OutFile 'temp.zip'"
 echo ""
 
 tar -xf temp.zip
