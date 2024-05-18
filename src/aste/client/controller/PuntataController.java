@@ -100,7 +100,9 @@ public class PuntataController
         private final MulticastSocket socket;
         private PuntataController puntataController;
 
-        public ChatClient(PuntataController puntataController, InetAddress ipMulticast) throws IOException {
+        @SuppressWarnings("deprecation")
+		public ChatClient(PuntataController puntataController, InetAddress ipMulticast) throws IOException {
+			this.puntataController = puntataController;
             socket = new MulticastSocket(3000);
             socket.setSoTimeout(10 * 1000);
             socket.joinGroup(ipMulticast);
@@ -227,7 +229,7 @@ public class PuntataController
 		Text puntataRicevuta = new Text();
 		Richiesta richiestaUser = new Richiesta();
 		richiestaUser.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PROFILO;
-		richiestaUser.payload[0] = offerta.idUtente;
+		richiestaUser.payload = new Object[]{ offerta.idUtente };
 		HelloApplication.output.writeObject(richiestaUser);
 		String nome;
 		String cognome;

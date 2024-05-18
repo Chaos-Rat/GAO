@@ -204,7 +204,8 @@ public class GestoreAste {
 		liberaIndirizzo(idAsta, indirizzoLibero);
     }
 
-    public synchronized void effettuaPuntata(int idAsta,
+    @SuppressWarnings("deprecation")
+	public synchronized void effettuaPuntata(int idAsta,
 		InetAddress indirizzoMulticast,
 		InetAddress indirizzoServer,
 		Offerta offerta
