@@ -98,7 +98,7 @@ public class PuntataController
 
     private static ChatClient handlerPuntate;
 
-    private static class ChatClient extends Task
+    private static class ChatClient extends Thread
     {
         private final MulticastSocket socket;
         private PuntataController puntataController;
@@ -112,23 +112,26 @@ public class PuntataController
         }
 
         @Override
-		protected Object call() throws Exception {
+		public void run() {
 			try (socket;) {
                 byte[] datiOfferta = new byte[Offerta.MAX_SERIALIZED_SIZE];
                 DatagramPacket pacchetto = new DatagramPacket(datiOfferta, datiOfferta.length);
 
-                while (!isCancelled()) {
+                while (!isInterrupted()) {
                     try {
                         socket.receive(pacchetto);
                         Offerta offerta = Offerta.fromByteArray(datiOfferta);
-						Platform.runLater(() -> {
-							try {
-								puntataController.ChatLog(offerta);
-							} catch (ClassNotFoundException | IOException e) {
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						});
+						
+						if (offerta.idUtente != HelloApplication.idUtenteLoggato) {
+							Platform.runLater(() -> {
+								try {
+									puntataController.ChatLog(offerta);
+								} catch (ClassNotFoundException | IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+							});
+						}
                     } catch (SocketTimeoutException e) {
                         continue;
                     } catch (ClassNotFoundException | ClassCastException e) {
@@ -137,9 +140,7 @@ public class PuntataController
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
-            }
-
-			return null;
+			}
 		}
     }
 
@@ -199,9 +200,7 @@ public class PuntataController
         };
         timer.start();
 		handlerPuntate = new ChatClient(this, ipAddress);
-		Thread handlerThread = new Thread(handlerPuntate);
-		handlerThread.setDaemon(true);
-		handlerThread.start();
+		handlerPuntate.start();
     }
 
     void ChatLog (Offerta offerta) throws ClassNotFoundException, IOException
@@ -240,9 +239,11 @@ public class PuntataController
     void SendClicked(ActionEvent event) throws IOException, ClassNotFoundException {
         Richiesta richiestaPunatata = new Richiesta();
         richiestaPunatata.tipoRichiesta = Richiesta.TipoRichiesta.EFFETTUA_PUNTATA;
+		float valorePuntata = Float.parseFloat(puntataF.getText());
         richiestaPunatata.payload = new Object[2];
         richiestaPunatata.payload[0] = idAsta;
-        richiestaPunatata.payload[1] = Float.parseFloat(puntataF.getText());
+        richiestaPunatata.payload[1] = valorePuntata;
+
         HelloApplication.output.writeObject(richiestaPunatata);
         Risposta rispostaPuntata = (Risposta)HelloApplication.input.readObject();
         if (rispostaPuntata.tipoRisposta == Risposta.TipoRisposta.OK)
@@ -272,7 +273,7 @@ public class PuntataController
     @FXML
     void ArticoliClicked(ActionEvent event) throws IOException
     {
-        handlerPuntate.cancel();
+        handlerPuntate.interrupt();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Articoli.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
@@ -287,7 +288,7 @@ public class PuntataController
 
     @FXML
     void AsteClicked(ActionEvent event) throws IOException {
-        handlerPuntate.cancel();
+        handlerPuntate.interrupt();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Aste.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
@@ -302,7 +303,7 @@ public class PuntataController
 
     @FXML
     void HomeClicked(ActionEvent event) throws IOException {
-        handlerPuntate.cancel();
+        handlerPuntate.interrupt();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Home.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
@@ -318,7 +319,7 @@ public class PuntataController
     @FXML
     void LogoutClicked(ActionEvent event)
     {
-        handlerPuntate.cancel();
+        handlerPuntate.interrupt();
         Stage stage = (Stage) LogoutB.getScene().getWindow();
         stage.close();
     }
@@ -326,7 +327,7 @@ public class PuntataController
     @FXML
     void LottiClicked(ActionEvent event) throws IOException
     {
-        handlerPuntate.cancel();
+        handlerPuntate.interrupt();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Lotti.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
@@ -342,7 +343,7 @@ public class PuntataController
     @FXML
     void ProfileClicked(ActionEvent event) throws IOException
     {
-        handlerPuntate.cancel();
+        handlerPuntate.interrupt();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Profile.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);

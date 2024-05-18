@@ -17,6 +17,7 @@ public class HelloApplication extends Application
     private static Socket socket;
     public static ObjectOutputStream output;
     public static ObjectInputStream input;
+	public static int idUtenteLoggato;
 
     static {
         try {

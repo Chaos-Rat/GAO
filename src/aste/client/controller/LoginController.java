@@ -75,6 +75,7 @@ public class LoginController {
             stage.show();
             Stage thirdstage = (Stage) EnterB.getScene().getWindow();
             thirdstage.close();
+			HelloApplication.idUtenteLoggato = (Integer)risposta.payload[0];
         }
         else
         {

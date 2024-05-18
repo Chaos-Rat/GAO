@@ -1500,6 +1500,7 @@ public class GestoreClient implements Runnable {
 					this.idUtente = idUtente;
 					admin = resultSet.getInt("utente_admin") == 1;
 					rispostaUscente.tipoRisposta = TipoRisposta.OK;
+					rispostaUscente.payload = new Object[]{ idUtente };
 					return;
 				}
 			}
@@ -1766,7 +1767,7 @@ public class GestoreClient implements Runnable {
 		}
 
 		try (Connection connection = gestoreDatabase.getConnection();) {
-			if (idUtenteInput == 0) { // utente loggato
+			if (idUtenteInput == 0) {
 				String queryVisualizzazione = "SELECT nome, cognome, data_nascita, citta_residenza, cap, indirizzo, email, iban\n" +
 					"FROM Utenti\n" +
 					"WHERE Id_utente = ?"
