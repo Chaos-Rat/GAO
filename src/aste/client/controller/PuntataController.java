@@ -5,6 +5,8 @@ import aste.Richiesta;
 import aste.Risposta;
 import aste.client.HelloApplication;
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -31,6 +33,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.ExecutorService;
 
 public class PuntataController
 {
@@ -95,7 +98,7 @@ public class PuntataController
 
     private static ChatClient handlerPuntate;
 
-    private static class ChatClient extends Thread
+    private static class ChatClient extends Task
     {
         private final MulticastSocket socket;
         private PuntataController puntataController;
@@ -109,12 +112,12 @@ public class PuntataController
         }
 
         @Override
-        public void run() {
-            try (socket;) {
+		protected Object call() throws Exception {
+			try (socket;) {
                 byte[] datiOfferta = new byte[Offerta.MAX_SERIALIZED_SIZE];
                 DatagramPacket pacchetto = new DatagramPacket(datiOfferta, datiOfferta.length);
 
-                while (!isInterrupted()) {
+                while (!isCancelled()) {
                     try {
                         socket.receive(pacchetto);
                         Offerta offerta = Offerta.fromByteArray(datiOfferta);
@@ -128,7 +131,9 @@ public class PuntataController
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
+
+			return null;
+		}
     }
 
     @FXML
@@ -217,8 +222,10 @@ public class PuntataController
 //                 {
 //                    System.out.println(rispostaPuntate.payload[0]);
 //                 }
-        handlerPuntate = new ChatClient(this, ipAddress);
-        handlerPuntate.start();
+		handlerPuntate = new ChatClient(this, ipAddress);
+		Thread handlerThread = new Thread(handlerPuntate);
+		handlerThread.setDaemon(true);
+		handlerThread.start();
     }
 
     void ChatLog (Offerta offerta) throws ClassNotFoundException, IOException
@@ -289,7 +296,7 @@ public class PuntataController
     @FXML
     void ArticoliClicked(ActionEvent event) throws IOException
     {
-        handlerPuntate.interrupt();
+        handlerPuntate.cancel();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Articoli.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
@@ -304,7 +311,7 @@ public class PuntataController
 
     @FXML
     void AsteClicked(ActionEvent event) throws IOException {
-        handlerPuntate.interrupt();
+        handlerPuntate.cancel();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Aste.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
@@ -319,7 +326,7 @@ public class PuntataController
 
     @FXML
     void HomeClicked(ActionEvent event) throws IOException {
-        handlerPuntate.interrupt();
+        handlerPuntate.cancel();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Home.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
@@ -335,7 +342,7 @@ public class PuntataController
     @FXML
     void LogoutClicked(ActionEvent event)
     {
-        handlerPuntate.interrupt();
+        handlerPuntate.cancel();
         Stage stage = (Stage) LogoutB.getScene().getWindow();
         stage.close();
     }
@@ -343,7 +350,7 @@ public class PuntataController
     @FXML
     void LottiClicked(ActionEvent event) throws IOException
     {
-        handlerPuntate.interrupt();
+        handlerPuntate.cancel();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Lotti.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
@@ -359,7 +366,7 @@ public class PuntataController
     @FXML
     void ProfileClicked(ActionEvent event) throws IOException
     {
-        handlerPuntate.interrupt();
+        handlerPuntate.cancel();
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Profile.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
