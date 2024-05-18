@@ -121,7 +121,14 @@ public class PuntataController
                     try {
                         socket.receive(pacchetto);
                         Offerta offerta = Offerta.fromByteArray(datiOfferta);
-                        puntataController.ChatLog(offerta);
+						Platform.runLater(() -> {
+							try {
+								puntataController.ChatLog(offerta);
+							} catch (ClassNotFoundException | IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						});
                     } catch (SocketTimeoutException e) {
                         continue;
                     } catch (ClassNotFoundException | ClassCastException e) {
@@ -191,37 +198,6 @@ public class PuntataController
             }
         };
         timer.start();
-//				Richiesta richiestaPuntate = new Richiesta();
-//				richiestaPuntate.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PUNTATE;
-//				richiestaPuntate.payload = new Object[1];
-//				richiestaPuntate.payload[0] = idAsta;
-//				HelloApplication.output.writeObject(richiestaPuntate);
-//				Risposta rispostaPuntate = (Risposta) HelloApplication.input.readObject();
-//
-//				if(rispostaPuntate.tipoRisposta == Risposta.TipoRisposta.OK)
-//				{
-//					for (int i = 0; i < rispostaPuntate.payload.length/5; i++)
-//					{
-//					idPuntata = (Integer) rispostaPuntate.payload[i / 5 + 0];
-//					valore = (Float) rispostaPuntate.payload[i / 5 + 1];
-//					messageDateTime = (LocalDateTime) rispostaPuntate.payload[i / 5 + 2];
-//					idUser = (Integer) rispostaPuntate.payload[i / 5 + 3];
-//					Username = (String)rispostaPuntate.payload[i / 5 + 4];
-//					HBox hbox = new HBox();
-//					hbox.setAlignment(Pos.CENTER_LEFT);
-//					hbox.setPadding(new Insets(5,5,5,10));
-//					Text email = new Text();
-//					email.setText(messageDateTime.toString() + "\n" +"Username \n" + String.valueOf(idUser));
-//					TextFlow textFlow = new TextFlow();
-//					textFlow.setStyle("-fx-background-color: rgb(233,233,235)" + "-fx-background-radius: 20px");
-//					textFlow.setPadding(new Insets(5,5,5,10));
-//					chatBox.getChildren().add(textFlow);
-//					}
-//				}
-//                else if (rispostaPuntate.tipoRisposta == Risposta.TipoRisposta.ERRORE)
-//                 {
-//                    System.out.println(rispostaPuntate.payload[0]);
-//                 }
 		handlerPuntate = new ChatClient(this, ipAddress);
 		Thread handlerThread = new Thread(handlerPuntate);
 		handlerThread.setDaemon(true);
@@ -231,7 +207,7 @@ public class PuntataController
     void ChatLog (Offerta offerta) throws ClassNotFoundException, IOException
     {
 		HBox hbox = new HBox();
-		hbox.setAlignment(Pos.CENTER);
+		hbox.setAlignment(Pos.CENTER_LEFT);
 		hbox.setPadding(new Insets(5,5,5,10));
 		Text puntataRicevuta = new Text();
 		Richiesta richiestaUser = new Richiesta();
@@ -252,9 +228,9 @@ public class PuntataController
         cognome = (String)rispostaUser.payload[1];
         email = (String)rispostaUser.payload[2];
 
-        puntataRicevuta.setText(offerta.dataOra.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n" + offerta.idUtente + " " + nome + " " + cognome +" \n" + String.valueOf(offerta.valore));
+        puntataRicevuta.setText(offerta.dataOra.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n" + offerta.idUtente + ". " + nome + " " + cognome +" \n" + String.valueOf(offerta.valore)+"$");
         TextFlow textFlow = new TextFlow(puntataRicevuta);
-        textFlow.setStyle("-fx-background-color: rgb(233,233,235)" + "-fx-background-radius: 20px");
+        textFlow.setStyle("-fx-background-color: rgb(233,233,235);" + "-fx-background-radius: 20px;");
         textFlow.setPadding(new Insets(5,5,5,10));
         textFlow.setPrefWidth(200);
         hbox.getChildren().add(textFlow);
