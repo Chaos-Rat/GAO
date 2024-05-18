@@ -278,8 +278,8 @@ public class GestoreClient implements Runnable {
 
 			while (result.next()) {
 				puntate.add(result.getInt("Id_puntata"));
-				puntate.add(result.getTimestamp("data_ora_effettuazione").toLocalDateTime());
 				puntate.add(result.getFloat("valore"));
+				puntate.add(result.getTimestamp("data_ora_effettuazione").toLocalDateTime());
 				puntate.add(result.getInt("Rif_utente"));
 				puntate.add(result.getString("Email"));
 			}
@@ -853,7 +853,7 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		if (valoreInput == null || valoreInput <= 0) {
+		if (valoreInput == null || valoreInput <= 0 || valoreInput >= 1000000000000.0f) {
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "valore"};
 			return;
