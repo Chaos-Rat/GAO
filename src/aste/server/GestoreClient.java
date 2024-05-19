@@ -2204,7 +2204,7 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.data_ora_inzio, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
+		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.data_ora_inizio, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
 			"Lotti.nome, Immagini.Id_immagine\n" + 
 			"FROM Aste\n" +
 			"LEFT JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
