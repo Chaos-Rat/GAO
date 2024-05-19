@@ -88,6 +88,27 @@ public class AstaController
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+        Richiesta richiesta = new Richiesta();
+        richiesta.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_IMMAGINE_PROFILO;
+        richiesta.payload = new Object[]{0};
+        HelloApplication.output.writeObject(richiesta);
+        Risposta risposta = (Risposta) HelloApplication.input.readObject();
+        if (risposta.tipoRisposta == Risposta.TipoRisposta.OK) {
+            FileOutputStream picture = new FileOutputStream("imagine.png");
+            picture.write((byte[]) risposta.payload[0]);
+            picture.close();
+            FileInputStream defaultImg = new FileInputStream("imagine.png");
+            Image image = new Image(defaultImg);
+            ImageView imageView = new ImageView();
+            imageView.setImage(image);
+            avatar.setFill(new ImagePattern(imageView.getImage()));
+            defaultImg.close();
+        }
+        else
+        {
+            System.out.println(risposta.tipoRisposta.toString());
+            System.out.println(((Risposta.TipoErrore) risposta.payload[0]).toString());
+        }
         Richiesta richiestaProfile = new Richiesta();
         richiestaProfile.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PROFILO;
         richiestaProfile.payload = new Object[1];

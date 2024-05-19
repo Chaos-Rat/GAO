@@ -20,9 +20,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -30,6 +33,8 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.*;
 import java.time.Duration;
@@ -171,6 +176,27 @@ public class PuntataController
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+        Richiesta richiestaProfile = new Richiesta();
+        richiestaProfile.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_IMMAGINE_PROFILO;
+        richiestaProfile.payload = new Object[]{0};
+        HelloApplication.output.writeObject(richiestaProfile);
+        Risposta rispostaProfile = (Risposta) HelloApplication.input.readObject();
+        if (rispostaProfile.tipoRisposta == Risposta.TipoRisposta.OK) {
+            FileOutputStream picture = new FileOutputStream("imagine.png");
+            picture.write((byte[]) rispostaProfile.payload[0]);
+            picture.close();
+            FileInputStream defaultImg = new FileInputStream("imagine.png");
+            Image image = new Image(defaultImg);
+            ImageView imageView = new ImageView();
+            imageView.setImage(image);
+            avatar.setFill(new ImagePattern(imageView.getImage()));
+            defaultImg.close();
+        }
+        else
+        {
+            System.out.println(rispostaProfile.tipoRisposta.toString());
+            System.out.println(((Risposta.TipoErrore) rispostaProfile.payload[0]).toString());
+        }
 		valoreMassimoLocale = 0;
 		chatBox.setSpacing(8);
         Richiesta richiestaProfilen = new Richiesta();
