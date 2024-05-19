@@ -368,7 +368,7 @@ public class GestoreClient implements Runnable {
 
 		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
 			System.err.println("[" + Thread.currentThread().getName() +
-				"]: C'e' stato un errore nella query di vissualizzazione delle aste concluse. " + e.getMessage()
+				"]: C'e' stato un errore nella query di visualizzazione delle aste concluse. " + e.getMessage()
 			);
 
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
@@ -2273,7 +2273,7 @@ public class GestoreClient implements Runnable {
 
 		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
 			System.err.println("[" + Thread.currentThread().getName() +
-				"]: C'e' stato un errore nella query di vissualizzazione aste. " + e.getMessage()
+				"]: C'e' stato un errore nella query di visualizzazione aste. " + e.getMessage()
 			);
 
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
@@ -2468,7 +2468,7 @@ public class GestoreClient implements Runnable {
 
 		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
 			System.err.println("[" + Thread.currentThread().getName() +
-				"]: C'e' stato un errore nella query di vissualizzazione delle aste correnti. " + e.getMessage()
+				"]: C'e' stato un errore nella query di visualizzazione delle aste correnti. " + e.getMessage()
 			);
 
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
@@ -2662,7 +2662,7 @@ public class GestoreClient implements Runnable {
 
 		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
 			System.err.println("[" + Thread.currentThread().getName() +
-				"]: C'e' stato un errore nella query di vissualizzazione delle aste programmate. " + e.getMessage()
+				"]: C'e' stato un errore nella query di visualizzazione delle aste programmate. " + e.getMessage()
 			);
 
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
