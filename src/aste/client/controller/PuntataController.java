@@ -323,9 +323,10 @@ public class PuntataController
 
     @FXML
     void SendClicked(ActionEvent event) throws IOException, ClassNotFoundException {
-        Richiesta richiestaPunatata = new Richiesta();
+		Richiesta richiestaPunatata = new Richiesta();
         richiestaPunatata.tipoRichiesta = Richiesta.TipoRichiesta.EFFETTUA_PUNTATA;
 		float valorePuntata = Float.parseFloat(puntataF.getText());
+		valoreMassimoLocale = valorePuntata;
         richiestaPunatata.payload = new Object[2];
         richiestaPunatata.payload[0] = idAsta;
         richiestaPunatata.payload[1] = valorePuntata;
@@ -336,7 +337,6 @@ public class PuntataController
         {
             System.out.println("Hai puntato " + puntataF.getText());
 			addLocalUserBox(new Offerta(HelloApplication.idUtenteLoggato, valorePuntata, LocalDateTime.now()));
-			valoreMassimoLocale = valorePuntata;
         }else if (rispostaPuntata.tipoRisposta == Risposta.TipoRisposta.ERRORE)
         {
             System.out.println(rispostaPuntata.payload[0]);
