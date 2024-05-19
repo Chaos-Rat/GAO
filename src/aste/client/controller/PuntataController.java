@@ -3,6 +3,9 @@ package aste.client.controller;
 import aste.Offerta;
 import aste.Richiesta;
 import aste.Risposta;
+import aste.Risposta.TipoErrore;
+import aste.Risposta.TipoRisposta;
+import aste.Richiesta.TipoRichiesta;
 import aste.client.HelloApplication;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -75,16 +78,6 @@ public class PuntataController
     @FXML
     private Text username;
 
-	private Integer idPuntata;
-
-	private float valore;
-
-	private  Integer idUser;
-
-	private String Username;
-
-	private LocalDateTime messageDateTime;
-
     public static  Integer idAsta;
 
 	public static LocalDateTime start;
@@ -96,6 +89,8 @@ public class PuntataController
     public static InetAddress ipAddress;
 
     private static ChatClient handlerPuntate;
+
+	private float valoreMassimoLocale;
 
     private static class ChatClient extends Thread
     {
@@ -135,7 +130,19 @@ public class PuntataController
 						if (offerta.idUtente != HelloApplication.idUtenteLoggato) {
 							Platform.runLater(() -> {
 								try {
-									puntataController.ChatLog(offerta);
+									puntataController.addRemoteUserBox(offerta);
+								} catch (ClassNotFoundException | IOException e) {
+									e.printStackTrace();
+								}
+							});
+
+							return;
+						}
+						
+						if (offerta.valore > puntataController.valoreMassimoLocale) {
+							Platform.runLater(() -> {
+								try {
+									puntataController.addLocalUserBox(offerta);
 								} catch (ClassNotFoundException | IOException e) {
 									e.printStackTrace();
 								}
@@ -164,6 +171,7 @@ public class PuntataController
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+		valoreMassimoLocale = 0;
 		chatBox.setSpacing(8);
         Richiesta richiestaProfilen = new Richiesta();
         richiestaProfilen.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PROFILO;
@@ -208,19 +216,44 @@ public class PuntataController
             }
             private String format(Duration remaining) {
                 return String.format("%01d days, %02d:%02d:%02d",
-                        remaining.toDays(),
-                        remaining.toHoursPart(),
-                        remaining.toMinutesPart(),
-                        remaining.toSecondsPart()
+					remaining.toDays(),
+					remaining.toHoursPart(),
+					remaining.toMinutesPart(),
+					remaining.toSecondsPart()
                 );
             }
         };
         timer.start();
+
+		Richiesta richiesta = new Richiesta();
+		richiesta.tipoRichiesta = TipoRichiesta.VISUALIZZA_PUNTATE;
+		richiesta.payload = new Object[]{ idAsta };
+		HelloApplication.output.writeObject(richiesta);
+
+		Risposta risposta = (Risposta)HelloApplication.input.readObject();
+		
+		if (risposta.tipoRisposta == TipoRisposta.OK) {
+			for (int i = 0; i < risposta.payload.length / 5; ++i) {
+				Offerta offerta = new Offerta((Integer)risposta.payload[i * 5 + 3],
+					(Float)risposta.payload[i * 5 + 1],
+					(LocalDateTime)risposta.payload[i * 5 + 2]
+				);
+
+				if (HelloApplication.idUtenteLoggato != offerta.idUtente) {
+					addRemoteUserBox(offerta);
+				} else {
+					addLocalUserBox(offerta);
+				}
+			}
+		} else {
+			System.err.println("C'è stato un errore nella visualizzazione delle puntate: " + (TipoErrore)risposta.payload[0]);
+		}
+
 		handlerPuntate = new ChatClient(this, ipAddress);
 		handlerPuntate.start();
     }
 
-    void ChatLog (Offerta offerta) throws ClassNotFoundException, IOException
+    void addRemoteUserBox(Offerta offerta) throws ClassNotFoundException, IOException
     {
 		HBox hbox = new HBox();
 		hbox.setAlignment(Pos.CENTER_LEFT);
@@ -252,6 +285,42 @@ public class PuntataController
         hbox.getChildren().add(textFlow);
         chatBox.getChildren().add(hbox);
     }
+
+	void addLocalUserBox(Offerta offerta) throws IOException, ClassNotFoundException {
+		Richiesta richiestaUser = new Richiesta();
+		richiestaUser.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_PROFILO;
+		richiestaUser.payload = new Object[]{ offerta.idUtente };
+		HelloApplication.output.writeObject(richiestaUser);
+		String nome;
+		String cognome;
+		String email;
+		Risposta rispostaUser = (Risposta) HelloApplication.input.readObject();
+
+        if (rispostaUser.tipoRisposta == Risposta.TipoRisposta.ERRORE) {
+            System.out.println(rispostaUser.payload[0]);
+            return;
+        }
+
+        nome = (String)rispostaUser.payload[0];
+        cognome = (String)rispostaUser.payload[1];
+        email = (String)rispostaUser.payload[2];
+
+		HBox hbox = new HBox();
+		hbox.setAlignment(Pos.CENTER_RIGHT);
+		hbox.setPadding(new Insets(5,5,5,10));
+		Text puntata = new Text();
+		puntata.setText(offerta.dataOra.format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")) + "\n" + offerta.idUtente + ". " + nome + " " + cognome +" \n" + String.valueOf(offerta.valore)+"$");
+		puntata.setFill(Color.color(0.934,0.945,0.996));
+		TextFlow textFlow = new TextFlow(puntata);
+		textFlow.setStyle("-fx-background-color: rgb(15,125,242);" + 
+		" -fx-background-radius: 20px;" +
+		"-fx-color: rgb(239,242,255)");
+		textFlow.setPadding(new Insets(5, 5,5,10));
+		textFlow.setPrefWidth(200);
+		hbox.getChildren().add(textFlow);
+		chatBox.getChildren().add(hbox);
+	}
+
     @FXML
     void SendClicked(ActionEvent event) throws IOException, ClassNotFoundException {
         Richiesta richiestaPunatata = new Richiesta();
@@ -266,21 +335,8 @@ public class PuntataController
         if (rispostaPuntata.tipoRisposta == Risposta.TipoRisposta.OK)
         {
             System.out.println("Hai puntato " + puntataF.getText());
-			HBox hbox = new HBox();
-			hbox.setAlignment(Pos.CENTER_RIGHT);
-			hbox.setPadding(new Insets(5,5,5,10));
-			Text puntata = new Text();
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-			puntata.setText(LocalDateTime.now().format(formatter) + "\n" +"Username \n" + puntataF.getText()+ "$");
-            puntata.setFill(Color.color(0.934,0.945,0.996));
-			TextFlow textFlow = new TextFlow(puntata);
-			textFlow.setStyle("-fx-background-color: rgb(15,125,242);" + 
-			" -fx-background-radius: 20px;" +
-			"-fx-color: rgb(239,242,255)");
-			textFlow.setPadding(new Insets(5, 5,5,10));
-            textFlow.setPrefWidth(200);
-			hbox.getChildren().add(textFlow);
-			chatBox.getChildren().add(hbox);
+			addLocalUserBox(new Offerta(HelloApplication.idUtenteLoggato, valorePuntata, LocalDateTime.now()));
+			valoreMassimoLocale = valorePuntata;
         }else if (rispostaPuntata.tipoRisposta == Risposta.TipoRisposta.ERRORE)
         {
             System.out.println(rispostaPuntata.payload[0]);
