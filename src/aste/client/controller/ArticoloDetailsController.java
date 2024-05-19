@@ -69,6 +69,9 @@ public class ArticoloDetailsController {
     private Text emailText;
 
     @FXML
+    private Text idArticoloText;
+
+    @FXML
     private Text lottoText;
 
     @FXML
@@ -142,23 +145,24 @@ public class ArticoloDetailsController {
         Risposta rispostaArticolo = (Risposta) HelloApplication.input.readObject();
         if (rispostaArticolo.tipoRisposta == Risposta.TipoRisposta.OK)
         {
-            nomeText.setText((String) rispostaArticolo.payload[0]);
-            condText.setText((String) rispostaArticolo.payload[1]);
-            descText.setText((String) rispostaArticolo.payload[2]);
-            lottoText.setText((String) rispostaArticolo.payload[3]);
-            Image [] image = new Image[((byte[][])rispostaArticolo.payload[4]).length];
+            idArticoloText.setText(String.valueOf(rispostaArticolo.payload[0]));
+            nomeText.setText((String) rispostaArticolo.payload[1]);
+            condText.setText((String) rispostaArticolo.payload[2]);
+            descText.setText((String) rispostaArticolo.payload[3]);
+            lottoText.setText(String.valueOf(rispostaArticolo.payload[4]));
+            Image [] image = new Image[((byte[][])rispostaArticolo.payload[5]).length];
             for (int i = 0; i < image.length; i++)
             {
                 FileOutputStream out = new FileOutputStream("cache/Articolo.png");
-                out.write(((byte[][]) rispostaArticolo.payload[4])[i]);
+                out.write(((byte[][]) rispostaArticolo.payload[5])[i]);
                 out.close();
                 FileInputStream in = new FileInputStream("cache/Articolo.png");
                 image [i] = new Image(in);
                 in.close();
             }
             articolo.setImage(image[0]);
-            useridText.setText((String) rispostaArticolo.payload[5]);
-            emailText.setText((String) rispostaArticolo.payload[6]);
+            useridText.setText(String.valueOf(rispostaArticolo.payload[6]));
+            emailText.setText((String) rispostaArticolo.payload[7]);
 
         } else if (rispostaArticolo.tipoRisposta == Risposta.TipoRisposta.ERRORE)
         {
@@ -182,11 +186,18 @@ public class ArticoloDetailsController {
     }
 
     @FXML
-    void idClicked(MouseEvent event)
-    {
-        useridText.setText("idk sumn");
-//        Stage stage1 = (Stage) useridText.getScene().getWindow();
-//        stage1.close();
+    void idClicked(MouseEvent event) throws IOException {
+        OtherUserProfileController.idUser = Integer.parseInt(useridText.getText());
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/OtherUserProfile.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setTitle("The AuctionHouse");
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+        Stage stage1 = (Stage) useridText.getScene().getWindow();
+        stage1.close();
     }
 
     @FXML

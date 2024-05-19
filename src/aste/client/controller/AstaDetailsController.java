@@ -78,6 +78,8 @@ public class AstaDetailsController
     @FXML
     private Text username;
 
+    private  Integer idLotto;
+
     public static Integer idAsta;
 
     private InetAddress ipaddress;
@@ -91,6 +93,7 @@ public class AstaDetailsController
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+        nomelottoText.setUnderline(true);
         useridText.setUnderline(true);
         System.out.println(idAsta);
         Richiesta richiestaAsta = new Richiesta();
@@ -114,7 +117,7 @@ public class AstaDetailsController
                 ipMultiText.setText("null");
             }
             String desc = (String)rispostaAsta.payload[5];
-            Integer idLotto = (Integer)rispostaAsta.payload[6];
+            idLotto = (Integer)rispostaAsta.payload[6];
             String nomeLotto = (String)rispostaAsta.payload[7];
             Integer idUser = (Integer)rispostaAsta.payload[8];
             String email = (String)rispostaAsta.payload[9];
@@ -235,6 +238,21 @@ public class AstaDetailsController
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.show();
         Stage stage1 = (Stage) ProfileB.getScene().getWindow();
+        stage1.close();
+    }
+
+    @FXML
+    void NomeLottoClicked(MouseEvent event) throws IOException {
+        LottoDetailsController.idLotto = idLotto;
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/LottoDetails.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setTitle("The AuctionHouse");
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+        Stage stage1 = (Stage) nomelottoText.getScene().getWindow();
         stage1.close();
     }
 

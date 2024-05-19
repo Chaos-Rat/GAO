@@ -108,6 +108,22 @@
                            <children>
                               <HBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="662.0">
                                  <children>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="idArticolo:" />
+                                    <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0">
+                                       <HBox.margin>
+                                          <Insets left="25.0" />
+                                       </HBox.margin>
+                                       <children>
+                                          <Text fx:id="idArticoloText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="100.13671875" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets left="40.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <HBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="662.0">
+                                 <children>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Nome:" />
                                     <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0">
                                        <HBox.margin>
