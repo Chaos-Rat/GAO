@@ -64,7 +64,14 @@ CREATE TABLE Categorie (
 );
 
 INSERT INTO Categorie(nome)
-VALUES ("Altre categorie");
+VALUES ("Altre categorie"),
+	("Giardinaggio"),
+	("Informatica ed elettronica"),
+	("Cucina"),
+	("Sport"),
+	("Animali domestici"),
+	("Abbigliamento")
+;
 
 CREATE TABLE Articoli (
    	Id_articolo INT NOT NULL AUTO_INCREMENT,

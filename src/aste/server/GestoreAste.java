@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.MulticastSocket;
+import java.net.NetworkInterface;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -203,21 +204,38 @@ public class GestoreAste {
 		liberaIndirizzo(idAsta, indirizzoLibero);
     }
 
-    @SuppressWarnings("deprecation")
 	public synchronized void effettuaPuntata(int idAsta,
 		InetAddress indirizzoMulticast,
 		InetAddress indirizzoServer,
 		Offerta offerta
 	) throws IOException {
-		try (MulticastSocket socket = new MulticastSocket(3000);) {
-			InetSocketAddress indirizzoSocket = new InetSocketAddress(indirizzoMulticast, 3000);
-			
-			socket.joinGroup(indirizzoMulticast);
+		InetSocketAddress indirizzoSocket = new InetSocketAddress(indirizzoMulticast, 6000);
+		NetworkInterface interfaccia = NetworkInterface.getByInetAddress(indirizzoServer);
+		
+		MulticastSocket socket = null;
+
+		// Solo il server è il trasmettitore quindi non c'e' bisogno di fare il bind della porta
+		try {
+			socket = new MulticastSocket();
+			socket.joinGroup(indirizzoSocket, interfaccia);
 
 			byte[] datiOfferta = Offerta.toByteArray(offerta);
 			
 			DatagramPacket pacchetto = new DatagramPacket(datiOfferta, datiOfferta.length, indirizzoSocket);
 			socket.send(pacchetto);
+		} finally {
+			if (socket != null) {
+				try {
+					socket.leaveGroup(indirizzoSocket, interfaccia);
+				} catch (IOException e) {
+					System.err.println("[" + Thread.currentThread().getName() +
+						"]: Errore nell'uscita dal gruppo multicast di ip: " + indirizzoMulticast +
+						". " + e.getMessage()
+					);
+				}
+	
+				socket.close();
+			}
 		}
     }
 }
