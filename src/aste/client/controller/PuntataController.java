@@ -20,9 +20,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
@@ -30,6 +33,8 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.*;
 import java.time.Duration;
@@ -171,6 +176,27 @@ public class PuntataController
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+        Richiesta richiestaProfile = new Richiesta();
+        richiestaProfile.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_IMMAGINE_PROFILO;
+        richiestaProfile.payload = new Object[]{0};
+        HelloApplication.output.writeObject(richiestaProfile);
+        Risposta rispostaProfile = (Risposta) HelloApplication.input.readObject();
+        if (rispostaProfile.tipoRisposta == Risposta.TipoRisposta.OK) {
+            FileOutputStream picture = new FileOutputStream("imagine.png");
+            picture.write((byte[]) rispostaProfile.payload[0]);
+            picture.close();
+            FileInputStream defaultImg = new FileInputStream("imagine.png");
+            Image image = new Image(defaultImg);
+            ImageView imageView = new ImageView();
+            imageView.setImage(image);
+            avatar.setFill(new ImagePattern(imageView.getImage()));
+            defaultImg.close();
+        }
+        else
+        {
+            System.out.println(rispostaProfile.tipoRisposta.toString());
+            System.out.println(((Risposta.TipoErrore) rispostaProfile.payload[0]).toString());
+        }
 		valoreMassimoLocale = 0;
 		chatBox.setSpacing(8);
         Richiesta richiestaProfilen = new Richiesta();
@@ -295,16 +321,13 @@ public class PuntataController
 		String cognome;
 		String email;
 		Risposta rispostaUser = (Risposta) HelloApplication.input.readObject();
-
         if (rispostaUser.tipoRisposta == Risposta.TipoRisposta.ERRORE) {
             System.out.println(rispostaUser.payload[0]);
             return;
         }
-
         nome = (String)rispostaUser.payload[0];
         cognome = (String)rispostaUser.payload[1];
         email = (String)rispostaUser.payload[2];
-
 		HBox hbox = new HBox();
 		hbox.setAlignment(Pos.CENTER_RIGHT);
 		hbox.setPadding(new Insets(5,5,5,10));
@@ -330,7 +353,6 @@ public class PuntataController
         richiestaPunatata.payload = new Object[2];
         richiestaPunatata.payload[0] = idAsta;
         richiestaPunatata.payload[1] = valorePuntata;
-
         HelloApplication.output.writeObject(richiestaPunatata);
         Risposta rispostaPuntata = (Risposta)HelloApplication.input.readObject();
         if (rispostaPuntata.tipoRisposta == Risposta.TipoRisposta.OK)
