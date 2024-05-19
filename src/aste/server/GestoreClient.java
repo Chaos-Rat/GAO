@@ -297,7 +297,7 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
+		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.data_ora_inizio, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
 			"Lotti.nome, Immagini.Id_immagine\n" + 
 			"FROM Aste\n" +
 			"LEFT JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
@@ -358,6 +358,8 @@ public class GestoreClient implements Runnable {
 				try (FileInputStream stream = new FileInputStream(nomeFile);) {
 					aste.add(stream.readAllBytes());
 				}
+
+				aste.add(resultSet.getTimestamp("data_ora_inizio").toLocalDateTime());
 			}
 
 			// Transformazione del array list in array e risposta nel payload uscita 
@@ -2202,7 +2204,7 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
+		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.data_ora_inzio, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
 			"Lotti.nome, Immagini.Id_immagine\n" + 
 			"FROM Aste\n" +
 			"LEFT JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
@@ -2261,6 +2263,8 @@ public class GestoreClient implements Runnable {
 				try (FileInputStream stream = new FileInputStream(nomeFile);) {
 					aste.add(stream.readAllBytes());
 				}
+
+				aste.add(resultSet.getTimestamp("data_ora_inizio").toLocalDateTime());
 			}
 
 			// Transformazione del array list in array e risposta nel payload uscita 
@@ -2392,7 +2396,7 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
+		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.data_ora_inizio, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
 			"Lotti.nome, Immagini.Id_immagine\n" + 
 			"FROM Aste\n" +
 			"LEFT JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
@@ -2454,6 +2458,8 @@ public class GestoreClient implements Runnable {
 				try (FileInputStream stream = new FileInputStream(nomeFile);) {
 					aste.add(stream.readAllBytes());
 				}
+
+				aste.add(resultSet.getTimestamp("data_ora_inizio").toLocalDateTime());
 			}
 
 			// Transformazione del array list in array e risposta nel payload uscita 
@@ -2585,7 +2591,7 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
+		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.data_ora_inizio, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
 			"Lotti.nome, Immagini.Id_immagine\n" + 
 			"FROM Aste\n" +
 			"LEFT JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
@@ -2646,6 +2652,8 @@ public class GestoreClient implements Runnable {
 				try (FileInputStream stream = new FileInputStream(nomeFile);) {
 					aste.add(stream.readAllBytes());
 				}
+
+				aste.add(resultSet.getTimestamp("data_ora_inizio").toLocalDateTime());
 			}
 
 			// Transformazione del array list in array e risposta nel payload uscita 
@@ -2777,8 +2785,8 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT DISTINCT A.Id_asta, A.durata, Ultime_Puntante.valore_massimo " +
-			"P.valore, L.nome, Immagini.Id_immagine\n" + 
+		String queryVisualizzazione = "SELECT DISTINCT A.Id_asta, A.durata, A.data_ora_inizio, Ultime_Puntate.valore_massimo," +
+			"P.valore, Lotti.nome, Immagini.Id_immagine\n" + 
 			"FROM Aste AS A\n" +
 			"JOIN Puntate AS P ON A.Id_asta = P.Rif_asta\n" +
 			"JOIN (\n" + 
@@ -2786,10 +2794,10 @@ public class GestoreClient implements Runnable {
 				"FROM Puntate\n" +
 				"GROUP BY Rif_asta\n" +
 			") AS Ultime_Puntate ON P.Rif_asta = Ultime_Puntate.Rif_asta\n" +
-			"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
+			"JOIN Lotti ON A.Rif_lotto = Lotti.Id_lotto\n" +
 			"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n"+
-			"WHERE (CURRENT_TIMESTAMP > DATE_ADD(Aste.data_ora_inizio, INTERVAL Aste.durata MINUTE)) AND\n" +
+			"WHERE (CURRENT_TIMESTAMP > DATE_ADD(A.data_ora_inizio, INTERVAL A.durata MINUTE)) AND\n" +
 			"P.valore = Ultime_Puntate.valore_massimo AND\n"
 		;
 
@@ -2800,7 +2808,7 @@ public class GestoreClient implements Runnable {
 		queryVisualizzazione += "Lotti.nome LIKE ? AND\n" +
 			"Immagini.principale = 1 AND\n" +
 			"P.Rif_utente = ?\n" +
-			"GROUP BY Aste.Id_asta\n" +
+			"GROUP BY A.Id_asta\n" +
 			"LIMIT ? OFFSET ?;"
 		;
 
@@ -2841,6 +2849,8 @@ public class GestoreClient implements Runnable {
 				try (FileInputStream stream = new FileInputStream(nomeFile);) {
 					aste.add(stream.readAllBytes());
 				}
+
+				aste.add(resultSet.getTimestamp("data_ora_inizio").toLocalDateTime());
 			}
 
 			// Transformazione del array list in array e risposta nel payload uscita 

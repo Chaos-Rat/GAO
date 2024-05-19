@@ -147,15 +147,15 @@ public class AsteController
         Risposta rispostaAste = (Risposta) HelloApplication.input.readObject();
         if (rispostaAste.tipoRisposta == Risposta.TipoRisposta.OK)
         {
-            for (int i = 0; i < rispostaAste.payload.length/5; i++)
+            for (int i = 0; i < rispostaAste.payload.length/6; i++)
             {
                 HBox box = new HBox();
-                Integer idAsta = (Integer) rispostaAste.payload[i*5+0];
-                Duration duration = (Duration)rispostaAste.payload[i*5+1];
-                Float price = (Float)rispostaAste.payload[i*5+2];
-                String Lottoname = (String)rispostaAste.payload[i*5+3];
+                Integer idAsta = (Integer) rispostaAste.payload[i*6+0];
+                Duration duration = (Duration)rispostaAste.payload[i*6+1];
+                Float price = (Float)rispostaAste.payload[i*6+2];
+                String Lottoname = (String)rispostaAste.payload[i*6+3];
                 FileOutputStream out = new FileOutputStream("cache/Articolo.png");
-                out.write((byte[]) rispostaAste.payload[i*5+4]);
+                out.write((byte[]) rispostaAste.payload[i*6+4]);
                 out.close();
                 FileInputStream in = new FileInputStream("cache/Articolo.png");
                 Image img = new Image(in);
@@ -317,14 +317,14 @@ public class AsteController
         HelloApplication.output.writeObject(richiestaAste);
         Risposta rispostaAste =(Risposta) HelloApplication.input.readObject();
         if (rispostaAste.tipoRisposta == Risposta.TipoRisposta.OK) {
-            for (int i = 0; i < rispostaAste.payload.length / 5; i++) {
+            for (int i = 0; i < rispostaAste.payload.length / 6; i++) {
                 HBox box = new HBox();
-                Integer idAsta = (Integer) rispostaAste.payload[i * 5 + 0];
-                Duration duration = (Duration) rispostaAste.payload[i * 5 + 1];
-                Float price = (Float) rispostaAste.payload[i * 5 + 2];
-                String Lottoname = (String) rispostaAste.payload[i * 5 + 3];
+                Integer idAsta = (Integer) rispostaAste.payload[i * 6 + 0];
+                Duration duration = (Duration) rispostaAste.payload[i * 6 + 1];
+                Float price = (Float) rispostaAste.payload[i * 6 + 2];
+                String Lottoname = (String) rispostaAste.payload[i * 6 + 3];
                 FileOutputStream out = new FileOutputStream("cache/Articolo.png");
-                out.write((byte[]) rispostaAste.payload[i * 5 + 4]);
+                out.write((byte[]) rispostaAste.payload[i * 6 + 4]);
                 out.close();
                 FileInputStream in = new FileInputStream("cache/Articolo.png");
                 Image img = new Image(in);
@@ -458,14 +458,14 @@ public class AsteController
                 HelloApplication.output.writeObject(richiestaAste);
                 Risposta rispostaAste =(Risposta) HelloApplication.input.readObject();
                 if (rispostaAste.tipoRisposta == Risposta.TipoRisposta.OK) {
-                    for (int i = 0; i < rispostaAste.payload.length / 5; i++) {
+                    for (int i = 0; i < rispostaAste.payload.length / 6; i++) {
                         HBox box = new HBox();
-                        Integer idAsta = (Integer) rispostaAste.payload[i * 5 + 0];
-                        Duration duration = (Duration) rispostaAste.payload[i * 5 + 1];
-                        Float price = (Float) rispostaAste.payload[i * 5 + 2];
-                        String Lottoname = (String) rispostaAste.payload[i * 5 + 3];
+                        Integer idAsta = (Integer) rispostaAste.payload[i * 6 + 0];
+                        Duration duration = (Duration) rispostaAste.payload[i * 6 + 1];
+                        Float price = (Float) rispostaAste.payload[i * 6 + 2];
+                        String Lottoname = (String) rispostaAste.payload[i * 6 + 3];
                         FileOutputStream out = new FileOutputStream("cache/Articolo.png");
-                        out.write((byte[]) rispostaAste.payload[i * 5 + 4]);
+                        out.write((byte[]) rispostaAste.payload[i * 6 + 4]);
                         out.close();
                         FileInputStream in = new FileInputStream("cache/Articolo.png");
                         Image img = new Image(in);
@@ -581,14 +581,14 @@ public class AsteController
         HelloApplication.output.writeObject(richiestaAste);
         Risposta rispostaAste =(Risposta) HelloApplication.input.readObject();
         if (rispostaAste.tipoRisposta == Risposta.TipoRisposta.OK) {
-            for (int i = 0; i < rispostaAste.payload.length / 5; i++) {
+            for (int i = 0; i < rispostaAste.payload.length / 6; i++) {
                 HBox box = new HBox();
-                Integer idAsta = (Integer) rispostaAste.payload[i * 5 + 0];
-                Duration duration = (Duration) rispostaAste.payload[i * 5 + 1];
-                Float price = (Float) rispostaAste.payload[i * 5 + 2];
-                String Lottoname = (String) rispostaAste.payload[i * 5 + 3];
+                Integer idAsta = (Integer) rispostaAste.payload[i * 6 + 0];
+                Duration duration = (Duration) rispostaAste.payload[i * 6 + 1];
+                Float price = (Float) rispostaAste.payload[i * 6 + 2];
+                String Lottoname = (String) rispostaAste.payload[i * 6 + 3];
                 FileOutputStream out = new FileOutputStream("cache/Articolo.png");
-                out.write((byte[]) rispostaAste.payload[i * 5 + 4]);
+                out.write((byte[]) rispostaAste.payload[i * 6 + 4]);
                 out.close();
                 FileInputStream in = new FileInputStream("cache/Articolo.png");
                 Image img = new Image(in);
