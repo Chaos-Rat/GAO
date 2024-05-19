@@ -100,7 +100,7 @@ public class PuntataController
     private static class ChatClient extends Thread
     {
         private final MulticastSocket socket;
-		private SocketAddress indirizzoSocket;
+		private InetSocketAddress indirizzoSocket;
 		private NetworkInterface interfaccia;
         private PuntataController puntataController;
 
@@ -108,11 +108,17 @@ public class PuntataController
 			this.puntataController = puntataController;
 			this.indirizzoSocket = new InetSocketAddress(ipMulticast, 0);
 			interfaccia = NetworkInterface.getByInetAddress(HelloApplication.getLocalAddress());
+
+			// Se l'interfaccia è di loopback non funziona se la si passa direttamente a joinGroup/leaveGroup.
+			// Settandola a null, e facendo decidere al sistema operativo, invece si ¯\_(ツ)_/¯
+			if (interfaccia.isLoopback()) {
+				interfaccia = null;
+			}
            
 			// Bisogna fare il bind della porta in quanto riceventi
 			socket = new MulticastSocket(6000);
             socket.setSoTimeout(10 * 1000);
-            socket.joinGroup(indirizzoSocket, interfaccia);
+			socket.joinGroup(indirizzoSocket, interfaccia);
         }
 
         @Override
@@ -131,7 +137,6 @@ public class PuntataController
 								try {
 									puntataController.ChatLog(offerta);
 								} catch (ClassNotFoundException | IOException e) {
-									// TODO Auto-generated catch block
 									e.printStackTrace();
 								}
 							});
