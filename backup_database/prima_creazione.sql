@@ -69,8 +69,16 @@ VALUES ("Altre categorie"),
 	("Informatica ed elettronica"),
 	("Cucina"),
 	("Sport"),
-	("Animali domestici"),
-	("Abbigliamento")
+	("Animali"),
+	("Abbigliamento"),
+	("Musica"),
+	("Auto e moto"),
+	("Ferra"),
+	("Casa e arredamento"),
+	("Fai da te"),
+	("Arte e antiquariato"),
+	("Giocattoli"),
+	("Libri")
 ;
 
 CREATE TABLE Articoli (

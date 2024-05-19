@@ -387,7 +387,7 @@ public class GestoreClient implements Runnable {
 				}
 			}
 
-			rispostaUscente.payload[2] = (byte[][])immaginiArticoli.toArray();
+			rispostaUscente.payload[2] = immaginiArticoli.toArray(new byte[0][]);
 			rispostaUscente.payload[3] = articoli.toArray();
 		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
 			System.err.println("[" + Thread.currentThread().getName() +
@@ -639,6 +639,7 @@ public class GestoreClient implements Runnable {
 
 		String queryVisualizzazione = "SELECT Id_categoria, nome\n" +
 			"FROM Categorie\n" +
+			"WHERE Id_categoria != 1\n" +
 			"ORDER BY nome ASC;"
 		;
 
@@ -647,6 +648,9 @@ public class GestoreClient implements Runnable {
 			ResultSet resultSet = statement.executeQuery(queryVisualizzazione);
 
 			ArrayList<Object> buffer = new ArrayList<>();
+
+			buffer.add(1);
+			buffer.add("Altre Categorie");
 
 			while (resultSet.next()) {
 				buffer.add(Integer.valueOf(resultSet.getInt("Id_categoria")));
@@ -747,7 +751,7 @@ public class GestoreClient implements Runnable {
 				}
 			}
 
-			rispostaUscente.payload[5] = (byte[][])immaginiArticoli.toArray();
+			rispostaUscente.payload[5] = immaginiArticoli.toArray(new byte[0][]);
 		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
 			System.err.println("[" + Thread.currentThread().getName() +
 				"]: C'e' stato un errore nella query di vissualizazione articolo. " + e.getMessage()
