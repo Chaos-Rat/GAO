@@ -14,11 +14,11 @@ import java.net.Socket;
 
 public class HelloApplication extends Application
 {
+	public static String Address = "localhost";
     public static Socket socket;
     public static ObjectOutputStream output;
     public static ObjectInputStream input;
 	public static int idUtenteLoggato;
-
 
 
     @Override

@@ -58,23 +58,19 @@ public class LoginController {
     @FXML
     private Text UserText;
 
-    public  String Address;
-
-
-
     @FXML
     public void initialize()
     {
-        Address = addressText.getText();
         Title.setText("TheBlackMarket");
-        addressText.setText("localhost");
+        addressText.setText(HelloApplication.Address);
         addressText.setVisible(false);
     }
     @FXML
     void Access(MouseEvent event) throws IOException, ClassNotFoundException
     {
         try {
-            HelloApplication.socket = new Socket(Address,3000);
+			HelloApplication.Address = addressText.getText();
+            HelloApplication.socket = new Socket(HelloApplication.Address,3000);
             System.out.println("sono connesso :)");
             HelloApplication.output = new ObjectOutputStream(HelloApplication.socket.getOutputStream());
             HelloApplication.input = new ObjectInputStream(HelloApplication.socket.getInputStream());
@@ -116,7 +112,8 @@ public class LoginController {
     void Register(MouseEvent event) throws IOException
     {
         try {
-            HelloApplication.socket = new Socket(Address,3000);
+			HelloApplication.Address = addressText.getText();
+            HelloApplication.socket = new Socket(HelloApplication.Address,3000);
             System.out.println("sono connesso :)");
             HelloApplication.output = new ObjectOutputStream(HelloApplication.socket.getOutputStream());
             HelloApplication.input = new ObjectInputStream(HelloApplication.socket.getInputStream());
@@ -140,6 +137,5 @@ public class LoginController {
     void AdvancedOptionsClicked(ActionEvent event)
     {
         addressText.setVisible(true);
-        Address = addressText.getText();
     }
 }

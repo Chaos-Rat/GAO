@@ -128,6 +128,7 @@ public class RegisterController {
         Risposta risposta = (Risposta) HelloApplication.input.readObject();
         if (risposta.tipoRisposta == Risposta.TipoRisposta.OK)
         {
+			HelloApplication.socket.close();
             Parent root = FXMLLoader.load(getClass().getResource("../view/Login.fxml"));
             Scene scene = new Scene(root);
             Stage stage = new Stage();
