@@ -303,28 +303,24 @@ public class HomeController {
             catmap.put("Tutte le categorie",0);
             category.getSelectionModel().getSelectedItem();
         }
-        Richiesta richiestaArticoli = new Richiesta();
-        richiestaArticoli.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_ARTICOLI;
-        richiestaArticoli.payload = new Object[5];
-        richiestaArticoli.payload[0] = 10;
-        richiestaArticoli.payload[1] = 1;
-        richiestaArticoli.payload[2] = "";
-        if(category.getSelectionModel().isSelected(0))
-        {
-            richiestaArticoli.payload[3] =0;
-        }else
-        {
-            richiestaArticoli.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
-        }
-        richiestaArticoli.payload[4] = false;
-        HelloApplication.output.writeObject(richiestaArticoli);
-        Risposta rispostaArticoli =(Risposta) HelloApplication.input.readObject();
-        if (rispostaArticoli.tipoRisposta == Risposta.TipoRisposta.OK) {
-            for (int i = 0; i < rispostaArticoli.payload.length / 4; i++)
-            {
+        Richiesta richiestaAste = new Richiesta();
+        richiestaAste.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_ASTE;
+        richiestaAste.payload = new Object[5];
+        richiestaAste.payload[0] = 10;
+        richiestaAste.payload[1] = 1;
+        richiestaAste.payload[2] = "";
+        richiestaAste.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
+        HelloApplication.output.writeObject(richiestaAste);
+        Risposta rispostaAste =(Risposta) HelloApplication.input.readObject();
+        if (rispostaAste.tipoRisposta == Risposta.TipoRisposta.OK) {
+            for (int i = 0; i < rispostaAste.payload.length / 5; i++) {
                 HBox box = new HBox();
+                Integer idAsta = (Integer) rispostaAste.payload[i * 5 + 0];
+                Duration duration = (Duration) rispostaAste.payload[i * 5 + 1];
+                Float price = (Float) rispostaAste.payload[i * 5 + 2];
+                String Lottoname = (String) rispostaAste.payload[i * 5 + 3];
                 FileOutputStream out = new FileOutputStream("cache/Articolo.png");
-                out.write((byte[]) rispostaArticoli.payload[i * 4 + 3]);
+                out.write((byte[]) rispostaAste.payload[i * 5 + 4]);
                 out.close();
                 FileInputStream in = new FileInputStream("cache/Articolo.png");
                 Image img = new Image(in);
@@ -334,37 +330,93 @@ public class HomeController {
                 item.setFitWidth(100);
                 item.setFitHeight(100);
                 item.setPreserveRatio(true);
-                String nome = (String) rispostaArticoli.payload[i * 4 + 1];
-                String cond = (String) rispostaArticoli.payload[i * 4 + 2];
-                Text nomeT = new Text("Nome: " + nome);
-                Text condT = new Text("Condition: " + cond);
+                Label timerLabel = new Label();
+                timerLabel.setVisible(false);
+                LocalDateTime endDateTime = LocalDateTime.now().plus(duration);
+                AnimationTimer timer = new AnimationTimer() {
+                    @Override
+                    public void handle(long l) {
+                        Duration remaining = Duration.between(LocalDateTime.now(), endDateTime);
+                        if (remaining.isPositive()) {
+                            timerLabel.setText(format(remaining));
+                        } else {
+                            timerLabel.setText(format(Duration.ZERO));
+                            stop();
+                        }
+                    }
+
+                    private String format(Duration remaining) {
+                        return String.format("%02d:%02d:%02d",
+                                remaining.toHoursPart(),
+                                remaining.toMinutesPart(),
+                                remaining.toSecondsPart()
+                        );
+                    }
+                };
+                timer.start();
+                Text nomeT = new Text("LottoNome: " + Lottoname);
+                Text priceT = new Text("StartingPrice : " + price.toString());
                 nomeT.setWrappingWidth(150);
-                condT.setWrappingWidth(150);
-                Integer id = (Integer) rispostaArticoli.payload[i * 4 + 0];
-                Text idT = new Text("Id: " + id.toString());
-                idT.setWrappingWidth(150);
-                Button button = new Button("Details");
-                CheckBox check = new CheckBox();
+                priceT.setWrappingWidth(150);
                 VBox vbox = new VBox();
                 VBox vbox2 = new VBox();
                 VBox vbox3 = new VBox();
-                box.setSpacing(50);
-                vbox2.setAlignment(Pos.CENTER);
+                VBox vbox4 = new VBox();
+                Button button = new Button();
+                button.setText("Details");
+                button.setId("#button");
+                button.setStyle(".button\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #6F5CC2 ;\n" +
+                        "    -fx-background-radius: 10,10,10,10;\n" +
+                        "}\n" +
+                        "\n" +
+                        ".button:hover\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #947cfc ;\n" +
+                        "    -fx-background-radius: 10,10,10,10;\n" +
+                        "}\n" +
+                        "\n" +
+                        ".button:pressed\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #6254a1 ;\n" +
+                        "    -fx-background-radius: 10,10,10,10;\n" +
+                        "}");
+//                button.setStyle("-fx-background-color : #16f70a ;");
+                button.setOnAction(new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent event) {
+                        try {
+                            AstaDetailsController.idAsta = idAsta;
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/AstaDetails.fxml"));
+                            Parent root = loader.load();
+                            Scene scene = new Scene(root);
+                            Stage stage = new Stage();
+                            stage.setTitle("The AuctionHouse");
+                            stage.setScene(scene);
+                            stage.initModality(Modality.APPLICATION_MODAL);
+                            stage.show();
+                            Stage stage1 = (Stage) button.getScene().getWindow();
+                            stage1.close();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
                 vbox.setAlignment(Pos.CENTER);
+                vbox2.setAlignment(Pos.CENTER);
                 vbox3.setAlignment(Pos.CENTER);
+                vbox4.setAlignment(Pos.CENTER);
                 vbox.getChildren().add(item);
-                vbox2.getChildren().addAll(nomeT,condT,idT);
-                vbox3.getChildren().add(button);
+                vbox2.getChildren().addAll(nomeT, priceT);
+                vbox3.getChildren().addAll(button);
+                vbox4.getChildren().add(timerLabel);
+                box.setSpacing(50);
                 box.setPrefWidth(940);
                 box.setAlignment(Pos.CENTER);
-                box.getChildren().addAll(vbox,vbox2,vbox3);
+                box.getChildren().addAll(vbox, vbox2, vbox3, vbox4);
                 asteList.getChildren().add(box);
             }
-        }
-        else if (rispostaArticoli.payload[0] == Risposta.TipoRisposta.ERRORE)
-        {
-            System.out.println(rispostaArticoli.payload[0]);
-            System.out.println(rispostaArticoli.payload[1]);
         }
 
     }
