@@ -14,22 +14,12 @@ import java.net.Socket;
 
 public class HelloApplication extends Application
 {
-    private static Socket socket;
+    public static Socket socket;
     public static ObjectOutputStream output;
     public static ObjectInputStream input;
 	public static int idUtenteLoggato;
 
-    static {
-        try {
-            socket = new Socket("localhost",3000);
-            System.out.println("sono connesso :)");
-            output = new ObjectOutputStream(socket.getOutputStream());
-            input = new ObjectInputStream(socket.getInputStream());
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     @Override
     public void start(Stage stage) throws IOException

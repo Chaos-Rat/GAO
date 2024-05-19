@@ -51,10 +51,10 @@ public class LottoDetailsController {
     private Circle avatar;
 
     @FXML
-    private Text idLottoText;
+    private Text idArticoloText;
 
     @FXML
-    private Text lottoText;
+    private Text idLottoText;
 
     @FXML
     private Button modifyB;
@@ -68,7 +68,9 @@ public class LottoDetailsController {
     public  static Integer idLotto;
 
     @FXML
-    public  void initialize() throws IOException, ClassNotFoundException {
+    public  void initialize() throws IOException, ClassNotFoundException
+    {
+        idArticoloText.setUnderline(true);
         modifyB.setVisible(false);
         Richiesta richiestaLotto = new Richiesta();
         richiestaLotto.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_LOTTO;
@@ -93,7 +95,7 @@ public class LottoDetailsController {
             Lotto.setImage(image[0]);
             Object [] articoloID = (Object[]) rispostaLotto.payload[3];
             articoloNomeText.setText(String.valueOf(articoloID[1]));
-            idLottoText.setText(String.valueOf(articoloID[0]));
+            idArticoloText.setText(String.valueOf(articoloID[0]));
         }else if(rispostaLotto.tipoRisposta == Risposta.TipoRisposta.ERRORE)
         {
             System.out.println(rispostaLotto.payload[0]);
@@ -130,7 +132,7 @@ public class LottoDetailsController {
 
     @FXML
     void HomeClicked(ActionEvent event) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Profile.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Home.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
         Stage stage = new Stage();
@@ -138,14 +140,15 @@ public class LottoDetailsController {
         stage.setScene(scene);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.show();
-        Stage stage1 = (Stage) ProfileB.getScene().getWindow();
+        Stage stage1 = (Stage) HomeB.getScene().getWindow();
         stage1.close();
     }
 
     @FXML
     void LogoutClicked(ActionEvent event)
     {
-
+        Stage stage = (Stage) LogoutB.getScene().getWindow();
+        stage.close();
     }
 
     @FXML
@@ -183,9 +186,18 @@ public class LottoDetailsController {
     }
 
     @FXML
-    void idClicked(MouseEvent event)
-    {
-
+    void idClicked(MouseEvent event) throws IOException {
+        ArticoloDetailsController.idArticolo =Integer.parseInt(idArticoloText.getText());
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/ArticoloDetails.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setTitle("The AuctionHouse");
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+        Stage stage1 = (Stage) idArticoloText.getScene().getWindow();
+        stage1.close();
     }
 
 }

@@ -40,5 +40,7 @@
             </Lighting>
          </effect>
       </ImageView>
+      <Button fx:id="advancedB" layoutX="30.0" layoutY="341.0" mnemonicParsing="false" onAction="#AdvancedOptionsClicked" prefHeight="25.0" prefWidth="120.0" text="Advanced Options" />
+      <TextField fx:id="addressText" layoutX="206.0" layoutY="341.0" prefHeight="25.0" prefWidth="189.0" promptText="Please insert the ip Address " />
    </children>
 </AnchorPane>

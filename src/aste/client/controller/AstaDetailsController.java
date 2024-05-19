@@ -173,7 +173,7 @@ public class AstaDetailsController
 
     @FXML
     void HomeClicked(ActionEvent event) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Profile.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Home.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
         Stage stage = new Stage();
@@ -181,7 +181,7 @@ public class AstaDetailsController
         stage.setScene(scene);
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.show();
-        Stage stage1 = (Stage) ProfileB.getScene().getWindow();
+        Stage stage1 = (Stage) HomeB.getScene().getWindow();
         stage1.close();
     }
 

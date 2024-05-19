@@ -18,6 +18,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import  java.io.*;
+import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,6 +41,9 @@ public class LoginController {
     private Text PassText;
 
     @FXML
+    private Button advancedB;
+
+    @FXML
     private Button RegisterB;
 
     @FXML
@@ -49,13 +53,35 @@ public class LoginController {
     private TextField UserField;
 
     @FXML
-    private Text UserText;
-
-    public LoginController() throws IOException {
-    }
+    private TextField addressText;
 
     @FXML
-    void Access(MouseEvent event) throws IOException, ClassNotFoundException {
+    private Text UserText;
+
+    public  String Address;
+
+
+
+    @FXML
+    public void initialize()
+    {
+        Address = addressText.getText();
+        Title.setText("TheBlackMarket");
+        addressText.setText("localhost");
+        addressText.setVisible(false);
+    }
+    @FXML
+    void Access(MouseEvent event) throws IOException, ClassNotFoundException
+    {
+        try {
+            HelloApplication.socket = new Socket(Address,3000);
+            System.out.println("sono connesso :)");
+            HelloApplication.output = new ObjectOutputStream(HelloApplication.socket.getOutputStream());
+            HelloApplication.input = new ObjectInputStream(HelloApplication.socket.getInputStream());
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         Richiesta richiesta = new Richiesta();
         richiesta.tipoRichiesta = Richiesta.TipoRichiesta.LOGIN;
         richiesta.payload = new Object[2];
@@ -89,6 +115,16 @@ public class LoginController {
     @FXML
     void Register(MouseEvent event) throws IOException
     {
+        try {
+            HelloApplication.socket = new Socket(Address,3000);
+            System.out.println("sono connesso :)");
+            HelloApplication.output = new ObjectOutputStream(HelloApplication.socket.getOutputStream());
+            HelloApplication.input = new ObjectInputStream(HelloApplication.socket.getInputStream());
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/Register.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
@@ -100,14 +136,10 @@ public class LoginController {
         Stage stage1 = (Stage) RegisterB.getScene().getWindow();
         stage1.close();
     }
-
-
     @FXML
-    public void initialize()
+    void AdvancedOptionsClicked(ActionEvent event)
     {
-            Title.setText("TheBlackMarket");
+        addressText.setVisible(true);
+        Address = addressText.getText();
     }
-
-
-
 }
