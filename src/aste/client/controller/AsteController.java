@@ -421,7 +421,6 @@ public class AsteController
                 asteList.getChildren().add(box);
             }
         }
-
     }
 
     @FXML
@@ -474,6 +473,7 @@ public class AsteController
                 Duration duration = (Duration) rispostaAste.payload[i * 6 + 1];
                 Float price = (Float) rispostaAste.payload[i * 6 + 2];
                 String Lottoname = (String) rispostaAste.payload[i * 6 + 3];
+                LocalDateTime dateTimeEND = (LocalDateTime) rispostaAste.payload[i * 6 + 5];
                 FileOutputStream out = new FileOutputStream("cache/Articolo.png");
                 out.write((byte[]) rispostaAste.payload[i * 6 + 4]);
                 out.close();
@@ -490,28 +490,27 @@ public class AsteController
                 if (richiestaAste.tipoRichiesta==Richiesta.TipoRichiesta.VISUALIZZA_ASTE_PROGRAMMATE)
                 {
                     timerLabel.setVisible(true);
-                }
-                LocalDateTime endDateTime = LocalDateTime.now().plus(duration);
-                AnimationTimer timer = new AnimationTimer() {
-                    @Override
-                    public void handle(long l) {
-                        Duration remaining = Duration.between(LocalDateTime.now(), endDateTime);
-                        if (remaining.isPositive()) {
-                            timerLabel.setText(format(remaining));
-                        } else {
-                            timerLabel.setText(format(Duration.ZERO));
-                            stop();
+                    AnimationTimer timer = new AnimationTimer() {
+                        @Override
+                        public void handle(long l) {
+                            Duration remaining = Duration.between(LocalDateTime.now(), dateTimeEND);
+                            if (remaining.isPositive()) {
+                                timerLabel.setText(format(remaining));
+                            } else {
+                                timerLabel.setText(format(Duration.ZERO));
+                                stop();
+                            }
                         }
-                    }
-                    private String format(Duration remaining) {
-                        return String.format("%02d:%02d:%02d",
-                                remaining.toHoursPart(),
-                                remaining.toMinutesPart(),
-                                remaining.toSecondsPart()
-                        );
-                    }
-                };
-                timer.start();
+                        private String format(Duration remaining) {
+                            return String.format("%02d:%02d:%02d",
+                                    remaining.toHoursPart(),
+                                    remaining.toMinutesPart(),
+                                    remaining.toSecondsPart()
+                            );
+                        }
+                    };
+                    timer.start();
+                }
                 Text nomeT = new Text("LottoNome: " + Lottoname);
                 Text priceT = new Text("StartingPrice : " + price.toString());
                 nomeT.setWrappingWidth(150);

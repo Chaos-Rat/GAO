@@ -295,16 +295,13 @@ public class PuntataController
 		String cognome;
 		String email;
 		Risposta rispostaUser = (Risposta) HelloApplication.input.readObject();
-
         if (rispostaUser.tipoRisposta == Risposta.TipoRisposta.ERRORE) {
             System.out.println(rispostaUser.payload[0]);
             return;
         }
-
         nome = (String)rispostaUser.payload[0];
         cognome = (String)rispostaUser.payload[1];
         email = (String)rispostaUser.payload[2];
-
 		HBox hbox = new HBox();
 		hbox.setAlignment(Pos.CENTER_RIGHT);
 		hbox.setPadding(new Insets(5,5,5,10));
@@ -330,7 +327,6 @@ public class PuntataController
         richiestaPunatata.payload = new Object[2];
         richiestaPunatata.payload[0] = idAsta;
         richiestaPunatata.payload[1] = valorePuntata;
-
         HelloApplication.output.writeObject(richiestaPunatata);
         Risposta rispostaPuntata = (Risposta)HelloApplication.input.readObject();
         if (rispostaPuntata.tipoRisposta == Risposta.TipoRisposta.OK)
