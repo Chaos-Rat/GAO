@@ -100,19 +100,24 @@ public class PuntataController
     private static class ChatClient extends Thread
     {
         private final MulticastSocket socket;
+		private SocketAddress indirizzoSocket;
+		private NetworkInterface interfaccia;
         private PuntataController puntataController;
 
-        @SuppressWarnings("deprecation")
 		public ChatClient(PuntataController puntataController, InetAddress ipMulticast) throws IOException {
 			this.puntataController = puntataController;
-            socket = new MulticastSocket(3000);
+			this.indirizzoSocket = new InetSocketAddress(ipMulticast, 0);
+			interfaccia = NetworkInterface.getByInetAddress(HelloApplication.getLocalAddress());
+           
+			// Bisogna fare il bind della porta in quanto riceventi
+			socket = new MulticastSocket(6000);
             socket.setSoTimeout(10 * 1000);
-            socket.joinGroup(ipMulticast);
+            socket.joinGroup(indirizzoSocket, interfaccia);
         }
 
         @Override
 		public void run() {
-			try (socket;) {
+			try {
                 byte[] datiOfferta = new byte[Offerta.MAX_SERIALIZED_SIZE];
                 DatagramPacket pacchetto = new DatagramPacket(datiOfferta, datiOfferta.length);
 
@@ -139,6 +144,14 @@ public class PuntataController
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);
+			} finally {
+				try {
+					socket.leaveGroup(indirizzoSocket, interfaccia);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+
+				socket.close();
 			}
 		}
     }
