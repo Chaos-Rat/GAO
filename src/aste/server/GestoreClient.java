@@ -297,12 +297,13 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.data_ora_inizio, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
+		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.data_ora_inizio, Salvataggi.Rif_utente, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
 			"Lotti.nome, Immagini.Id_immagine\n" + 
 			"FROM Aste\n" +
 			"LEFT JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
 			"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
 			"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n" +
+			"LEFT JOIN Salvataggi ON Aste.Id_asta = Salvataggi.Rif_asta\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n"+
 			"WHERE (CURRENT_TIMESTAMP > DATE_ADD(Aste.data_ora_inizio, INTERVAL Aste.durata MINUTE)) AND\n"
 		;
@@ -360,6 +361,7 @@ public class GestoreClient implements Runnable {
 				}
 
 				aste.add(resultSet.getTimestamp("data_ora_inizio").toLocalDateTime());
+				aste.add(resultSet.getInt("Rif_utente") != 0);
 			}
 
 			// Transformazione del array list in array e risposta nel payload uscita 
@@ -2204,17 +2206,18 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.data_ora_inizio, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
+		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.data_ora_inizio, Salvataggi.Rif_utente, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
 			"Lotti.nome, Immagini.Id_immagine\n" + 
 			"FROM Aste\n" +
 			"LEFT JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
 			"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
 			"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n" +
+			"LEFT JOIN Salvataggi ON Aste.Id_asta = Salvataggi.Rif_asta AND Salvataggi.Rif_utente = ?\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n"+
 			"WHERE (CURRENT_TIMESTAMP > Aste.data_ora_inizio) AND\n" +
 			"(CURRENT_TIMESTAMP < DATE_ADD(Aste.data_ora_inizio, INTERVAL Aste.durata MINUTE)) AND\n"
 		;
-
+		
 		if (categoriaSpecificata) {
 			queryVisualizzazione += "Articoli.Rif_categoria = ? AND\n";
 		}
@@ -2228,14 +2231,16 @@ public class GestoreClient implements Runnable {
 		try (Connection connection = gestoreDatabase.getConnection();) {
 			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
 			if (categoriaSpecificata) {
-				preparedStatement.setInt(1, idCategoriaInput);
+				preparedStatement.setInt(1, idUtente);
+				preparedStatement.setInt(2, idCategoriaInput);
+				preparedStatement.setString(3, "%"+ stringaRicerca+ "%");
+				preparedStatement.setInt(4, numeroAste);
+				preparedStatement.setInt(5, ((numeroPagina-1)*numeroAste));
+			} else {
+				preparedStatement.setInt(1, idUtente);
 				preparedStatement.setString(2, "%"+ stringaRicerca+ "%");
 				preparedStatement.setInt(3, numeroAste);
 				preparedStatement.setInt(4, ((numeroPagina-1)*numeroAste));
-			} else {
-				preparedStatement.setString(1, "%"+ stringaRicerca+ "%");
-				preparedStatement.setInt(2, numeroAste);
-				preparedStatement.setInt(3, ((numeroPagina-1)*numeroAste));
 			}
 			
 			ResultSet resultSet = preparedStatement.executeQuery();
@@ -2265,6 +2270,7 @@ public class GestoreClient implements Runnable {
 				}
 
 				aste.add(resultSet.getTimestamp("data_ora_inizio").toLocalDateTime());
+				aste.add(resultSet.getInt("Rif_utente") != 0);
 			}
 
 			// Transformazione del array list in array e risposta nel payload uscita 
@@ -2396,12 +2402,13 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.data_ora_inizio, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
+		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.data_ora_inizio, Salvataggi.Rif_utente, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
 			"Lotti.nome, Immagini.Id_immagine\n" + 
 			"FROM Aste\n" +
 			"LEFT JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
 			"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
 			"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n" +
+			"LEFT JOIN Salvataggi ON Aste.Id_asta = Salvataggi.Rif_asta\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n"+
 			"WHERE (CURRENT_TIMESTAMP > Aste.data_ora_inizio) AND\n" +
 			"(CURRENT_TIMESTAMP < DATE_ADD(Aste.data_ora_inizio, INTERVAL Aste.durata MINUTE)) AND\n"
@@ -2460,6 +2467,7 @@ public class GestoreClient implements Runnable {
 				}
 
 				aste.add(resultSet.getTimestamp("data_ora_inizio").toLocalDateTime());
+				aste.add(resultSet.getInt("Rif_utente") != 0);
 			}
 
 			// Transformazione del array list in array e risposta nel payload uscita 
@@ -2591,12 +2599,13 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.data_ora_inizio, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
+		String queryVisualizzazione = "SELECT DISTINCT Aste.Id_asta, Aste.durata, Aste.data_ora_inizio, Salvataggi.Rif_utente, Aste.prezzo_inizio, MAX(Puntate.valore) AS prezzo_attuale, " +
 			"Lotti.nome, Immagini.Id_immagine\n" + 
 			"FROM Aste\n" +
 			"LEFT JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
 			"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
 			"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n" +
+			"LEFT JOIN Salvataggi ON Aste.Id_asta = Salvataggi.Rif_asta\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n"+
 			"WHERE (CURRENT_TIMESTAMP < Aste.data_ora_inizio) AND\n"
 		;
@@ -2654,6 +2663,7 @@ public class GestoreClient implements Runnable {
 				}
 
 				aste.add(resultSet.getTimestamp("data_ora_inizio").toLocalDateTime());
+				aste.add(resultSet.getInt("Rif_utente") != 0);
 			}
 
 			// Transformazione del array list in array e risposta nel payload uscita 
@@ -2785,7 +2795,7 @@ public class GestoreClient implements Runnable {
 		}
 
 		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT DISTINCT A.Id_asta, A.durata, A.data_ora_inizio, Ultime_Puntate.valore_massimo," +
+		String queryVisualizzazione = "SELECT DISTINCT A.Id_asta, A.durata, A.data_ora_inizio, Salvataggi.Rif_utente, Ultime_Puntate.valore_massimo," +
 			"P.valore, Lotti.nome, Immagini.Id_immagine\n" + 
 			"FROM Aste AS A\n" +
 			"JOIN Puntate AS P ON A.Id_asta = P.Rif_asta\n" +
@@ -2796,6 +2806,7 @@ public class GestoreClient implements Runnable {
 			") AS Ultime_Puntate ON P.Rif_asta = Ultime_Puntate.Rif_asta\n" +
 			"JOIN Lotti ON A.Rif_lotto = Lotti.Id_lotto\n" +
 			"JOIN Articoli ON Lotti.Id_lotto = Articoli.Rif_lotto\n" +
+			"LEFT JOIN Salvataggi ON A.Id_asta = Salvataggi.Rif_Asta\n" +
 			"LEFT JOIN Immagini ON Immagini.Rif_articolo = Articoli.Id_articolo\n"+
 			"WHERE (CURRENT_TIMESTAMP > DATE_ADD(A.data_ora_inizio, INTERVAL A.durata MINUTE)) AND\n" +
 			"P.valore = Ultime_Puntate.valore_massimo AND\n"
@@ -2851,6 +2862,7 @@ public class GestoreClient implements Runnable {
 				}
 
 				aste.add(resultSet.getTimestamp("data_ora_inizio").toLocalDateTime());
+				aste.add(resultSet.getInt("Rif_utente") != 0);
 			}
 
 			// Transformazione del array list in array e risposta nel payload uscita 
