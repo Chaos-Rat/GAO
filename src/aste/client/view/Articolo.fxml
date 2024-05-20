@@ -178,16 +178,8 @@
                      <children>
                         <VBox prefHeight="100.0" prefWidth="86.0" />
                         <VBox prefHeight="100.0" prefWidth="49.0" />
-                        <VBox prefHeight="100.0" prefWidth="75.0">
-                           <children>
-                              <Button fx:id="previousB" mnemonicParsing="false" text="Previous" />
-                           </children>
-                        </VBox>
-                        <VBox prefHeight="100.0" prefWidth="75.0">
-                           <children>
-                              <Button fx:id="nextB" mnemonicParsing="false" prefHeight="25.0" prefWidth="60.0" text="Next" />
-                           </children>
-                        </VBox>
+                        <VBox prefHeight="100.0" prefWidth="75.0" />
+                        <VBox prefHeight="100.0" prefWidth="75.0" />
                         <VBox prefHeight="100.0" prefWidth="86.0" />
                      </children>
                   </HBox>

@@ -151,7 +151,7 @@
                                           <Insets left="25.0" />
                                        </HBox.margin>
                                        <children>
-                                          <Text fx:id="articoloNomeText" onMouseClicked="#idClicked" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="100.13671875" />
+                                          <Text fx:id="articoloNomeText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="100.13671875" />
                                        </children>
                                     </VBox>
                                  </children>
@@ -162,16 +162,12 @@
                               <HBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="662.0">
                                  <children>
                                     <Text strokeType="OUTSIDE" strokeWidth="0.0" text="IdArticolo:" />
-                                    <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0">
+                                    <VBox alignment="CENTER_LEFT" prefHeight="54.0" prefWidth="488.0">
                                        <HBox.margin>
                                           <Insets left="25.0" />
                                        </HBox.margin>
                                        <children>
-                                          <Text fx:id="idArticoloText" fill="#2600ff" onMouseClicked="#idClicked" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="100.13671875">
-                                             <VBox.margin>
-                                                <Insets />
-                                             </VBox.margin>
-                                          </Text>
+                                          <HBox fx:id="idArticoloBox" alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" />
                                        </children>
                                     </VBox>
                                  </children>

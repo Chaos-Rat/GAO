@@ -142,7 +142,7 @@ public class HomeController {
         Richiesta richiestaAste = new Richiesta();
         richiestaAste.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_ASTE;
         richiestaAste.payload = new Object[4];
-        richiestaAste.payload[0] = 10;
+        richiestaAste.payload[0] = 100;
         richiestaAste.payload[1] = 1;
         richiestaAste.payload[2] = "";
         richiestaAste.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
@@ -150,15 +150,16 @@ public class HomeController {
         Risposta rispostaAste = (Risposta) HelloApplication.input.readObject();
         if (rispostaAste.tipoRisposta == Risposta.TipoRisposta.OK)
         {
-            for (int i = 0; i < rispostaAste.payload.length/6; i++)
+            for (int i = 0; i < rispostaAste.payload.length/7; i++)
             {
                 HBox box = new HBox();
-                Integer idAsta = (Integer) rispostaAste.payload[i*6+0];
-                Duration duration = (Duration)rispostaAste.payload[i*6+1];
-                Float price = (Float)rispostaAste.payload[i*6+2];
-                String Lottoname = (String)rispostaAste.payload[i*6+3];
+                Integer idAsta = (Integer) rispostaAste.payload[i*7+0];
+                Duration duration = (Duration)rispostaAste.payload[i*7+1];
+                Float price = (Float)rispostaAste.payload[i*7+2];
+                String Lottoname = (String)rispostaAste.payload[i*7+3];
+                Boolean Salvataggio = (Boolean)rispostaAste.payload[i*7+6];
                 FileOutputStream out = new FileOutputStream("cache/Articolo.png");
-                out.write((byte[]) rispostaAste.payload[i*6+4]);
+                out.write((byte[]) rispostaAste.payload[i*7+4]);
                 out.close();
                 FileInputStream in = new FileInputStream("cache/Articolo.png");
                 Image img = new Image(in);
@@ -244,6 +245,7 @@ public class HomeController {
                     }
                 });
                 Button button2 = new Button();
+                button2.setText("Save");
                 button2.setStyle(".button\n" +
                 "{\n" +
                 "    -fx-background-color :  #6F5CC2 ;\n" +
@@ -261,6 +263,11 @@ public class HomeController {
                 "    -fx-background-color :  #6254a1 ;\n" +
                 "    -fx-background-radius: 10,10,10,10;\n" +
                 "}");
+                if (Salvataggio == true)
+                {
+                    button2.setText("Saved");
+                    button2.setStyle("-fx-background-color: #2112EE;" + "-fx-border-color: #2112EE;"+ "-fx-text-fill: white;");
+                }
                 button2.setOnAction(new EventHandler<ActionEvent>()
                 {
                     @Override
@@ -292,7 +299,6 @@ public class HomeController {
                        
                     }
                 });
-                button2.setText("Save");
                 vbox.setAlignment(Pos.CENTER);
                 vbox2.setAlignment(Pos.CENTER);
                 vbox3.setAlignment(Pos.CENTER);

@@ -139,7 +139,7 @@ public class AsteController
         Richiesta richiestaAste = new Richiesta();
         richiestaAste.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_ASTE_CORRENTI;
         richiestaAste.payload = new Object[4];
-        richiestaAste.payload[0] = 10;
+        richiestaAste.payload[0] = 100;
         richiestaAste.payload[1] = 1;
         richiestaAste.payload[2] = "";
         richiestaAste.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
@@ -156,6 +156,7 @@ public class AsteController
                 String Lottoname = (String)rispostaAste.payload[i* 7+3];
                 FileOutputStream out = new FileOutputStream("cache/Articolo.png");
                 out.write((byte[]) rispostaAste.payload[i* 7+4]);
+                Boolean Salvataggio = (Boolean)rispostaAste.payload[i*7+6];
                 out.close();
                 FileInputStream in = new FileInputStream("cache/Articolo.png");
                 Image img = new Image(in);
@@ -309,7 +310,7 @@ public class AsteController
                 break;
         }
         richiestaAste.payload = new Object[5];
-        richiestaAste.payload[0] = 10;
+        richiestaAste.payload[0] = 100;
         richiestaAste.payload[1] = 1;
         richiestaAste.payload[2] = "";
         richiestaAste.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
@@ -322,6 +323,7 @@ public class AsteController
                 Duration duration = (Duration) rispostaAste.payload[i * 7 + 1];
                 Float price = (Float) rispostaAste.payload[i * 7 + 2];
                 String Lottoname = (String) rispostaAste.payload[i * 7 + 3];
+                Boolean Salvataggio = (Boolean)rispostaAste.payload[i*7+6];
                 FileOutputStream out = new FileOutputStream("cache/Articolo.png");
                 out.write((byte[]) rispostaAste.payload[i * 7 + 4]);
                 out.close();
@@ -464,7 +466,7 @@ public class AsteController
                 break;
         }
         richiestaAste.payload = new Object[5];
-        richiestaAste.payload[0] = 10;
+        richiestaAste.payload[0] = 100;
         richiestaAste.payload[1] = 1;
         richiestaAste.payload[2] = "";
         richiestaAste.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
@@ -480,6 +482,7 @@ public class AsteController
                 LocalDateTime dateTimeEND = (LocalDateTime) rispostaAste.payload[i * 7 + 5];
                 FileOutputStream out = new FileOutputStream("cache/Articolo.png");
                 out.write((byte[]) rispostaAste.payload[i * 7 + 4]);
+                Boolean Salvataggio = (Boolean)rispostaAste.payload[i*7+6];
                 out.close();
                 FileInputStream in = new FileInputStream("cache/Articolo.png");
                 Image img = new Image(in);
