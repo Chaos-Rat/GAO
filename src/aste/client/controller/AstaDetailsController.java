@@ -14,6 +14,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.ImagePattern;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Modality;
@@ -93,6 +94,27 @@ public class AstaDetailsController
     @FXML
     public void initialize() throws IOException, ClassNotFoundException
     {
+        Richiesta richiesta = new Richiesta();
+        richiesta.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_IMMAGINE_PROFILO;
+        richiesta.payload = new Object[]{0};
+        HelloApplication.output.writeObject(richiesta);
+        Risposta risposta = (Risposta) HelloApplication.input.readObject();
+        if (risposta.tipoRisposta == Risposta.TipoRisposta.OK) {
+            FileOutputStream picture = new FileOutputStream("imagine.png");
+            picture.write((byte[]) risposta.payload[0]);
+            picture.close();
+            FileInputStream defaultImg = new FileInputStream("imagine.png");
+            Image image = new Image(defaultImg);
+            ImageView imageView = new ImageView();
+            imageView.setImage(image);
+            avatar.setFill(new ImagePattern(imageView.getImage()));
+            defaultImg.close();
+        }
+        else
+        {
+            System.out.println(risposta.tipoRisposta.toString());
+            System.out.println(((Risposta.TipoErrore) risposta.payload[0]).toString());
+        }
         nomelottoText.setUnderline(true);
         useridText.setUnderline(true);
         System.out.println(idAsta);
