@@ -25,7 +25,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.regex.Pattern;
-
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import aste.Offerta;
@@ -50,8 +49,6 @@ public class GestoreClient implements Runnable {
 
 		idUtente = 0;
 		admin = false;
-		richiestaEntrante = new Richiesta();
-		rispostaUscente = new Risposta();
 	}
 
 	@Override
@@ -2524,6 +2521,7 @@ public class GestoreClient implements Runnable {
 				"]: C'e' stato un errore nell'apertura/lettura/chiusura delle immagini nella visualizzazione aste. "
 				+ e.getMessage()
 			);
+			
 			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
