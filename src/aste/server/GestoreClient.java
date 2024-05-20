@@ -1,6 +1,7 @@
 package aste.server;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InvalidClassException;
@@ -13,6 +14,7 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -27,7 +29,6 @@ import java.util.regex.Pattern;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-
 import aste.Offerta;
 import aste.Richiesta;
 import aste.Risposta;
@@ -1888,8 +1889,7 @@ public class GestoreClient implements Runnable {
 	}
 
 	private byte[] generaPassword(String password, byte[] sale) {
-		// TODO: change back to 65535
-		KeySpec specification = new PBEKeySpec(password.toCharArray(), sale, 4, 512);
+		KeySpec specification = new PBEKeySpec(password.toCharArray(), sale, 65535, 512);
 		SecretKeyFactory factory;
 
 		try {
@@ -2088,10 +2088,249 @@ public class GestoreClient implements Runnable {
 		}
 	}
 
+	@FunctionalInterface
+	private static interface ConsumerSQL<T> {
+		void accept(T t) throws SQLException;
+	}
+
 	private void modificaProfilo() 
     {
-        // Implementazione della modifica del profilo
+        String nomeInput;
+		
+		try {
+			nomeInput = (String)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "nome" };
+			return;
+		}
 
+		String cognomeInput;
+		
+		try {
+			cognomeInput = (String)richiestaEntrante.payload[1];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "cognome" };
+			return;
+		}
+
+		LocalDate dataNascitaInput;
+		
+		try {
+			dataNascitaInput = (LocalDate)richiestaEntrante.payload[2];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "dataNascita" };
+			return;
+		}
+
+		String cittaResidenzaInput;
+		
+		try {
+			cittaResidenzaInput = (String)richiestaEntrante.payload[3];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "cittaResidenza" };
+			return;
+		}
+
+		Integer capInput;
+		
+		try {
+			capInput = (Integer)richiestaEntrante.payload[4];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "cap" };
+			return;
+		}
+
+		String indirizzoInput;
+
+		try {
+			indirizzoInput = (String)richiestaEntrante.payload[5];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "indirizzo" };
+			return;
+		}
+
+		String emailInput;
+
+		try {
+			emailInput = (String)richiestaEntrante.payload[6];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "email" };
+			return;
+		}
+
+		String ibanInput;
+		
+		try {
+			ibanInput = (String)richiestaEntrante.payload[7];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "iban" };
+			return;
+		}
+
+		byte[] immagineProfiloInput;
+
+		try {
+			immagineProfiloInput = (byte[])richiestaEntrante.payload[8];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "immagineProfilo" };
+			return;
+		}
+
+		try (Connection connection = gestoreDatabase.getConnection();) {
+			ArrayList<ConsumerSQL<PreparedStatement>> modifiche = new ArrayList<>();
+
+			StringBuilder stringBuilder = new StringBuilder();
+			stringBuilder.append("UPDATE Utenti\n");
+			stringBuilder.append("SET ");
+
+			if (nomeInput != null) {
+				stringBuilder.append("nome = ?, ");
+				modifiche.add((PreparedStatement preparedStatement) -> {
+					preparedStatement.setString(modifiche.size() + 1, nomeInput);
+				});
+			}
+
+			if (cognomeInput != null) {
+				stringBuilder.append("cognome = ?, ");
+				modifiche.add((PreparedStatement preparedStatement) -> {
+					preparedStatement.setString(modifiche.size() + 1, cognomeInput);
+				});
+			}
+
+			if (dataNascitaInput != null) {
+				if (dataNascitaInput.isAfter(LocalDate.now())) {
+					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+					rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "dataNascita" };
+					return;
+				}
+
+				stringBuilder.append("data_nascita = ?, ");
+				modifiche.add((PreparedStatement preparedStatement) -> {
+					preparedStatement.setDate(modifiche.size() + 1, Date.valueOf(dataNascitaInput));
+				});
+			}
+
+			if (cittaResidenzaInput != null) {
+				stringBuilder.append("citta_residenza = ?, ");
+				modifiche.add((PreparedStatement preparedStatement) -> {
+					preparedStatement.setString(modifiche.size() + 1, cittaResidenzaInput);
+				});
+			}
+
+			if (capInput != null) {
+				// Il CAP e un codice di 5 cifre. 
+				if (capInput < 0 || capInput > 100000) {
+					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+					rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "cap" };
+					return;
+				}
+
+				stringBuilder.append("cap = ?, ");
+				modifiche.add((PreparedStatement preparedStatement) -> {
+					preparedStatement.setInt(modifiche.size() + 1, capInput);
+				});
+			}
+
+			if (indirizzoInput != null) {
+				stringBuilder.append("indirizzo = ?, ");
+				modifiche.add((PreparedStatement preparedStatement) -> {
+					preparedStatement.setString(modifiche.size() + 1, indirizzoInput);
+				});
+			}
+
+			if (emailInput != null) {
+				/*
+				The email couldn't start or finish with a dot
+				The email shouldn't contain spaces into the string
+				The email shouldn't contain special chars (<:, *,ecc)
+				The email could contain dots in the middle of mail address before the @
+				The email could contain a double doman ( '.de.org' or similar rarity)
+				*/
+				if (!Pattern.matches("^((?!\\.)[\\w\\-_.]*[^.])(@\\w+)(\\.\\w+(\\.\\w+)?[^.\\W])$", emailInput)) {
+					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+					rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "email" };
+					return;
+				}
+
+				stringBuilder.append("email = ?, ");
+				modifiche.add((PreparedStatement preparedStatement) -> {
+					preparedStatement.setString(modifiche.size() + 1, emailInput);
+				});
+			}
+
+			if (ibanInput != null) {
+				// Alfanumerico tra 2 e 34 lettere (mauiscole).
+				if (!Pattern.matches("^[A-Z0-9]{2,34}$", ibanInput)) {
+					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+					rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "iban" };
+					return;
+				}
+
+				stringBuilder.append("iban = ?, ");
+				modifiche.add((PreparedStatement preparedStatement) -> {
+					preparedStatement.setString(modifiche.size() + 1, ibanInput);
+				});
+			}
+
+			if (immagineProfiloInput != null) {
+				if (immagineProfiloInput.length == 0) {
+					rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+					rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "immagineProfilo" };
+					return;
+				}
+
+				stringBuilder.append("immagine_profilo = ?, ");
+				modifiche.add((PreparedStatement preparedStatement) -> {
+					preparedStatement.setBoolean(modifiche.size() + 1, true);
+				});
+
+				try (FileOutputStream stream = new FileOutputStream("res\\profili\\" + idUtente + ".png");){
+					stream.write(immagineProfiloInput);
+				}
+			}
+
+			if (modifiche.size() == 0) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+				return;
+			}
+
+			stringBuilder.replace(stringBuilder.length() - 2, stringBuilder.length(), "\nWHERE Id_utente = ?;");
+
+			String queryModifica = stringBuilder.toString();
+			PreparedStatement preparedStatement = connection.prepareStatement(queryModifica);
+
+			for (ConsumerSQL<PreparedStatement> operazione : modifiche) {
+				operazione.accept(preparedStatement);
+			}
+
+			preparedStatement.executeUpdate();
+			
+			rispostaUscente.tipoRisposta = TipoRisposta.OK;
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di modifica profilo." + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		} catch (IOException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nell'apertura/scrittura/chiusura dell'immagine profilo nella modifica del profilo." + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
     }
 
 	private int calcolaNumeroPagine(int elementiPagina, int elementiTotali) {
