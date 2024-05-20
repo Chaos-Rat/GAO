@@ -3201,7 +3201,94 @@ public class GestoreClient implements Runnable {
 	}
 
 	private void salvaAsta() {
-		// Implementazione del salvataggio di un'asta
+		// controllo se l'utente e' connesso 
+		if (idUtente == 0) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+			return;
+		}
+
+		Integer idAstaInput;
+
+		try {
+			idAstaInput = (Integer)richiestaEntrante.payload[0];
+		} catch (ClassCastException e) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+			return;
+		}
+
+		if (idAstaInput == null) {
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.CAMPI_INVALIDI, "idAsta"};
+			return;
+		}
+
+		try (Connection connection = gestoreDatabase.getConnection();) {
+			String queryControlloAsta = "SELECT 1\n" +
+				"FROM Aste\n" +
+				"WHERE Id_asta = ?;"
+			;
+
+			PreparedStatement statement = connection.prepareStatement(queryControlloAsta);
+			statement.setInt(1, idAstaInput);
+			ResultSet resultSet = statement.executeQuery();
+
+			if (!resultSet.next()) {
+				rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+				rispostaUscente.payload = new Object[]{ TipoErrore.OPERAZIONE_INVALIDA };
+				return;
+			}
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di controllo sull'idAsta nel salvataggio asta. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+			return;
+		}
+
+		try (Connection connection = gestoreDatabase.getConnection();) {
+			String queryControlloSalvataggio = "SELECT 1\n" +
+				"FROM Salvataggi\n" +
+				"WHERE Rif_asta = ? AND Rif_utente = ?;"	
+			;
+
+			PreparedStatement preparedStatement = connection.prepareStatement(queryControlloSalvataggio);
+			preparedStatement.setInt(1, idAstaInput);
+			preparedStatement.setInt(2, idUtente);
+			ResultSet resultSet = preparedStatement.executeQuery();
+
+			if (resultSet.next()) {
+				String queryElimininazione = "DELETE FROM Salvataggi\n" +
+					"WHERE Rif_asta = ? AND Rif_utente = ?;"
+				;
+
+				preparedStatement = connection.prepareStatement(queryElimininazione);
+				preparedStatement.setInt(1, idAstaInput);
+				preparedStatement.setInt(2, idUtente);
+				preparedStatement.executeUpdate();
+			} else {
+				String queryCreazione = "INSERT INTO Salvataggi(Rif_asta, Rif_utente)\n" +
+					"VALUES (?, ?);"
+				;
+
+				preparedStatement = connection.prepareStatement(queryCreazione);
+				preparedStatement.setInt(1, idAstaInput);
+				preparedStatement.setInt(2, idUtente);
+				preparedStatement.executeUpdate();
+			}
+
+			rispostaUscente.tipoRisposta = TipoRisposta.OK;
+		} catch (SQLException e) {
+			System.err.println("[" + Thread.currentThread().getName() +
+				"]: C'e' stato un errore nella query di salvataggio asta. " + e.getMessage()
+			);
+
+			rispostaUscente.tipoRisposta = TipoRisposta.ERRORE;
+			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
+		}
 	}
 
 	private void annullaAsta() {

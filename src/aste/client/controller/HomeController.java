@@ -203,7 +203,6 @@ public class HomeController {
                 VBox vbox4 = new VBox();
                 Button button = new Button();
                 button.setText("Details");
-                button.setId("#button");
                 button.setStyle(".button\n" +
                         "{\n" +
                         "    -fx-background-color :  #6F5CC2 ;\n" +
@@ -244,6 +243,56 @@ public class HomeController {
                         }
                     }
                 });
+                Button button2 = new Button();
+                button2.setStyle(".button\n" +
+                "{\n" +
+                "    -fx-background-color :  #6F5CC2 ;\n" +
+                "    -fx-background-radius: 10,10,10,10;\n" +
+                "}\n" +
+                "\n" +
+                ".button:hover\n" +
+                "{\n" +
+                "    -fx-background-color :  #947cfc ;\n" +
+                "    -fx-background-radius: 10,10,10,10;\n" +
+                "}\n" +
+                "\n" +
+                ".button:pressed\n" +
+                "{\n" +
+                "    -fx-background-color :  #6254a1 ;\n" +
+                "    -fx-background-radius: 10,10,10,10;\n" +
+                "}");
+                button2.setOnAction(new EventHandler<ActionEvent>()
+                {
+                    @Override
+                    public void handle(ActionEvent event)
+                    {
+                       try {
+                       button2.setText("Saved");
+                       button2.setStyle("-fx-background-color: #2112EE;" + "-fx-border-color: #2112EE;"+ "-fx-text-fill: white;");
+                       Richiesta richiestaSalva = new Richiesta();
+                       richiestaSalva.tipoRichiesta = Richiesta.TipoRichiesta.SALVA_ASTA;
+                       richiestaSalva.payload = new Object[1];
+                       richiestaSalva.payload[0] = idAsta;
+                       HelloApplication.output.writeObject(richiestaSalva);
+                       Risposta rispostaSalve = (Risposta) HelloApplication.input.readObject();
+                       if (rispostaSalve.tipoRisposta==Risposta.TipoRisposta.OK) 
+                       {
+                            System.out.println("L'asta è stata salvata con successo"); 
+                       }else if (rispostaSalve.tipoRisposta == Risposta.TipoRisposta.ERRORE) 
+                       {
+                            System.out.println(rispostaSalve.payload[0]); 
+                       }
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (ClassNotFoundException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                       
+                    }
+                });
+                button2.setText("Save");
                 vbox.setAlignment(Pos.CENTER);
                 vbox2.setAlignment(Pos.CENTER);
                 vbox3.setAlignment(Pos.CENTER);
@@ -251,7 +300,7 @@ public class HomeController {
                 vbox.getChildren().add(item);
                 vbox2.getChildren().addAll(nomeT,priceT);
                 vbox3.getChildren().addAll(button);
-                vbox4.getChildren().add(timerLabel);
+                vbox4.getChildren().add(button2);
                 box.setSpacing(50);
                 box.setPrefWidth(940);
                 box.setAlignment(Pos.CENTER);
