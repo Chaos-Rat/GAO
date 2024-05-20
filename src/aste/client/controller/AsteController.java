@@ -335,7 +335,11 @@ public class AsteController
                 item.setPreserveRatio(true);
                 Label timerLabel = new Label();
                 timerLabel.setVisible(false);
-                LocalDateTime endDateTime = LocalDateTime.now().plus(duration);
+                if (richiestaAste.tipoRichiesta==Richiesta.TipoRichiesta.VISUALIZZA_ASTE_PROGRAMMATE)
+                {
+                    timerLabel.setVisible(true);
+                }
+                LocalDateTime endDateTime = (LocalDateTime)rispostaAste.payload[i*6+5];
                 AnimationTimer timer = new AnimationTimer() {
                     @Override
                     public void handle(long l) {
@@ -490,27 +494,27 @@ public class AsteController
                 if (richiestaAste.tipoRichiesta==Richiesta.TipoRichiesta.VISUALIZZA_ASTE_PROGRAMMATE)
                 {
                     timerLabel.setVisible(true);
-                    AnimationTimer timer = new AnimationTimer() {
-                        @Override
-                        public void handle(long l) {
-                            Duration remaining = Duration.between(LocalDateTime.now(), dateTimeEND);
-                            if (remaining.isPositive()) {
-                                timerLabel.setText(format(remaining));
-                            } else {
-                                timerLabel.setText(format(Duration.ZERO));
-                                stop();
-                            }
-                        }
-                        private String format(Duration remaining) {
-                            return String.format("%02d:%02d:%02d",
-                                    remaining.toHoursPart(),
-                                    remaining.toMinutesPart(),
-                                    remaining.toSecondsPart()
-                            );
-                        }
-                    };
-                    timer.start();
                 }
+                AnimationTimer timer = new AnimationTimer() {
+                    @Override
+                    public void handle(long l) {
+                        Duration remaining = Duration.between(LocalDateTime.now(), dateTimeEND);
+                        if (remaining.isPositive()) {
+                            timerLabel.setText(format(remaining));
+                        } else {
+                            timerLabel.setText(format(Duration.ZERO));
+                            stop();
+                        }
+                    }
+                    private String format(Duration remaining) {
+                        return String.format("%02d:%02d:%02d",
+                                remaining.toHoursPart(),
+                                remaining.toMinutesPart(),
+                                remaining.toSecondsPart()
+                        );
+                    }
+                };
+                timer.start();
                 Text nomeT = new Text("LottoNome: " + Lottoname);
                 Text priceT = new Text("StartingPrice : " + price.toString());
                 nomeT.setWrappingWidth(150);
