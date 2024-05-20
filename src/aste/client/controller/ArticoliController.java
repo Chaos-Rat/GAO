@@ -127,7 +127,7 @@ public class ArticoliController
         Richiesta richiestaArticoli = new Richiesta();
         richiestaArticoli.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_ARTICOLI;
         richiestaArticoli.payload = new Object[5];
-        richiestaArticoli.payload[0] = 10;
+        richiestaArticoli.payload[0] = 100;
         richiestaArticoli.payload[1] = 1;
         richiestaArticoli.payload[2] = "";
         richiestaArticoli.payload[3] = 0 ;
@@ -178,7 +178,6 @@ public class ArticoliController
                             "    -fx-background-color :  #096e03 ;\n" +
                             "    -fx-background-radius: 15,15,15,15;\n" +
                             "}");
-
                     button.setOnAction(new EventHandler<ActionEvent>() {
                         @Override
                         public void handle(ActionEvent event) {

@@ -139,7 +139,7 @@ public class AsteController
         Richiesta richiestaAste = new Richiesta();
         richiestaAste.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_ASTE_CORRENTI;
         richiestaAste.payload = new Object[4];
-        richiestaAste.payload[0] = 10;
+        richiestaAste.payload[0] = 100;
         richiestaAste.payload[1] = 1;
         richiestaAste.payload[2] = "";
         richiestaAste.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
@@ -156,6 +156,7 @@ public class AsteController
                 String Lottoname = (String)rispostaAste.payload[i* 7+3];
                 FileOutputStream out = new FileOutputStream("cache/Articolo.png");
                 out.write((byte[]) rispostaAste.payload[i* 7+4]);
+                Boolean Salvataggio = (Boolean)rispostaAste.payload[i*7+6];
                 out.close();
                 FileInputStream in = new FileInputStream("cache/Articolo.png");
                 Image img = new Image(in);
@@ -309,7 +310,7 @@ public class AsteController
                 break;
         }
         richiestaAste.payload = new Object[5];
-        richiestaAste.payload[0] = 10;
+        richiestaAste.payload[0] = 100;
         richiestaAste.payload[1] = 1;
         richiestaAste.payload[2] = "";
         richiestaAste.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
@@ -322,6 +323,7 @@ public class AsteController
                 Duration duration = (Duration) rispostaAste.payload[i * 7 + 1];
                 Float price = (Float) rispostaAste.payload[i * 7 + 2];
                 String Lottoname = (String) rispostaAste.payload[i * 7 + 3];
+                Boolean Salvataggio = (Boolean)rispostaAste.payload[i*7+6];
                 FileOutputStream out = new FileOutputStream("cache/Articolo.png");
                 out.write((byte[]) rispostaAste.payload[i * 7 + 4]);
                 out.close();
@@ -370,6 +372,76 @@ public class AsteController
                 VBox vbox3 = new VBox();
                 VBox vbox4 = new VBox();
                 Button button = new Button();
+                Button unsave = new Button();
+                unsave.setVisible(false);
+                if (richiestaAste.tipoRichiesta==Richiesta.TipoRichiesta.VISUALIZZA_ASTE_SALVATE)
+                {
+                    unsave.setVisible(true);
+                }
+                unsave.setText("Saved");
+                unsave.setStyle(".button\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #6F5CC2 ;\n" +
+                        "    -fx-background-radius: 10,10,10,10;\n" +
+                        "}\n" +
+                        "\n" +
+                        ".button:hover\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #947cfc ;\n" +
+                        "    -fx-background-radius: 10,10,10,10;\n" +
+                        "}\n" +
+                        "\n" +
+                        ".button:pressed\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #6254a1 ;\n" +
+                        "    -fx-background-radius: 10,10,10,10;\n" +
+                        "}");
+                unsave.setStyle("-fx-background-color: #2112EE;"+ "-fx-border-color: #2112EE;"+ "-fx-text-fill: white;");
+                unsave.setOnAction(new EventHandler<ActionEvent>()
+                {
+                    @Override
+                    public void handle(ActionEvent event)
+                    {
+                        try
+                        {
+                            unsave.setText("Save");
+                            unsave.setStyle(".button\n" +
+                                    "{\n" +
+                                    "    -fx-background-color :  #6F5CC2 ;\n" +
+                                    "    -fx-background-radius: 10,10,10,10;\n" +
+                                    "}\n" +
+                                    "\n" +
+                                    ".button:hover\n" +
+                                    "{\n" +
+                                    "    -fx-background-color :  #947cfc ;\n" +
+                                    "    -fx-background-radius: 10,10,10,10;\n" +
+                                    "}\n" +
+                                    "\n" +
+                                    ".button:pressed\n" +
+                                    "{\n" +
+                                    "    -fx-background-color :  #6254a1 ;\n" +
+                                    "    -fx-background-radius: 10,10,10,10;\n" +
+                                    "}");
+                            Richiesta richiestaSalva = new Richiesta();
+                            richiestaSalva.tipoRichiesta = Richiesta.TipoRichiesta.SALVA_ASTA;
+                            richiestaSalva.payload = new Object[1];
+                            richiestaSalva.payload[0] = idAsta;
+                            HelloApplication.output.writeObject(richiestaSalva);
+                            Risposta rispostaSalve = (Risposta) HelloApplication.input.readObject();
+                            if (rispostaSalve.tipoRisposta==Risposta.TipoRisposta.OK)
+                            {
+                                System.out.println("L'asta è stata salvata con successo");
+                            }else if (rispostaSalve.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+                            {
+                                System.out.println(rispostaSalve.payload[0]);
+                            }
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        } catch (ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
                 button.setText("Details");
                 button.setId("#button");
                 button.setStyle(".button\n" +
@@ -417,7 +489,9 @@ public class AsteController
                 vbox.getChildren().add(item);
                 vbox2.getChildren().addAll(nomeT, priceT);
                 vbox3.getChildren().addAll(button);
-                vbox4.getChildren().add(timerLabel);
+                HBox box2 = new HBox();
+                box2.getChildren().addAll(unsave,timerLabel);
+                vbox4.getChildren().addAll(box2);
                 box.setSpacing(50);
                 box.setPrefWidth(940);
                 box.setAlignment(Pos.CENTER);
@@ -464,7 +538,7 @@ public class AsteController
                 break;
         }
         richiestaAste.payload = new Object[5];
-        richiestaAste.payload[0] = 10;
+        richiestaAste.payload[0] = 100;
         richiestaAste.payload[1] = 1;
         richiestaAste.payload[2] = "";
         richiestaAste.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
@@ -480,6 +554,7 @@ public class AsteController
                 LocalDateTime dateTimeEND = (LocalDateTime) rispostaAste.payload[i * 7 + 5];
                 FileOutputStream out = new FileOutputStream("cache/Articolo.png");
                 out.write((byte[]) rispostaAste.payload[i * 7 + 4]);
+                Boolean Salvataggio = (Boolean)rispostaAste.payload[i*7+6];
                 out.close();
                 FileInputStream in = new FileInputStream("cache/Articolo.png");
                 Image img = new Image(in);
@@ -524,8 +599,75 @@ public class AsteController
                 VBox vbox3 = new VBox();
                 VBox vbox4 = new VBox();
                 Button button = new Button();
+                Button unsave = new Button();
+                unsave.setVisible(false);
+                if (richiestaAste.tipoRichiesta==Richiesta.TipoRichiesta.VISUALIZZA_ASTE_SALVATE)
+                {
+                    unsave.setVisible(true);
+                }
+                unsave.setText("Saved");
+                unsave.setStyle(".button\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #6F5CC2 ;\n" +
+                        "    -fx-background-radius: 10,10,10,10;\n" +
+                        "}\n" +
+                        "\n" +
+                        ".button:hover\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #947cfc ;\n" +
+                        "    -fx-background-radius: 10,10,10,10;\n" +
+                        "}\n" +
+                        "\n" +
+                        ".button:pressed\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #6254a1 ;\n" +
+                        "    -fx-background-radius: 10,10,10,10;\n" +
+                        "}");
+                unsave.setStyle("-fx-background-color: #2112EE;"+ "-fx-border-color: #2112EE;"+ "-fx-text-fill: white;");
+                unsave.setOnAction(new EventHandler<ActionEvent>()
+                {
+                    @Override
+                    public void handle(ActionEvent event)
+                    {
+                        try
+                        {
+                            unsave.setText("Save");
+                            unsave.setStyle(".button\n" +
+                                    "{\n" +
+                                    "    -fx-background-color :  #6F5CC2 ;\n" +
+                                    "    -fx-background-radius: 10,10,10,10;\n" +
+                                    "}\n" +
+                                    "\n" +
+                                    ".button:hover\n" +
+                                    "{\n" +
+                                    "    -fx-background-color :  #947cfc ;\n" +
+                                    "    -fx-background-radius: 10,10,10,10;\n" +
+                                    "}\n" +
+                                    "\n" +
+                                    ".button:pressed\n" +
+                                    "{\n" +
+                                    "    -fx-background-color :  #6254a1 ;\n" +
+                                    "    -fx-background-radius: 10,10,10,10;\n" +
+                                    "}");
+                            Richiesta richiestaSalva = new Richiesta();
+                            richiestaSalva.tipoRichiesta = Richiesta.TipoRichiesta.SALVA_ASTA;
+                            richiestaSalva.payload = new Object[1];
+                            richiestaSalva.payload[0] = idAsta;
+                            HelloApplication.output.writeObject(richiestaSalva);
+                            Risposta rispostaSalve = (Risposta) HelloApplication.input.readObject();
+                            if (rispostaSalve.tipoRisposta==Risposta.TipoRisposta.OK)
+                            {
+                                System.out.println("L'asta è stata salvata con successo");
+                            }else if (rispostaSalve.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+                            {
+                                System.out.println(rispostaSalve.payload[0]);
+                            }
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
                 button.setText("Details");
-                button.setId("#button");
                 button.setStyle(".button\n" +
                         "{\n" +
                         "    -fx-background-color :  #6F5CC2 ;\n" +
@@ -571,7 +713,7 @@ public class AsteController
                 vbox.getChildren().add(item);
                 vbox2.getChildren().addAll(nomeT, priceT);
                 vbox3.getChildren().addAll(button);
-                vbox4.getChildren().add(timerLabel);
+                vbox4.getChildren().addAll(unsave,timerLabel);
                 box.setSpacing(50);
                 box.setPrefWidth(940);
                 box.setAlignment(Pos.CENTER);
@@ -580,7 +722,6 @@ public class AsteController
             }
         }
     }
-
     @FXML
     void ProfileClicked(ActionEvent event) throws IOException
     {

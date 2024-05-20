@@ -217,16 +217,7 @@ public class ArticoloDetailsController {
 
     @FXML
     void ModifyClicked(ActionEvent event) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/ArticoloModify.fxml"));
-        Parent root = loader.load();
-        Scene scene = new Scene(root);
-        Stage stage = new Stage();
-        stage.setTitle("The AuctionHouse");
-        stage.setScene(scene);
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.show();
-        Stage stage1 = (Stage) modifyB.getScene().getWindow();
-        stage1.close();
+
     }
 
 

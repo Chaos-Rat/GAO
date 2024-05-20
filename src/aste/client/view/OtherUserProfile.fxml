@@ -46,6 +46,7 @@
                         <Insets top="10.0" />
                      </padding>
                   </HBox>
+                  <Button fx:id="ProfileB" alignment="CENTER" mnemonicParsing="false" onAction="#ProfileClicked" prefHeight="25.0" prefWidth="132.0" stylesheets="@CSS/button.css" text="Profile" textFill="WHITE" />
                   <Button fx:id="AsteB" alignment="CENTER" mnemonicParsing="false" onAction="#AsteClicked" prefHeight="25.0" prefWidth="132.0" stylesheets="@CSS/button.css" text="Aste" textFill="WHITE" />
                   <Button fx:id="LottiB" mnemonicParsing="false" onAction="#LottiCLicked" prefHeight="25.0" prefWidth="129.0" stylesheets="@CSS/button.css" text="Lotti" textFill="WHITE" />
                   <Button fx:id="ArticoliB" mnemonicParsing="false" onAction="#ArticoliClicked" prefHeight="25.0" prefWidth="129.0" stylesheets="@CSS/button.css" text="Articoli" textFill="WHITE" />

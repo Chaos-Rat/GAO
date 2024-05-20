@@ -113,7 +113,7 @@ public class LottiController
         Richiesta richiestaLotti = new Richiesta();
         richiestaLotti.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_LOTTI;
         richiestaLotti.payload = new Object[5];
-        richiestaLotti.payload[0] = 10 ;
+        richiestaLotti.payload[0] = 100;
         richiestaLotti.payload[1] = 1;
         richiestaLotti.payload[2] = "";
         richiestaLotti.payload[3] = 0;
@@ -139,18 +139,59 @@ public class LottiController
                 Text nomeT = new Text("Nome: " + nome);
                 Integer id = (Integer) rispostaLotti.payload[i * 3 + 0];
                 Text idT = new Text("Id: +" + id.toString());
+                Button button = new Button();
+                button.setText("Details");
+                button.setStyle(".button\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #16f70a ;\n" +
+                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "}\n" +
+                        "\n" +
+                        ".button:hover\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #1aab13 ;\n" +
+                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "}\n" +
+                        "\n" +
+                        ".button:pressed\n" +
+                        "{\n" +
+                        "    -fx-background-color :  #096e03 ;\n" +
+                        "    -fx-background-radius: 15,15,15,15;\n" +
+                        "}");
+                button.setOnAction((ActionEvent event) ->
+                {
+                    try {
+                        LottoDetailsController.idLotto = id;
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/LottoDetails.fxml"));
+                        Parent root = loader.load();
+                        Scene scene = new Scene(root);
+                        Stage stage = new Stage();
+                        stage.setTitle("The AuctionHouse");
+                        stage.setScene(scene);
+                        stage.initModality(Modality.APPLICATION_MODAL);
+                        stage.show();
+                        Stage stage1 = (Stage) button.getScene().getWindow();
+                        stage1.close();
+                    } catch (IOException e)
+                    {
+                        throw new RuntimeException(e);
+                    }
+                });
                 nomeT.setWrappingWidth(150);
                 idT.setWrappingWidth(150);
                 VBox vbox = new VBox();
                 VBox vbox2 = new VBox();
-                vbox2.setAlignment(Pos.CENTER);
+                VBox vbox3 = new VBox();
                 vbox.setAlignment(Pos.CENTER);
+                vbox2.setAlignment(Pos.CENTER);
+                vbox3.setAlignment(Pos.CENTER);
                 vbox.getChildren().add(item);
                 vbox2.getChildren().addAll(nomeT);
+                vbox3.getChildren().addAll(button);
 				box.setSpacing(50);
                 box.setPrefWidth(940);
                 box.setAlignment(Pos.CENTER);
-                box.getChildren().addAll(vbox, vbox2);
+                box.getChildren().addAll(vbox, vbox2,vbox3);
                 lottiList.getChildren().add(box);
             }
         }else if (rispostaLotti.payload[0] == Risposta.TipoRisposta.ERRORE)
@@ -203,7 +244,7 @@ public class LottiController
         Richiesta richiestaLotti = new Richiesta();
         richiestaLotti.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_LOTTI;
         richiestaLotti.payload = new Object[5];
-        richiestaLotti.payload[0] = 10;
+        richiestaLotti.payload[0] = 100;
         richiestaLotti.payload[1] = 1;
         richiestaLotti.payload[2] = "";
         richiestaLotti.payload[3] = catmap.get(category.getSelectionModel().getSelectedItem());
