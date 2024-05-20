@@ -1,7 +1,6 @@
 package aste.server;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InvalidClassException;
@@ -2332,10 +2331,6 @@ public class GestoreClient implements Runnable {
 			rispostaUscente.payload = new Object[]{ TipoErrore.GENERICO };
 		}
     }
-
-	private int calcolaNumeroPagine(int elementiPagina, int elementiTotali) {
-		return Math.ceilDiv(elementiPagina, elementiTotali);
-	}
 
     // Implementazione della visualizzazione delle aste (pagina home)
     private void visualizzaAste() {
