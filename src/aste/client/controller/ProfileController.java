@@ -220,14 +220,50 @@ public class ProfileController
         Richiesta richiestaProfile = new Richiesta();
         richiestaProfile.tipoRichiesta = Richiesta.TipoRichiesta.MODIFICA_PROFILO;
         richiestaProfile.payload = new Object[9];
-        richiestaProfile.payload[0] = nameEdit.getText();
-        richiestaProfile.payload[1] = surnameEdit.getText();
+        if (nameEdit.getText() == "")
+        {
+            richiestaProfile.payload[0] = null;
+        }else{
+            richiestaProfile.payload[0] = nameEdit.getText();
+        }
+        if (surnameEdit.getText() == "")
+        {
+            richiestaProfile.payload[1] = null;
+        }else{
+            richiestaProfile.payload[1] = surnameEdit.getText();
+        }
         richiestaProfile.payload [2] = dateEdit.getValue();
-        richiestaProfile.payload[3] = cityEdit.getText();
-        richiestaProfile.payload[4] = Integer.parseInt(capEdit.getText());
-        richiestaProfile.payload[5] = addressEdit.getText();
-        richiestaProfile.payload[6] = emailEdit.getText();
-        richiestaProfile.payload[7] = ibanEdit.getText();
+        if (cityEdit.getText() == "")
+        {
+            richiestaProfile.payload[3] = null;
+        }else{
+            richiestaProfile.payload[3] = cityEdit.getText();
+        }
+        if (capEdit.getText() == "")
+        {
+            richiestaProfile.payload[4] = null;
+
+        }else{
+            richiestaProfile.payload[4] = Integer.parseInt(capEdit.getText());
+        }
+        if (addressEdit.getText() == "")
+        {
+            richiestaProfile.payload[5] = null;
+        }else{
+            richiestaProfile.payload[5] = addressEdit.getText();
+        }
+        if (emailEdit.getText() == "")
+        {
+            richiestaProfile.payload[6] = null;
+        }else{
+            richiestaProfile.payload[6] = emailEdit.getText();
+        }
+        if (ibanEdit.getText() == "")
+        {
+            richiestaProfile.payload[7] = null;
+        }else{
+            richiestaProfile.payload[7] = ibanEdit.getText();
+        }
         richiestaProfile.payload[8] = new byte[selectedFiles.size()][];
         for (int i = 0 ; i<selectedFiles.size();i++)
         {
