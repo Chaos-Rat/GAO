@@ -2191,15 +2191,17 @@ public class GestoreClient implements Runnable {
 
 			if (nomeInput != null) {
 				stringBuilder.append("nome = ?, ");
+				int elementi = modifiche.size();
 				modifiche.add((PreparedStatement preparedStatement) -> {
-					preparedStatement.setString(modifiche.size() + 1, nomeInput);
+					preparedStatement.setString(elementi + 1, nomeInput);
 				});
 			}
 
 			if (cognomeInput != null) {
 				stringBuilder.append("cognome = ?, ");
+				int elementi = modifiche.size();
 				modifiche.add((PreparedStatement preparedStatement) -> {
-					preparedStatement.setString(modifiche.size() + 1, cognomeInput);
+					preparedStatement.setString(elementi + 1, cognomeInput);
 				});
 			}
 
@@ -2211,15 +2213,17 @@ public class GestoreClient implements Runnable {
 				}
 
 				stringBuilder.append("data_nascita = ?, ");
+				int elementi = modifiche.size();
 				modifiche.add((PreparedStatement preparedStatement) -> {
-					preparedStatement.setDate(modifiche.size() + 1, Date.valueOf(dataNascitaInput));
+					preparedStatement.setDate(elementi + 1, Date.valueOf(dataNascitaInput));
 				});
 			}
 
 			if (cittaResidenzaInput != null) {
 				stringBuilder.append("citta_residenza = ?, ");
+				int elementi = modifiche.size();
 				modifiche.add((PreparedStatement preparedStatement) -> {
-					preparedStatement.setString(modifiche.size() + 1, cittaResidenzaInput);
+					preparedStatement.setString(elementi + 1, cittaResidenzaInput);
 				});
 			}
 
@@ -2232,15 +2236,17 @@ public class GestoreClient implements Runnable {
 				}
 
 				stringBuilder.append("cap = ?, ");
+				int elementi = modifiche.size();
 				modifiche.add((PreparedStatement preparedStatement) -> {
-					preparedStatement.setInt(modifiche.size() + 1, capInput);
+					preparedStatement.setInt(elementi + 1, capInput);
 				});
 			}
 
 			if (indirizzoInput != null) {
 				stringBuilder.append("indirizzo = ?, ");
+				int elementi = modifiche.size();
 				modifiche.add((PreparedStatement preparedStatement) -> {
-					preparedStatement.setString(modifiche.size() + 1, indirizzoInput);
+					preparedStatement.setString(elementi + 1, indirizzoInput);
 				});
 			}
 
@@ -2259,8 +2265,9 @@ public class GestoreClient implements Runnable {
 				}
 
 				stringBuilder.append("email = ?, ");
+				int elementi = modifiche.size();
 				modifiche.add((PreparedStatement preparedStatement) -> {
-					preparedStatement.setString(modifiche.size() + 1, emailInput);
+					preparedStatement.setString(elementi + 1, emailInput);
 				});
 			}
 
@@ -2273,8 +2280,9 @@ public class GestoreClient implements Runnable {
 				}
 
 				stringBuilder.append("iban = ?, ");
+				int elementi = modifiche.size();
 				modifiche.add((PreparedStatement preparedStatement) -> {
-					preparedStatement.setString(modifiche.size() + 1, ibanInput);
+					preparedStatement.setString(elementi + 1, ibanInput);
 				});
 			}
 
@@ -2286,8 +2294,9 @@ public class GestoreClient implements Runnable {
 				}
 
 				stringBuilder.append("immagine_profilo = ?, ");
+				int elementi = modifiche.size();
 				modifiche.add((PreparedStatement preparedStatement) -> {
-					preparedStatement.setBoolean(modifiche.size() + 1, true);
+					preparedStatement.setBoolean(elementi + 1, true);
 				});
 
 				try (FileOutputStream stream = new FileOutputStream("res\\profili\\" + idUtente + ".png");){
@@ -2309,6 +2318,8 @@ public class GestoreClient implements Runnable {
 			for (ConsumerSQL<PreparedStatement> operazione : modifiche) {
 				operazione.accept(preparedStatement);
 			}
+
+			preparedStatement.setInt(modifiche.size() + 1, idUtente);
 
 			preparedStatement.executeUpdate();
 			
