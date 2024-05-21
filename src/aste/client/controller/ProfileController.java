@@ -21,16 +21,21 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 
 public class ProfileController
 {
+    private List<File> selectedFiles;
+
     @FXML
     private Button ArticoliB;
 
@@ -109,6 +114,8 @@ public class ProfileController
     @FXML
     private Text surnameText;
 
+    private Image [] img;
+
     @FXML
     void ModifyInfo(ActionEvent event)
     {
@@ -136,9 +143,17 @@ public class ProfileController
         FileChooser fileChooser = new FileChooser();
         fileChooser.getExtensionFilters().addAll(ex1,ex2,ex3);
         fileChooser.setTitle("Select your image");
-        File selectedFile = fileChooser.showOpenDialog(stage);
-        Image image = new Image(selectedFile.toURI().toString());
-        avatar.setFill(new ImagePattern(image));
+        selectedFiles = fileChooser.showOpenMultipleDialog(stage);
+        if (selectedFiles != null) {
+            File selectedFile = selectedFiles.get(0);
+            Image image = new Image(selectedFile.toURI().toString());
+            img = new Image[]{image};
+            avatar.setFill(new ImagePattern(image));
+        }
+        else {
+            selectedFiles = new ArrayList<>();
+        }
+
     }
 
     @FXML
@@ -186,8 +201,7 @@ public class ProfileController
     }
 
     @FXML
-    void ConfirmClicked(ActionEvent event)
-    {
+    void ConfirmClicked(ActionEvent event) throws IOException, ClassNotFoundException {
         nameText.setText("Name: " + nameEdit.getText());
         surnameText.setText("Surname: " + surnameEdit.getText());
         emailText.setText("Email: " + emailEdit.getText());
@@ -203,6 +217,34 @@ public class ProfileController
         capEdit.setVisible(false);
         addressEdit.setVisible(false);
         ibanEdit.setVisible(false);
+        Richiesta richiestaProfile = new Richiesta();
+        richiestaProfile.tipoRichiesta = Richiesta.TipoRichiesta.MODIFICA_PROFILO;
+        richiestaProfile.payload = new Object[9];
+        richiestaProfile.payload[0] = nameEdit.getText();
+        richiestaProfile.payload[1] = surnameEdit.getText();
+        richiestaProfile.payload [2] = dateEdit.getValue();
+        richiestaProfile.payload[3] = cityEdit.getText();
+        richiestaProfile.payload[4] = Integer.parseInt(capEdit.getText());
+        richiestaProfile.payload[5] = addressEdit.getText();
+        richiestaProfile.payload[6] = emailEdit.getText();
+        richiestaProfile.payload[7] = ibanEdit.getText();
+        richiestaProfile.payload[8] = new byte[selectedFiles.size()][];
+        for (int i = 0 ; i<selectedFiles.size();i++)
+        {
+            FileInputStream stream = new FileInputStream(selectedFiles.get(i));
+            richiestaProfile.payload[8] =  stream.readAllBytes();
+            stream.close();
+        }
+        HelloApplication.output.writeObject(richiestaProfile);
+        Risposta rispostaProfile = (Risposta) HelloApplication.input.readObject();
+        if (rispostaProfile.tipoRisposta == Risposta.TipoRisposta.OK)
+        {
+            System.out.println("The data modification proccess finished with success!");
+        } else if (rispostaProfile.tipoRisposta == Risposta.TipoRisposta.ERRORE)
+        {
+            System.out.println(rispostaProfile.payload[0]);
+        }
+
     }
 
     public void initialize() throws IOException, ClassNotFoundException {
