@@ -456,7 +456,8 @@ public class GestoreClient implements Runnable {
 			"Puntate.valore, Puntate.Rif_utente, Utenti.Email\n" +
 			"FROM Puntate\n" +
 			"JOIN Utenti ON Puntate.Rif_utente = Utenti.Id_utente\n" +
-			"WHERE Rif_asta = ?;"
+			"WHERE Rif_asta = ?\n" +
+			"ORDER BY Puntate.valore;"
 		;
 
 		try (Connection connection = gestoreDatabase.getConnection();) {
