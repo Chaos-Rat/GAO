@@ -22,3 +22,20 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+
+# IntelliJ
+out/
+.idea/
+*.iml
+
+# External Libraries
+lib/
+
+# Visual Studio Code
+/.vscode
+
+# dynamic resources
+/res/immagini_articoli/*.png
+/res/profili/*.png
+/cache/*.png
+imagine.png

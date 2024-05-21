@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aste.client.controller.RegisterController">
+   <children>
+      <VBox layoutY="77.0" prefHeight="525.0" prefWidth="281.0">
+         <children>
+            <HBox prefHeight="6.0" prefWidth="281.0" />
+            <HBox alignment="CENTER" prefHeight="82.0" prefWidth="232.0">
+               <children>
+                  <VBox alignment="CENTER_LEFT" prefHeight="89.0" prefWidth="213.0">
+                     <children>
+                        <Text fx:id="nameText" strokeType="OUTSIDE" strokeWidth="0.0" text="Nome" wrappingWidth="111.13671875">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Text>
+                        <TextField fx:id="nameField" alignment="BOTTOM_LEFT" prefHeight="22.0" prefWidth="213.0" promptText="Please insert your name" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="82.0" prefWidth="232.0">
+               <children>
+                  <VBox alignment="CENTER_LEFT" prefHeight="74.0" prefWidth="210.0">
+                     <children>
+                        <Text fx:id="cognText" strokeType="OUTSIDE" strokeWidth="0.0" text="Cognome" wrappingWidth="111.13671875">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Text>
+                        <TextField fx:id="cognField" prefHeight="25.0" prefWidth="195.0" promptText="Please insert your family name" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="82.0" prefWidth="232.0">
+               <children>
+                  <VBox alignment="CENTER_LEFT" prefHeight="75.0" prefWidth="212.0">
+                     <children>
+                        <Text fx:id="cityText" strokeType="OUTSIDE" strokeWidth="0.0" text="City" wrappingWidth="111.13671875">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Text>
+                        <TextField fx:id="cityField" prefHeight="25.0" prefWidth="196.0" promptText="Insert the City you currently live in" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="82.0" prefWidth="232.0">
+               <children>
+                  <VBox alignment="CENTER_LEFT" prefHeight="82.0" prefWidth="219.0">
+                     <children>
+                        <Text fx:id="addressText" strokeType="OUTSIDE" strokeWidth="0.0" text="Address" wrappingWidth="111.13671875">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Text>
+                        <TextField fx:id="addressField" prefHeight="25.0" prefWidth="196.0" promptText="Please insert your Address" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="82.0" prefWidth="232.0">
+               <children>
+                  <VBox alignment="CENTER_LEFT" prefHeight="77.0" prefWidth="212.0">
+                     <children>
+                        <Text fx:id="capText" strokeType="OUTSIDE" strokeWidth="0.0" text="CAP" wrappingWidth="111.13671875">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Text>
+                        <TextField fx:id="capField" prefHeight="25.0" prefWidth="196.0" promptText="Please insert your CAP" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="82.0" prefWidth="232.0">
+               <children>
+                  <VBox alignment="CENTER_LEFT" prefHeight="70.0" prefWidth="214.0">
+                     <children>
+                        <Text fx:id="ibanText" strokeType="OUTSIDE" strokeWidth="0.0" text="IBAN" wrappingWidth="111.13671875">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Text>
+                        <TextField fx:id="ibanField" prefHeight="25.0" prefWidth="196.0" promptText="Please insert your IBAN" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="79.0" prefWidth="281.0">
+               <children>
+                  <VBox alignment="CENTER_LEFT" prefHeight="59.0" prefWidth="219.0">
+                     <children>
+                        <Text fx:id="dateText" strokeType="OUTSIDE" strokeWidth="0.0" text="Date" wrappingWidth="111.13671875">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Text>
+                        <DatePicker fx:id="dateP" prefHeight="25.0" prefWidth="220.0" promptText="Date of Birth" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <TextField fx:id="emailF" layoutX="333.0" layoutY="272.0" prefHeight="25.0" prefWidth="183.0" promptText="Please insert your email" />
+      <Text fx:id="emailT" layoutX="352.0" layoutY="245.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Email" wrappingWidth="111.13671875">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Text>
+      <PasswordField fx:id="passF" layoutX="333.0" layoutY="347.0" prefHeight="25.0" prefWidth="183.0" promptText="Please insert your password" />
+      <Text fx:id="passT" layoutX="352.0" layoutY="327.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Password" wrappingWidth="111.13671875">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Text>
+      <Button fx:id="nextB" layoutX="281.0" layoutY="262.0" mnemonicParsing="false" onAction="#NextClick" text="Next" />
+      <Button fx:id="backB" layoutX="281.0" layoutY="346.0" mnemonicParsing="false" onAction="#BackStageClick" text="Back" />
+      <Button fx:id="backB2" layoutX="563.0" layoutY="326.0" mnemonicParsing="false" onAction="#BackClick" prefHeight="25.0" prefWidth="60.0" text="Back" />
+      <Button fx:id="regB" layoutX="563.0" layoutY="270.0" mnemonicParsing="false" onAction="#RegisterClick" text="Register" />
+      <HBox alignment="CENTER" layoutX="-8.0" prefHeight="77.0" prefWidth="812.0" style="-fx-background-color: #52348F;">
+         <children>
+            <ImageView fitHeight="64.0" fitWidth="82.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@BlackMarket.png" />
+               </image>
+            </ImageView>
+            <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="TheBlackMarket">
+               <font>
+                  <Font name="Courgette Regular" size="31.0" />
+               </font>
+            </Text>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

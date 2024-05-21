@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="810.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="aste.client.controller.ProfileController">
+   <children>
+      <BorderPane prefHeight="580.0" prefWidth="810.0">
+         <top>
+            <HBox alignment="CENTER" prefHeight="50.0" prefWidth="810.0" style="-fx-background-color: #52348F;" BorderPane.alignment="CENTER">
+               <children>
+                  <ImageView fitHeight="50.0" fitWidth="89.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@BlackMarket.png" />
+                     </image>
+                  </ImageView>
+                  <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="The BlackMarket" textAlignment="CENTER">
+                     <font>
+                        <Font size="31.0" />
+                     </font>
+                  </Text>
+               </children>
+            </HBox>
+         </top>
+         <left>
+            <VBox prefHeight="530.0" prefWidth="106.0" style="-fx-background-color: #6F5CC2;" BorderPane.alignment="CENTER">
+               <children>
+                  <Button fx:id="HomeB" alignment="CENTER" mnemonicParsing="false" onAction="#HomeClicked" prefHeight="25.0" prefWidth="132.0" stylesheets="@CSS/button.css" text="Home" textFill="WHITE" />
+                  <HBox alignment="CENTER" prefHeight="37.0" prefWidth="106.0">
+                     <children>
+                        <Text fill="WHITE" strokeType="OUTSIDE" strokeWidth="0.0" text="Area Personale" />
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets top="10.0" />
+                     </padding>
+                  </HBox>
+                  <Button fx:id="AsteB" alignment="CENTER" mnemonicParsing="false" onAction="#AsteClicked" prefHeight="25.0" prefWidth="132.0" stylesheets="@CSS/button.css" text="Aste" textFill="WHITE" />
+                  <Button fx:id="LottiB" mnemonicParsing="false" onAction="#LottiCLicked" prefHeight="25.0" prefWidth="129.0" stylesheets="@CSS/button.css" text="Lotti" textFill="WHITE" />
+                  <Button fx:id="ArticoliB" mnemonicParsing="false" onAction="#ArticoliClicked" prefHeight="25.0" prefWidth="129.0" stylesheets="@CSS/button.css" text="Articoli" textFill="WHITE" />
+                  <Button fx:id="LogoutB" mnemonicParsing="false" onAction="#LogoutClicked" prefHeight="25.0" prefWidth="129.0" stylesheets="@CSS/logout.css" text="Logout" textFill="WHITE" />
+               </children>
+            </VBox>
+         </left>
+         <center>
+            <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+               <children>
+                  <HBox alignment="CENTER_LEFT" prefHeight="179.0" prefWidth="682.0">
+                     <children>
+                        <Button fx:id="ChangeB" mnemonicParsing="false" onAction="#ChangeAvatar" text="Change">
+                           <HBox.margin>
+                              <Insets right="10.0" />
+                           </HBox.margin></Button>
+                        <Circle fx:id="avatar" fill="WHITE" radius="76.0" stroke="BLACK" strokeType="INSIDE" strokeWidth="0.0" />
+                        <VBox alignment="CENTER_LEFT" prefHeight="220.0" prefWidth="218.0">
+                           <children>
+                              <Text fx:id="nameText" strokeType="OUTSIDE" strokeWidth="0.0" text="Name:" wrappingWidth="120.220703125">
+                                 <VBox.margin>
+                                    <Insets />
+                                 </VBox.margin></Text>
+                              <Text fx:id="surnameText" strokeType="OUTSIDE" strokeWidth="0.0" text="Surname: " wrappingWidth="125.13671875" />
+                              <Text fx:id="emailText" strokeType="OUTSIDE" strokeWidth="0.0" text="Email:" />
+                              <Text fx:id="dateText" strokeType="OUTSIDE" strokeWidth="0.0" text="Date:" />
+                              <Text fx:id="cityText" strokeType="OUTSIDE" strokeWidth="0.0" text="City:" />
+                              <Text fx:id="capText" strokeType="OUTSIDE" strokeWidth="0.0" text="CAP:" />
+                              <Text fx:id="addressText" strokeType="OUTSIDE" strokeWidth="0.0" text="Address:" />
+                              <Text fx:id="ibanText" strokeType="OUTSIDE" strokeWidth="0.0" text="Iban:" />
+                           </children>
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </VBox>
+                        <Button fx:id="ModifyB" mnemonicParsing="false" onAction="#ModifyInfo" text="Modify" />
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="362.0" prefWidth="704.0">
+                     <children>
+                        <VBox prefHeight="357.0" prefWidth="272.0">
+                           <children>
+                              <HBox alignment="CENTER" prefHeight="56.0" prefWidth="357.0">
+                                 <children>
+                                    <TextField fx:id="nameEdit" prefWidth="196.0" promptText="Please Enter your new name" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER" prefHeight="56.0" prefWidth="357.0">
+                                 <children>
+                                    <TextField fx:id="surnameEdit" prefWidth="196.0" promptText="Please Enter your new surname" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER" prefHeight="56.0" prefWidth="357.0">
+                                 <children>
+                                    <TextField fx:id="emailEdit" prefWidth="196.0" promptText="Please Enter your new email" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER_RIGHT" prefHeight="56.0" prefWidth="357.0">
+                                 <children>
+                                    <DatePicker fx:id="dateEdit" prefHeight="23.0" prefWidth="234.0" promptText="Please enter your new date of birth" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER" prefHeight="56.0" prefWidth="357.0">
+                                 <children>
+                                    <TextField fx:id="cityEdit" prefWidth="196.0" promptText="Please Enter your new city name" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER" prefHeight="56.0" prefWidth="357.0">
+                                 <children>
+                                    <TextField fx:id="capEdit" prefWidth="196.0" promptText="Please Enter your new CAP" />
+                                 </children>
+                              </HBox>
+                              <HBox alignment="CENTER" prefHeight="56.0" prefWidth="357.0">
+                                 <children>
+                                    <TextField fx:id="addressEdit" prefWidth="196.0" promptText="Please Enter your new Address" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox alignment="CENTER" prefHeight="357.0" prefWidth="214.0">
+                           <children>
+                              <HBox alignment="CENTER_RIGHT" prefHeight="56.0" prefWidth="357.0">
+                                 <children>
+                                    <TextField fx:id="ibanEdit" prefWidth="196.0" promptText="Please Enter your new Iban" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <VBox alignment="CENTER_RIGHT" prefHeight="177.0" prefWidth="74.0">
+                           <children>
+                              <Button fx:id="ConfirmB" mnemonicParsing="false" onAction="#ConfirmClicked" text="Confirm">
+                                 <VBox.margin>
+                                    <Insets bottom="20.0" />
+                                 </VBox.margin>
+                              </Button>
+                              <Button fx:id="backB" mnemonicParsing="false" onAction="#BackClicked" prefHeight="25.0" prefWidth="57.0" text="Back" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </center>
+      </BorderPane>
+   </children>
+</AnchorPane>
