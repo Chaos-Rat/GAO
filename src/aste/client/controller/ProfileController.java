@@ -22,6 +22,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
@@ -220,57 +221,56 @@ public class ProfileController
         Richiesta richiestaProfile = new Richiesta();
         richiestaProfile.tipoRichiesta = Richiesta.TipoRichiesta.MODIFICA_PROFILO;
         richiestaProfile.payload = new Object[9];
-        if (nameEdit.getText() == "")
-        {
+        if (nameEdit.getText().equals("")) {
             richiestaProfile.payload[0] = null;
-        }else{
+        } else {
             richiestaProfile.payload[0] = nameEdit.getText();
         }
-        if (surnameEdit.getText() == "")
-        {
+        if (surnameEdit.getText().equals("")) {
             richiestaProfile.payload[1] = null;
-        }else{
+        } else {
             richiestaProfile.payload[1] = surnameEdit.getText();
         }
-        richiestaProfile.payload [2] = dateEdit.getValue();
-        if (cityEdit.getText() == "")
-        {
+        richiestaProfile.payload[2] = dateEdit.getValue();
+        if (cityEdit.getText().equals("")) {
             richiestaProfile.payload[3] = null;
-        }else{
+        } else {
             richiestaProfile.payload[3] = cityEdit.getText();
         }
-        if (capEdit.getText() == "")
-        {
+        if (capEdit.getText().equals("")) {
             richiestaProfile.payload[4] = null;
 
-        }else{
+        } else {
             richiestaProfile.payload[4] = Integer.parseInt(capEdit.getText());
         }
-        if (addressEdit.getText() == "")
-        {
+        if (addressEdit.getText().equals("")) {
             richiestaProfile.payload[5] = null;
-        }else{
+        } else {
             richiestaProfile.payload[5] = addressEdit.getText();
         }
-        if (emailEdit.getText() == "")
-        {
+        if (emailEdit.getText().equals("")) {
             richiestaProfile.payload[6] = null;
-        }else{
+        } else {
             richiestaProfile.payload[6] = emailEdit.getText();
         }
-        if (ibanEdit.getText() == "")
-        {
+        if (ibanEdit.getText().equals("")) {
             richiestaProfile.payload[7] = null;
-        }else{
+        } else {
             richiestaProfile.payload[7] = ibanEdit.getText();
         }
-        richiestaProfile.payload[8] = new byte[selectedFiles.size()][];
-        for (int i = 0 ; i<selectedFiles.size();i++)
+        if (selectedFiles == null)
         {
+            richiestaProfile.payload[8] = null;
+        } else
+        {
+        richiestaProfile.payload[8] = new byte[selectedFiles.size()][];
+        for (int i = 0; i < selectedFiles.size(); i++)
+            {
             FileInputStream stream = new FileInputStream(selectedFiles.get(i));
-            richiestaProfile.payload[8] =  stream.readAllBytes();
+            richiestaProfile.payload[8] = stream.readAllBytes();
             stream.close();
-        }
+            }
+         }
         HelloApplication.output.writeObject(richiestaProfile);
         Risposta rispostaProfile = (Risposta) HelloApplication.input.readObject();
         if (rispostaProfile.tipoRisposta == Risposta.TipoRisposta.OK)
@@ -284,8 +284,27 @@ public class ProfileController
     }
 
     public void initialize() throws IOException, ClassNotFoundException {
-        Image image = new Image(getClass().getResourceAsStream("../view/Avatar.png"));
-        avatar.setFill(new ImagePattern(image));
+        Richiesta richiesta = new Richiesta();
+        richiesta.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_IMMAGINE_PROFILO;
+        richiesta.payload = new Object[]{0};
+        HelloApplication.output.writeObject(richiesta);
+        Risposta risposta = (Risposta) HelloApplication.input.readObject();
+        if (risposta.tipoRisposta == Risposta.TipoRisposta.OK) {
+            FileOutputStream picture = new FileOutputStream("imagine.png");
+            picture.write((byte[]) risposta.payload[0]);
+            picture.close();
+            FileInputStream defaultImg = new FileInputStream("imagine.png");
+            Image image = new Image(defaultImg);
+            ImageView imageView = new ImageView();
+            imageView.setImage(image);
+            avatar.setFill(new ImagePattern(imageView.getImage()));
+            defaultImg.close();
+        }
+        else
+        {
+            System.out.println(risposta.tipoRisposta.toString());
+            System.out.println(((Risposta.TipoErrore) risposta.payload[0]).toString());
+        }
         backB.setVisible(false);
         ChangeB.setVisible(false);
         ConfirmB.setVisible(false);
