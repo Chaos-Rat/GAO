@@ -3529,31 +3529,36 @@ public class GestoreClient implements Runnable {
 			return;
 		}
 
-		// Impostazione della query finale 
-		String queryVisualizzazione = "SELECT Aste.data_ora_inizio, Aste.durata, Aste.prezzo_inizio, " +
-			"MAX(Puntate.valore) AS prezzo_attuale, Aste.ip_multicast, Aste.descrizione_annullamento, " +
-			"Lotti.Id_lotto, Lotti.nome\n"+ 
-			"FROM Aste\n"+
-			"LEFT JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
-			"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
-			"WHERE Aste.Id_asta = ?\n" +
-			"GROUP BY Aste.Id_asta;"
-		;
-
-		String queryUtente = "SELECT Utenti.Id_utente, Utenti.email\n" +
-			"FROM Utenti\n" +
-			"JOIN Articoli ON Utenti.Id_utente = Articoli.Rif_utente\n" +
-			"WHERE Articoli.Rif_lotto = ?\n" +
-			"LIMIT 1;"	
-		;
-
-		String queryImmagini = "SELECT Immagini.Id_immagine\n" +
-			"FROM Immagini\n" +
-			"JOIN Articoli ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
-			"WHERE Articoli.Rif_lotto = ?;"
-		;
-
 		try (Connection connection = gestoreDatabase.getConnection();) {
+			// Impostazione della query finale 
+				String queryVisualizzazione = "SELECT Aste.data_ora_inizio, Aste.durata, Aste.prezzo_inizio, " +
+				"MAX(Puntate.valore) AS prezzo_attuale, Aste.ip_multicast, Aste.descrizione_annullamento, " +
+				"Lotti.Id_lotto, Lotti.nome\n"+ 
+				"FROM Aste\n"+
+				"LEFT JOIN Puntate ON Aste.Id_asta = Puntate.Rif_asta\n" +
+				"JOIN Lotti ON Aste.Rif_lotto = Lotti.Id_lotto\n" +
+				"WHERE Aste.Id_asta = ?\n" +
+				"GROUP BY Aste.Id_asta;"
+			;
+
+			String queryUtente = "SELECT Utenti.Id_utente, Utenti.email\n" +
+				"FROM Utenti\n" +
+				"JOIN Articoli ON Utenti.Id_utente = Articoli.Rif_utente\n" +
+				"WHERE Articoli.Rif_lotto = ?\n" +
+				"LIMIT 1;"	
+			;
+
+			String queryImmagini = "SELECT Immagini.Id_immagine\n" +
+				"FROM Immagini\n" +
+				"JOIN Articoli ON Immagini.Rif_articolo = Articoli.Id_articolo\n" +
+				"WHERE Articoli.Rif_lotto = ?;"
+			;
+
+			String queryControlloSalvataggio = "SELECT 1\n" +
+				"FROM Salvataggi\n" +
+				"WHERE Rif_asta = ? AND Rif_utente = ?;"	
+			;
+
 			// Ottenendo dati asta/lotto
 			PreparedStatement preparedStatement = connection.prepareStatement(queryVisualizzazione);
 			preparedStatement.setInt(1, idAstaInput);
@@ -3577,6 +3582,7 @@ public class GestoreClient implements Runnable {
 				resultSet.getString("descrizione_annullamento"),
 				resultSet.getInt("Id_lotto"),
 				resultSet.getString("nome"),
+				null,
 				null,
 				null,
 				null,
@@ -3617,6 +3623,12 @@ public class GestoreClient implements Runnable {
 					}
 				}
 			}
+
+			preparedStatement = connection.prepareStatement(queryControlloSalvataggio);
+			preparedStatement.setInt(1, idAstaInput);
+			preparedStatement.setInt(2, idUtente);
+			resultSet = preparedStatement.executeQuery();
+			rispostaUscente.payload[11] = resultSet.next();
 		} catch (SQLException e) { // questo catch e per gli errori che potrebbe dare la query 
 			System.err.println("[" + Thread.currentThread().getName() +
 				"]: C'e' stato un errore nella query di vissualizazione asta. " + e.getMessage()
@@ -3774,6 +3786,10 @@ public class GestoreClient implements Runnable {
 
 			}
 		}
+	}
+
+	private void visualizzaSalvataggio() {
+		
 	}
 
 	// Metodo visualliza articoli 
