@@ -183,7 +183,7 @@
                                           <Insets left="25.0" />
                                        </HBox.margin>
                                        <children>
-                                          <Text fx:id="lottoText" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="99.13671875" />
+                                          <Text fx:id="lottoText" fill="#1a00ff" onMouseClicked="#IdLottoClicked" strokeType="OUTSIDE" strokeWidth="0.0" wrappingWidth="99.13671875" />
                                        </children>
                                     </VBox>
                                  </children>

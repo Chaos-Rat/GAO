@@ -91,6 +91,7 @@ public class ArticoloDetailsController {
 	@FXML
 	public void initialize() throws IOException, ClassNotFoundException
     {
+		lottoText.setUnderline(true);
         Richiesta richiesta = new Richiesta();
         richiesta.tipoRichiesta = Richiesta.TipoRichiesta.VISUALIZZA_IMMAGINE_PROFILO;
         richiesta.payload = new Object[]{0};
@@ -214,6 +215,22 @@ public class ArticoloDetailsController {
         Stage stage1 = (Stage) AsteB.getScene().getWindow();
         stage1.close();
     }
+
+	@FXML
+	void IdLottoClicked(MouseEvent event) throws IOException
+	{
+		LottoDetailsController.idLotto = Integer.parseInt(lottoText.getText());
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../view/LottoDetails.fxml"));
+        Parent root = loader.load();
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+        stage.setTitle("The AuctionHouse");
+        stage.setScene(scene);
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.show();
+        Stage stage1 = (Stage) lottoText.getScene().getWindow();
+        stage1.close();
+	}
 
     @FXML
     void ModifyClicked(ActionEvent event) throws IOException {
